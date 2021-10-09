@@ -23,7 +23,7 @@ class RegisterController < ApplicationController
     ]
     # 仮登録用のトークンを生成
     _register_params = register_params.to_h
-    _register_params[:token] = Register.make_token
+    _register_params[:token] = make_random_token
 
     @register = Register.new(_register_params)
     if @register.save == true

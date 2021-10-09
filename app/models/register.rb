@@ -29,23 +29,4 @@ class Register < ApplicationRecord
       :minimum => 0,
     },
   }
-
-  def self.make_token(size = 64)
-    small_alphabets = ("a".."z").to_a
-    big_alphabets = ("A".."Z").to_a
-    numbers = (0..9).to_a
-    characters = small_alphabets + big_alphabets + numbers
-    char_length = characters.length
-
-    token = ""
-
-    # ブロック内からは外部変数を参照できる
-    size.times do |index|
-      token += characters[rand(0..char_length)].to_s
-      p characters[rand(0..char_length)].to_s
-    end
-    print "completed times"
-    p token
-    token
-  end
 end

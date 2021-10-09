@@ -19,13 +19,11 @@ module SessionsHelper
     end
   end
 
-
-
   def logged_in?
     if defined?(@current_user)
       return true
     else
       return false
+    end
   end
-
 end
