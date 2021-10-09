@@ -1,0 +1,17 @@
+<%= form_with(model: decline) do |form| %>
+  <% if decline.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(decline.errors.count, "error") %> prohibited this decline from being saved:</h2>
+
+      <ul>
+        <% decline.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

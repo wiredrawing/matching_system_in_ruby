@@ -1,0 +1,21 @@
+<%= form_with({
+  url: signup_path,
+  model: @register,
+}) do |form| %>
+  <% if @register.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@register.errors.count, "error") %> prohibited this member from being saved:</h2>
+      <ul>
+        <% @register.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="actions">
+    <p><%= form.text_field :email %></p>
+    <p><%= form.text_field :display_name %></p>
+    <p><%= form.select :gender, @genders  %></p>
+    <p><%= form.submit %></p>
+  </div>
+<% end %>

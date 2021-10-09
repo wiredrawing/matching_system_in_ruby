@@ -1,0 +1,2 @@
+class Footprint < ApplicationRecord
+end
