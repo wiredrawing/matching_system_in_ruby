@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "sessions/new"
   resources :logs
   resources :urls
   resources :declines
@@ -10,6 +11,16 @@ Rails.application.routes.draw do
   resources :members
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+
+  ##########################################
+  # ログインページ
+  ##########################################
+  get "/signin", {
+    :to => "sessions#new",
+  }
+  post "/signin", {
+    :to => "sessions#create",
+  }
 
   ##########################################
   # 新規登録時の仮登録

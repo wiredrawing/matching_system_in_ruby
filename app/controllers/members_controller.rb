@@ -1,10 +1,11 @@
 class MembersController < ApplicationController
   before_action :set_member, only: %i[ show edit update destroy ]
 
-
-
   # GET /members or /members.json
   def index
+    puts "@current_user", @current_user
+    puts current_user().email
+    puts current_user().password_digest
     @members = Member.all
   end
 
@@ -82,19 +83,19 @@ class MembersController < ApplicationController
   def member_params
     params.fetch(:member, {})
     # createメソッドで登録許可される値
-    .permit(
-      :email,
-      :display_name,
-      :family_name,
-      :given_name,
-      :gender,
-      :height,
-      :weight,
-      :birthday,
-      :salary,
-      :message,
-      :memo,
-      :password_digest
-    )
+      .permit(
+        :email,
+        :display_name,
+        :family_name,
+        :given_name,
+        :gender,
+        :height,
+        :weight,
+        :birthday,
+        :salary,
+        :message,
+        :memo,
+        :password_digest
+      )
   end
 end
