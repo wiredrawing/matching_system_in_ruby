@@ -3,13 +3,15 @@ class Register < ApplicationRecord
 
   # emailバリデーション
   validates(:email, {
-    :presence => true,
+    :presence => {
+      :message => "メールアドレスは必須項目です",
+    },
     :length => {
-      :minimum => 1,
+      :minimum => 5,
       :maximum => 512,
       :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
     },
-    :uniqueness => true,
+    :uniqueness => false,
   })
 
   # display_name(本名とは違うニックネーム表示用)

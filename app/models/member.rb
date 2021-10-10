@@ -21,28 +21,48 @@ class Member < ApplicationRecord
   }
 
   # 性別
-  validates :gender, {
+  validates(:gender, {
     :presence => true,
     :length => {
       :minimum => 0,
     },
+  })
+
+  validates :given_name, {
+    :presence => true,
+    :length => {
+      :minimum => 1,
+      :maximum => 512,
+      :message => "名前は1文字以上512文字以内で入力して下さい",
+    },
   }
 
-  validates :password, {
+  validates :family_name, {
+    :presence => true,
+    :length => {
+      :minimum => 1,
+      :maximum => 512,
+      :message => "名字は1文字以上512文字以内で入力して下さい",
+    },
+  }
+
+  # パスワード
+  validates(:password, {
     :presence => true,
     :length => {
       :minimum => 10,
       :maximun => 64,
     },
-  }
+  })
 
-  validates :password_confirmation, {
+  # パスワード確認用
+  validates (:password_confirmation), ({
     :presence => true,
     :length => {
       :minimum => 10,
       :maximun => 64,
     },
-  }
+  })
 
   has_secure_password
 end

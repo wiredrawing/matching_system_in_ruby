@@ -12,15 +12,16 @@ class SessionsController < ApplicationController
       :email => params[:session][:email],
     })
 
+    p "member ====>", member
     if member && member.authenticate(params[:session][:password])
-
       # ログイン処理を実行
-      login(member)
+      self.login(member)
+      p "mypage_url => #{mypage_url}"
+      redirect_to(mypage_url)
     else
+      render ({
+        :template => "sessions/new",
+      })
     end
-
-    render ({
-      :template => "sessions/new",
-    })
   end
 end

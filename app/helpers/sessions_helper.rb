@@ -2,28 +2,27 @@ module SessionsHelper
   def login(member)
     puts "================================================="
     p "SessionHelper#login を実行中"
+    p member
     puts "================================================="
+    # セッションにmember_idを保存
     session[:member_id] = member.id
+
+    self.current_user()
   end
 
   def current_user
-    puts "================================================="
-    p "SessionHelper#current_user を実行中"
-    puts "================================================="
-
-    if (defined?(@current_user))
-      return @current_user
-    else
+    if @current_user.nil?
       @current_user = Member.find_by(id: session[:member_id])
+    else
       return @current_user
     end
   end
 
   def logged_in?
-    if defined?(@current_user)
-      return true
-    else
-      return false
+    if self.current_user.nil?
+      return fasle
     end
+
+    return true
   end
 end

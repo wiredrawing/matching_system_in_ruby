@@ -4,8 +4,6 @@ class MembersController < ApplicationController
   # GET /members or /members.json
   def index
     puts "@current_user", @current_user
-    puts current_user().email
-    puts current_user().password_digest
     @members = Member.all
   end
 
@@ -15,11 +13,6 @@ class MembersController < ApplicationController
 
   # GET /members/new
   def new
-    @genders = [
-      ["未設定", 0],
-      ["男性", 1],
-      ["女性", 2],
-    ]
     @member = Member.new
   end
 

@@ -13,6 +13,13 @@ Rails.application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
   ##########################################
+  # マイページ関連
+  ##########################################
+  get "/mypage", { :to => "mypage#index" }
+  get "/mypage/edit", { :to => "mypage#edit" }
+  post "/mypage/edit", { :to => "mypage#update" }
+
+  ##########################################
   # ログインページ
   ##########################################
   get "/signin", {
