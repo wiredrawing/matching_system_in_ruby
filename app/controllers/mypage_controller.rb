@@ -40,7 +40,12 @@ class MypageController < ApplicationController
 
   # 画像アップロード処理
   def upload
-
+    @image = Image.all
+    p @image
+    # 特定のIDのみをDBレコードから抜き出す
+    members = Member.select(:id).all.map do | member |
+      next member.id.to_i
+    end
     return render ({
       :template => "mypage/upload",
     })
