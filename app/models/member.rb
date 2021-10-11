@@ -53,6 +53,7 @@ class Member < ApplicationRecord
       :minimum => 10,
       :maximun => 64,
     },
+    :on => :member_update_password,
   })
 
   # パスワード確認用
@@ -62,6 +63,7 @@ class Member < ApplicationRecord
       :minimum => 10,
       :maximun => 64,
     },
+    :on => :member_update_password,
   })
 
   has_secure_password

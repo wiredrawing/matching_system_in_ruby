@@ -1,0 +1,20 @@
+<p>memberモデル</p>
+<%= @member %>
+<p>セッションデータから</p>
+<%= @current_user %>
+
+
+<%= form_with({
+                :model => @member,
+                :url => mypage_upload_url,
+                :multipart => true,
+                :method => "post",
+              } )  do | form | %>
+  <%= form.hidden_field :id %>
+  <%= form.hidden_field :token %>
+  <%= form.file_field :upload_file, {
+    :id => "upload-file-id",
+    :class => "upload-file-class"
+  } %>
+  <%= form.submit({:value => "ファイルアップロード"}) %>
+<% end  %>

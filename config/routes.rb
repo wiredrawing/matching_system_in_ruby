@@ -18,7 +18,8 @@ Rails.application.routes.draw do
   get "/mypage", { :to => "mypage#index" }
   get "/mypage/edit", { :to => "mypage#edit" }
   patch "/mypage/edit", { :to => "mypage#update" }
-
+  get ("/mypage/upload"), ({ :to => "mypage#upload" })
+  post "/mypage/upload", {:to => "mypage#completed_uploading"}
   ##########################################
   # ログインページ
   ##########################################

@@ -1,8 +1,8 @@
 <p>ここはマイページ編集ページ</p>
-<p><%= @current_user.display_name %></p>
-<p><%= @current_user.email %></p>
-<p><%= @current_user.password_digest %></p>
-<%= form_with(:model => @current_user, :url => mypage_edit_path) do | form | %>
+<p><%= @member.display_name %></p>
+<p><%= @member.email %></p>
+<p><%= @member.password_digest %></p>
+<%= form_with(:model => @member, :url => mypage_edit_path) do | form | %>
   <div>
     <p>フォーム</p>
     <%= form  %>
@@ -11,6 +11,7 @@
     <p><%= form.text_field(:display_name) %></p>
     <p><%= form.text_field(:family_name) %></p>
     <p><%= form.text_field(:given_name) %></p>
+    <p><%= form.select :gender, @genders %></p>
     <p>パスワード<br>
       <%= form.text_field(:password) %>
     </p>
@@ -23,4 +24,11 @@
       :class => "button-to-update",
       }) %></p>
   </div>
+<% end %>
+<!-- 以下エラー表示 -->
+<% if @member.errors.messages.length > 0 %>
+  <%= @member.errors.messages[:display_name] %>
+  <%= @member.errors.messages[:family_name] %>
+  <%= @member.errors.messages[:given_name] %>
+  <%= @member.errors.messages[:gender] %>
 <% end %>
