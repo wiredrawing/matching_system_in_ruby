@@ -6,6 +6,7 @@
   <div>
     <p>フォーム</p>
     <%= form  %>
+    <%= form.hidden_field(:id) %>
     <p><%= form.text_field(:email, {:readonly => true }) %></p>
     <p><%= form.text_field(:display_name) %></p>
     <p><%= form.text_field(:family_name) %></p>
@@ -16,5 +17,10 @@
     <p>パスワード<br>
       <%= form.text_field(:password_confirmation) %>
     </p>
+    <p><%= form . submit(:update, {
+      :value => "更新",
+      :id => "button-to-update",
+      :class => "button-to-update",
+      }) %></p>
   </div>
 <% end %>
