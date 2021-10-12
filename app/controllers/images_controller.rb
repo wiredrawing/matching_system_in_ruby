@@ -3,11 +3,29 @@ class ImagesController < ApplicationController
 
   # GET /images or /images.json
   def index
-    @images = Image.all
+    # ログイン中ユーザーがアップロードしたファイル一覧を取得する
+    condition = {
+      :member_id => @current_user.id,
+    }
+    @images = Image.where condition
+
+    @images.each do |image|
+      p "image.fetch_selected_file_path :id => image.id", image.fetch_file_path
+      p "image_url({:id => @image.id}) =======>", image_url({ :id => image.id })
+    end
   end
 
-  # GET /images/1 or /images/1.json
+  #######################################################
+  # 指定したmember.idの画像を表示する
+  # GET /images/{uuid}
+  #######################################################
   def show
+    file_path = @image.fetch_file_path
+    # 画像出力
+    render({
+      :file => file_path,
+      :content_type => "image/jpeg",
+    })
   end
 
   # GET /images/new
@@ -57,13 +75,14 @@ class ImagesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_image
-      @image = Image.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def image_params
-      params.fetch(:image, {})
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_image
+    @image = Image.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def image_params
+    params.fetch(:image, {})
+  end
 end

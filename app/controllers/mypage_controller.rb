@@ -1,4 +1,5 @@
-require 'fileutils'
+require "fileutils"
+
 class MypageController < ApplicationController
   before_action :login_check
 
@@ -37,7 +38,6 @@ class MypageController < ApplicationController
     end
   end
 
-
   # 画像アップロード処理
   def upload
     render ({
@@ -49,18 +49,18 @@ class MypageController < ApplicationController
     begin
       # 既存レコードにuuidが存在していないかどうかを検証
       uuid = SecureRandom.uuid
-      @image = Image . find_by({
-        :id => uuid
+      @image = Image.find_by({
+        :id => uuid,
       })
 
       # もし同一のuuidが既に存在していたら例外を投げる
-      if @image != nil then
+      if @image != nil
         raise StandardError.new "UUIDの重複がありました"
       end
 
-      p '@image ---> ', @image
+      p "@image ---> ", @image
 
-      p 'params[:member] -------------------> ', params[:member]
+      p "params[:member] -------------------> ", params[:member]
 
       # アップロードされたファイルをハッシュ化
       upload_file = params[:member][:upload_file]
@@ -99,24 +99,24 @@ class MypageController < ApplicationController
         :blur_level => 30,
         :is_approved => true,
         :token => random_token,
-        :uploaded_at => uploaded_at
+        :uploaded_at => uploaded_at,
       }
       @image = Image.new(_new_image)
 
-      if @image.validate == true then
+      if @image.validate == true
         @image.save
         return render ({
-          :template => "mypage/upload",
-        })
+                        :template => "mypage/upload",
+                      })
       else
         # バリデーション失敗時はエラー内容の表示処理
-        p '@image ----------------------->', @image
-        p 'response ---->', response
-        p '@image.errors.messages ---> ', @image.errors.messages
+        p "@image ----------------------->", @image
+        p "response ---->", response
+        p "@image.errors.messages ---> ", @image.errors.messages
       end
     rescue => error
       # 例外発生時は､アップロードフォームへ再度リダイレクト
-      p "rescue ======>  ",  error
+      p "rescue ======>  ", error
       return redirect_to mypage_upload_url
     end
   end
