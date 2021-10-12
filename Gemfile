@@ -25,6 +25,8 @@ gem 'bcrypt', '~> 3.1.7'
 # authentication system
 gem 'devise'
 
+gem 'mini_magick'
+
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

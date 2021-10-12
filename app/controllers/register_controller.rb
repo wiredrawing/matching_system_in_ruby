@@ -26,7 +26,7 @@ class RegisterController < ApplicationController
       return render :template => "register/completed"
     end
 
-    # vaildationエラーを画面表示
+    # validationエラーを画面表示
     p @register.errors.messages
     return render ({ :template => "register/index" })
   end

@@ -3,9 +3,7 @@ class CreateUrls < ActiveRecord::Migration[6.1]
     create_table :urls do |t|
 
       t.bigint :member_id
-      t.string :url, {
-        :limit => 2048
-      }
+      t.string :url
       t.timestamps
     end
   end

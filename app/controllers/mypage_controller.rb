@@ -31,60 +31,94 @@ class MypageController < ApplicationController
     # バリデーション成功の場合はMyPageトップへリダイレクト
     if (@member.validate) == true
       @member.save
-      return redirect_to mypage_url
+      redirect_to mypage_url
     else
-      return render({ :template => "mypage/edit" })
+      render({ :template => "mypage/edit" })
     end
   end
 
 
   # 画像アップロード処理
   def upload
-    @image = Image.all
-    p @image
-    # 特定のIDのみをDBレコードから抜き出す
-    members = Member.select(:id).all.map do | member |
-      next member.id.to_i
-    end
-    return render ({
+    render ({
       :template => "mypage/upload",
     })
   end
 
   def completed_uploading
-    # アップロードされたファイルをハッシュ化
-    p 'params ---->', params
-    uploaded_data = {}
-    uploaded_data[:upload_file] = params[:member][:upload_file]
-    uploaded_data[:upload_file_name] = params[:member][:upload_file].original_filename
-    uploaded_data[:extension] = params[:member][:upload_file].content_type
-    p 'uploaded_data------------------------>', uploaded_data
-    # 画像がアップロードされた日付
-    Time.zone = "Asia/Tokyo"
-    today = Time.zone.now
-    uploaded_data[:year] = today.strftime "%Y"
-    uploaded_data[:month] = today.strftime "%m"
-    uploaded_data[:day] = today.strftime "%d"
-    uploaded_data[:hour] = today.strftime "%H"
-    uploaded_data[:minute] = today.strftime "%M"
-    # 画像のアップロード先ディレクトリ
-    uuid = SecureRandom.uuid
-    uploaded_path = Rails.root.join("storage/uploads/" +
-                                      uploaded_data[:year] + "/" +
-                                      uploaded_data[:month] + "/" +
-                                      uploaded_data[:hour] + "/" +
-                                      uploaded_data[:minute] + "/"
-                                    )
-    # umaskの設定
-    File.umask 0
-    response_dir = FileUtils . mkdir_p (uploaded_path)
+    begin
+      # 既存レコードにuuidが存在していないかどうかを検証
+      uuid = SecureRandom.uuid
+      @image = Image . find_by({
+        :id => uuid
+      })
 
-    uploaded_file_path = uploaded_path.to_s + "/" + uuid
-    File.open uploaded_file_path, "w+b" do | fp |
-      _temp = fp . write uploaded_data[:upload_file].read
-      p '_temp ---->' , _temp
+      # もし同一のuuidが既に存在していたら例外を投げる
+      if @image != nil then
+        raise StandardError.new "UUIDの重複がありました"
+      end
+
+      p '@image ---> ', @image
+
+      p 'params[:member] -------------------> ', params[:member]
+
+      # アップロードされたファイルをハッシュ化
+      upload_file = params[:member][:upload_file]
+
+      uploaded_data = {}
+      # アップロード後の仮パスを取得
+      uploaded_data[:temp_path] = upload_file.tempfile.path
+      uploaded_data[:original_filename] = upload_file.original_filename
+      uploaded_data[:extension] = upload_file.content_type
+
+      # 画像がアップロードされた日付
+      Time.zone = "Asia/Tokyo"
+      today = Time.zone.now
+      # 画像のアップロード先ディレクトリ
+      uploaded_data[:year] = today.strftime "%Y"
+      uploaded_data[:month] = today.strftime "%m"
+      uploaded_data[:day] = today.strftime "%d"
+      uploaded_data[:hour] = today.strftime "%H"
+      uploaded_data[:minute] = today.strftime "%M"
+      # ファイルコピー先のディレクトリを確定
+      decided_file_path = "storage/uploads/" + uploaded_data[:year] + "/" + uploaded_data[:month] + "/" + uploaded_data[:day] + "/" + uploaded_data[:hour]
+      uploaded_path = Rails.root.join decided_file_path
+      # umaskの設定
+      File.umask 0
+      FileUtils.mkdir_p uploaded_path
+      uploaded_file_path = uploaded_path.to_s + "/" + uuid
+      response = FileUtils.cp uploaded_data[:temp_path], uploaded_file_path
+
+      # 仮パス -> 確定ディレクトリ へのコピー完了後
+      uploaded_at = today.strftime("%Y-%m-%d %H:%M:%S")
+      random_token = self.make_random_token 64
+      _new_image = {
+        :member_id => @current_user.id,
+        :filename => uploaded_data[:original_filename],
+        :use_type => 1,
+        :blur_level => 30,
+        :is_approved => true,
+        :token => random_token,
+        :uploaded_at => uploaded_at
+      }
+      @image = Image.new(_new_image)
+
+      if @image.validate == true then
+        @image.save
+        return render ({
+          :template => "mypage/upload",
+        })
+      else
+        # バリデーション失敗時はエラー内容の表示処理
+        p '@image ----------------------->', @image
+        p 'response ---->', response
+        p '@image.errors.messages ---> ', @image.errors.messages
+      end
+    rescue => error
+      # 例外発生時は､アップロードフォームへ再度リダイレクト
+      p "rescue ======>  ",  error
+      return redirect_to mypage_upload_url
     end
-
   end
 
   private

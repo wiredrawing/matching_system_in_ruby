@@ -20,7 +20,7 @@ module SessionsHelper
 
   def logged_in?
     if self.current_user.nil?
-      return fasle
+      return false
     end
 
     return true

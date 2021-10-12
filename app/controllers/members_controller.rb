@@ -3,7 +3,7 @@ class MembersController < ApplicationController
 
   # GET /members or /members.json
   def index
-    puts "@current_user", @current_user
+    puts "@current_user ----->", @current_user
     @members = Member.all
   end
 
@@ -28,8 +28,8 @@ class MembersController < ApplicationController
       ["女性", 2],
     ]
 
-    p "memer_params", member_params
-    p "parms", params
+    p "member_params -->", member_params
+    p "parms -->", params
     @member = Member.new(member_params)
 
     respond_to do |format|
@@ -74,8 +74,8 @@ class MembersController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def member_params
-    params.fetch(:member, {})
     # createメソッドで登録許可される値
+    params.fetch(:member, {})
       .permit(
         :email,
         :display_name,

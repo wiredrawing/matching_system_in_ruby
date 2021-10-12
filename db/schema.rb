@@ -32,13 +32,14 @@ ActiveRecord::Schema.define(version: 2021_10_09_221404) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "images", force: :cascade do |t|
+  create_table "images", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "member_id"
     t.integer "use_type"
-    t.string "filename", limit: 512
+    t.string "filename"
     t.integer "blur_level"
     t.integer "is_approved"
-    t.string "token", limit: 512
+    t.string "token"
+    t.datetime "uploaded_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -81,7 +82,7 @@ ActiveRecord::Schema.define(version: 2021_10_09_221404) do
 
   create_table "messages", force: :cascade do |t|
     t.bigint "member_id"
-    t.string "message", limit: 4096
+    t.string "message"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -100,7 +101,7 @@ ActiveRecord::Schema.define(version: 2021_10_09_221404) do
 
   create_table "urls", force: :cascade do |t|
     t.bigint "member_id"
-    t.string "url", limit: 2048
+    t.string "url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

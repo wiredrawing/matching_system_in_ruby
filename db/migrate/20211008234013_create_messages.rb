@@ -3,10 +3,7 @@ class CreateMessages < ActiveRecord::Migration[6.1]
     create_table :messages do |t|
 
       t.bigint :member_id
-      t.string :message, {
-        :limit => 4096
-      }
-
+      t.string :message
       t.timestamps
     end
   end

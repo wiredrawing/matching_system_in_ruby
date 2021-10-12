@@ -4,7 +4,6 @@ class CreateDeclines < ActiveRecord::Migration[6.1]
 
       t.bigint :from_member_id
       t.bigint :to_member_id
-
       t.timestamps
     end
   end

@@ -24,16 +24,16 @@ module RegisterHelper
     characters = small_alphabets + big_alphabets + numbers
 
     characters.push("_").push(".").push("-").push("$")
-    p "charcters =====>", characters
+    # p "charcters =====>", characters
     # 有効な文字群の長さ
     char_length = characters.length - 1
-    p char_length
+    # p char_length
     size.times do |index|
       random_index = rand(0..char_length)
-      p "radon_index ----->", random_index
+      # p "radon_index ----->", random_index
       token += characters[random_index].to_s
     end
 
-    return token
+    return(token)
   end
 end
