@@ -1,4 +1,12 @@
 Rails.application.routes.draw do
+
+  ##########################################
+  # api
+  ##########################################
+  namespace "api" do
+    resources :images
+  end
+
   get "sessions/new"
   resources :logs
   resources :urls
@@ -19,7 +27,7 @@ Rails.application.routes.draw do
   get "/mypage/edit", { :to => "mypage#edit" }
   patch "/mypage/edit", { :to => "mypage#update" }
   get ("/mypage/upload"), ({ :to => "mypage#upload" })
-  post "/mypage/upload", {:to => "mypage#completed_uploading"}
+  post "/mypage/upload", { :to => "mypage#completed_uploading" }
   ##########################################
   # ログインページ
   ##########################################

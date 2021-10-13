@@ -59,6 +59,11 @@ class RegisterController < ApplicationController
     end
   end
 
+  def login_check
+    p "login_check00000000000000000000000000000000000000000000"
+    return true
+  end
+
   private
 
   # Use callbacks to share common setup or constraints between actions.

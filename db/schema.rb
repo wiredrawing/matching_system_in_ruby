@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_10_09_221404) do
+ActiveRecord::Schema.define(version: 2021_10_08_234124) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -36,8 +36,11 @@ ActiveRecord::Schema.define(version: 2021_10_09_221404) do
     t.bigint "member_id"
     t.integer "use_type"
     t.string "filename"
+    t.string "extension"
     t.integer "blur_level"
     t.integer "is_approved"
+    t.integer "is_displayed", default: 0
+    t.integer "is_deleted", default: 0
     t.string "token"
     t.datetime "uploaded_at"
     t.datetime "created_at", precision: 6, null: false
@@ -52,7 +55,7 @@ ActiveRecord::Schema.define(version: 2021_10_09_221404) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "logs", force: :cascade do |t|
+  create_table "logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "action_id"

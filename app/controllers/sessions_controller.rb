@@ -24,4 +24,9 @@ class SessionsController < ApplicationController
       })
     end
   end
+
+  def login_check
+    p "login_check00000000000000000000000000000000000000000000"
+    return true
+  end
 end
