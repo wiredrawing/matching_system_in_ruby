@@ -25,8 +25,8 @@ class SessionsController < ApplicationController
     end
   end
 
+  # ログインページはログイン状態が不要なためoverride
   def login_check
-    p "login_check00000000000000000000000000000000000000000000"
     return true
   end
 end

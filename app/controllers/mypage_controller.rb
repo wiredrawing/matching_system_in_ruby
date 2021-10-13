@@ -49,6 +49,7 @@ class MypageController < ApplicationController
     begin
       # 既存レコードにuuidが存在していないかどうかを検証
       uuid = SecureRandom.uuid
+      p("アプリケーション側で生成したUUID =====>", uuid)
       @image = Image.find_by({
         :id => uuid,
       })
@@ -92,16 +93,18 @@ class MypageController < ApplicationController
       # 仮パス -> 確定ディレクトリ へのコピー完了後
       uploaded_at = today.strftime("%Y-%m-%d %H:%M:%S")
       random_token = self.make_random_token 64
-      _new_image = {
+
+      @image = Image.new ({
+        :id => uuid,
         :member_id => @current_user.id,
         :filename => uploaded_data[:original_filename],
         :use_type => 1,
         :blur_level => 30,
+        :extension => uploaded_data[:extension],
         :is_approved => true,
         :token => random_token,
         :uploaded_at => uploaded_at,
-      }
-      @image = Image.new(_new_image)
+      })
 
       if @image.validate == true
         @image.save

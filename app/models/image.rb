@@ -1,8 +1,4 @@
 class Image < ApplicationRecord
-
-  # urlヘルパーを使用するためのモジュール
-  include Rails.application.routes.url_helpers
-
   @member_id_list = Member.select(:id).all.map do |member|
     next member.id.to_i
   end

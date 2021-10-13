@@ -1,18 +1,13 @@
 class ImagesController < ApplicationController
+  include ImagesHelper
   before_action :set_image, only: %i[ show edit update destroy ]
 
   # GET /images or /images.json
   def index
     # ログイン中ユーザーがアップロードしたファイル一覧を取得する
-    condition = {
+    @images = Image.where({
       :member_id => @current_user.id,
-    }
-    @images = Image.where condition
-
-    @images.each do |image|
-      p "image.fetch_selected_file_path :id => image.id", image.fetch_file_path
-      p "image_url({:id => @image.id}) =======>", image_url({ :id => image.id })
-    end
+    })
   end
 
   #######################################################
@@ -85,4 +80,6 @@ class ImagesController < ApplicationController
   def image_params
     params.fetch(:image, {})
   end
+
+  helper_method :get_selected_image_url
 end

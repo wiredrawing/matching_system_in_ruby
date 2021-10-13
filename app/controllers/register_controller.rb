@@ -59,8 +59,8 @@ class RegisterController < ApplicationController
     end
   end
 
+  # ログインチェックをoverride
   def login_check
-    p "login_check00000000000000000000000000000000000000000000"
     return true
   end
 

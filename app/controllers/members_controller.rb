@@ -1,10 +1,14 @@
 class MembersController < ApplicationController
   before_action :set_member, only: %i[ show edit update destroy ]
 
+  # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
-    puts "@current_user ----->", @current_user
-    @members = Member.all
+    @members = Member.where.not({
+      :id => @current_user.id,
+    }).where.not({
+      :gender => @current_user.gender,
+    })
   end
 
   # GET /members/1 or /members/1.json
