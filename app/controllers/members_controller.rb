@@ -1,4 +1,9 @@
 class MembersController < ApplicationController
+  GENDER_LIST = [
+    { :id => 0, :data => "未設定" },
+    { :id => 1, :data => "男性" },
+    { :id => 2, :data => "女性" },
+  ]
   before_action :set_member, only: %i[ show edit update destroy ]
 
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示

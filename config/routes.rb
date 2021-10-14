@@ -31,30 +31,37 @@ Rails.application.routes.draw do
   ##########################################
   # ログインページ
   ##########################################
-  get "/signin", {
-    :to => "sessions#new",
-  }
-  post "/signin", {
-    :to => "sessions#create",
-  }
+  scope "login", :as => :login do
+    get "/", {
+      :to => "sessions#new",
+    }
+    post "/", {
+      :to => "sessions#create",
+    }
+  end
 
   ##########################################
   # 新規登録時の仮登録
   ##########################################
-  get "/register/:id/:token", {
-    :to => "register#main_index",
-    :as => "register_create",
-  }
-  post "/register/:id/:token", {
-    :to => "register#main_create",
-  }
-  get "/signup/completed", {
-    :to => "register#completed",
-  }
-  post "/signup", {
-    :to => "register#create",
-  }
-  get "/signup", {
-    :to => "register#index",
-  }
+  scope("register", :as => :register) do
+    post "/", {
+      :to => "register#create",
+    }
+    get "/", {
+      :to => "register#index",
+    }
+    get "/:id/:token", {
+      :to => "register#main_index",
+    # :as => "register_create",
+    }
+    post "/:id/:token", {
+      :to => "register#main_create",
+    }
+    get "/completed", {
+      :to => "register#completed",
+    }
+    get "/pre-completed", {
+      :to => "register#completed",
+    }
+  end
 end

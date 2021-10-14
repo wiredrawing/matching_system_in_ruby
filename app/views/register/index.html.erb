@@ -1,6 +1,7 @@
+<hr>
 <p>仮登録用フォーム</p>
 <%= form_with({
-  url: signup_path,
+  url: register_path,
   model: @register,
 }) do |form| %>
   <% if @register.errors.any? %>
@@ -14,9 +15,16 @@
     </div>
   <% end %>
   <div class="actions">
-    <p><%= form.text_field :email %></p>
+    <p><%= form.label "メールアドレス" %></p>
+    <p><%= form.text_field :email, :class => :email %></p>
+    <p><%= form.label "表示用ユーザー名" %></p>
     <p><%= form.text_field :display_name %></p>
+    <p><%= form.label "性別の選択" %></p>
     <p><%= form.select :gender, @genders  %></p>
     <p><%= form.submit %></p>
   </div>
 <% end %>
+<p>register_path => <%= register_path %></p>
+<p>register_path :id => @register.id, :token => @register.token <br>
+  => <%= register_path :id => @register.id, :token => @register.token %></p>
+<hr>

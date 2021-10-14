@@ -24,5 +24,7 @@ class CreateMembers < ActiveRecord::Migration[6.1]
       }
       t.timestamps
     end
+    # メールアドレスカラムにユニーク誓約を付与する
+    add_index :members, [:email], :unique => true
   end
 end

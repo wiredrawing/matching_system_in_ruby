@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
     t.integer "is_registered", limit: 2, default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["email"], name: "index_members_on_email", unique: true
   end
 
   create_table "messages", force: :cascade do |t|

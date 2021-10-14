@@ -11,7 +11,18 @@ class Register < ApplicationRecord
       :maximum => 512,
       :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
     },
-    :uniqueness => false,
+    # 独自性の追加(※ memberテーブルに既に存在する場合はエラーとする)
+    :uniqueness => {
+      :message => lambda do |object, data|
+        print("validates->:uniquenes->:message内のlambda関数内処理")
+        p "uniquenessのmessegeラムダ内"
+        p "object ------>", object
+        p "data--------->", data
+        message = "このメールアドレスは現在使用できません"
+        return message
+      end,
+    # :message => "このメールアドレスは使用できません",
+    },
   })
 
   # display_name(本名とは違うニックネーム表示用)
@@ -30,5 +41,27 @@ class Register < ApplicationRecord
     :length => {
       :minimum => 0,
     },
+    :inclusion => {
+      # mapメソッドで1以上の値で構成された配列を返却する
+      :in => (lambda do
+        gender_id_list = []
+        MembersController::GENDER_LIST.map do |gender|
+          gender_id = gender[:id]
+          if gender_id > 0
+            gender_id_list.push(gender[:id])
+          end
+        end
+        # 0以外の定数数値を返却する
+        return gender_id_list
+      end)[],
+      :message => "性別は未設定以外を選択して下さい",
+    },
   }
+
+  gender_list = MembersController::GENDER_LIST.map do |gender|
+    gender_id = gender[:id]
+    if gender_id > 0
+      next gender[:id]
+    end
+  end
 end
