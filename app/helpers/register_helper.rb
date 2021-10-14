@@ -23,7 +23,7 @@ module RegisterHelper
 
     characters = small_alphabets + big_alphabets + numbers
 
-    characters.push("_").push(".").push("-").push("$")
+    characters.push("_").push("-").push("$")
     # p "charcters =====>", characters
     # 有効な文字群の長さ
     char_length = characters.length - 1

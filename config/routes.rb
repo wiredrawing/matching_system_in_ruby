@@ -46,22 +46,27 @@ Rails.application.routes.draw do
   scope("register", :as => :register) do
     post "/", {
       :to => "register#create",
+      :as => "create",
     }
     get "/", {
       :to => "register#index",
+      :as => "index",
     }
     get "/:id/:token", {
       :to => "register#main_index",
-    # :as => "register_create",
+      :as => "main_index",
     }
     post "/:id/:token", {
       :to => "register#main_create",
+      :as => "main_create",
     }
     get "/completed", {
       :to => "register#completed",
+      :as => "completed",
     }
     get "/pre-completed", {
       :to => "register#completed",
+      :as => "pre-completed",
     }
   end
 end

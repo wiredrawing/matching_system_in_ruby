@@ -1,7 +1,7 @@
 <hr>
 <p>仮登録用フォーム</p>
 <%= form_with({
-  url: register_path,
+  url: register_create_path,
   model: @register,
 }) do |form| %>
   <% if @register.errors.any? %>
@@ -24,7 +24,7 @@
     <p><%= form.submit %></p>
   </div>
 <% end %>
-<p>register_path => <%= register_path %></p>
-<p>register_path :id => @register.id, :token => @register.token <br>
-  => <%= register_path :id => @register.id, :token => @register.token %></p>
+<p>register_create_path => <%= register_create_path %></p>
+<p>register_create_path :id => @register.id, :token => @register.token <br>
+  => <%= register_create_path :id => @register.id, :token => @register.token %></p>
 <hr>

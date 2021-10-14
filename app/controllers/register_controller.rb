@@ -35,6 +35,7 @@ class RegisterController < ApplicationController
   def main_index
     # 仮登録ユーザーの存在チェック
     # idとtokenがマッチする場合のみ
+    puts(params)
     if Register.exists? params.permit(:id, :token)
       @member = Register.find_by params.permit :id, :token
       return render ({ :template => "register/main_index" })

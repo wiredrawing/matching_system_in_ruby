@@ -1,5 +1,5 @@
 <%= form_with({
-  url: register_create_path,
+  url: register_completed_path,
   model: member,
   method: "post",
 }) do |form| %>
@@ -33,6 +33,7 @@
     <%= form.hidden_field :token %>
     <!-- 仮登録ユーザーID -->
     <%= form.hidden_field :id %>
-    <p><%= form.submit %>
-    </div>
-  <% end %>
+    <p><%= form.submit %></p>
+  </div>
+<% end %>
+<%= register_completed_path :id => member.id, :token => member.token %>
