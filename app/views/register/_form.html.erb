@@ -1,5 +1,5 @@
 <%= form_with({
-  url: register_completed_path,
+  url: register_main_create_path,
   model: member,
   method: "post",
 }) do |form| %>
@@ -14,12 +14,19 @@
     </div>
   <% end %>
   <div class="actions">
+    <p><%= form.label "事前登録済みメールアドレス" %></p>
     <p><%= form.text_field :email, {:readonly => true} %></p>
+    <p><%= form.label "サイト上のニックネーム" %></p>
     <p><%= form.text_field :display_name, { :readonly => true } %></p>
+    <p><%= form.label "名字" %></p>
     <p><%= form.text_field :family_name %></p>
-    <p><%= form.select :gender, @genders %></p>
+    <p><%= form.label "名前" %></p>
     <p><%= form.text_field :given_name %></p>
+    <p><%= form.label "性別" %></p>
+    <p><%= form.select :gender, @genders %></p>
+    <p><%= form.label "自己PR" %></p>
     <p><%= form.text_field :message %></p>
+    <p><%= form.label "メモ" %></p>
     <p><%= form.text_field :memo %></p>
     <p>
       パスワード<br>
@@ -29,6 +36,8 @@
       確認用パスワード<br>
       <%= form.text_field :password_confirmation %>
     </p>
+    <!-- 本登録用トークン -->
+    <%= form.hidden_field :is_registerd %>
     <!-- 本登録用トークン -->
     <%= form.hidden_field :token %>
     <!-- 仮登録ユーザーID -->

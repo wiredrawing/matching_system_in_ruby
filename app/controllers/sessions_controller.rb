@@ -8,8 +8,10 @@ class SessionsController < ApplicationController
   def create
     p "params[:session]", params[:session]
 
+    p "UtilitiesController.BINARY_TYPE", UtilitiesController::BINARY_TYPE
     member = Member.find_by({
       :email => params[:session][:email],
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
 
     p "member ====>", member

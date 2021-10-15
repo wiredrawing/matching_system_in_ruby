@@ -8,11 +8,5 @@ module MembersHelper
       ["男性", 1],
       ["女性", 2],
     ]
-    p "MemberHelper の実行"
-
-    @binary_type = {
-      :on => 1,
-      :off => 0,
-    }
   end
 end

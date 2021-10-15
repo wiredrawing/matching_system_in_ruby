@@ -8,30 +8,30 @@ class MypageController < ApplicationController
   end
 
   def edit
-    p "MypageController#edit =="
-    return render ({ :template => "mypage/edit" })
+    return render ({ :template => "mypage/edit", :aa => :aa })
   end
 
   # ログインユーザーの情報更新処理
   def update
-    @member = Member.find(self.member_params[:id])
-    @member.attributes = {
-      # :id => member_params[:id],
-      # :email => member_params[:email],
-      :display_name => member_params[:display_name],
-      :family_name => member_params[:family_name],
-      :given_name => member_params[:given_name],
-      :gender => member_params[:gender],
-      :height => member_params[:height],
-      :weight => member_params[:weight],
-      :birthday => member_params[:birthday],
-      :salary => member_params[:salary],
-      :message => member_params[:member],
-      :memo => member_params[:memo],
-    }
+    @member = Member.find(self.current_user.id)
+    # # POSTされたデータをHash化する
+    # _member_params_hash = member_params.permit([
+    #   :display_name,
+    #   :family_name,
+    #   :given_name,
+    #   :gender,
+    #   :message,
+    #   :memo,
+    # ]).to_hash()
+
+    # 更新対象のカラムをオブジェクトにアサイン
+    @member.attributes = member_params
+
     # バリデーション成功の場合はMyPageトップへリダイレクト
-    if (@member.validate) == true
-      @member.save
+    _valid = @member.validate()
+    if _valid == true
+      # レコードの更新処理
+      @member.save()
       redirect_to mypage_url
     else
       render({ :template => "mypage/edit" })

@@ -31,32 +31,76 @@ class RegisterController < ApplicationController
     return render ({ :template => "register/index" })
   end
 
-  # 本登録処理
+  ###########################################
+  # 本登録処理初期表示
+  ###########################################
   def main_index
     # 仮登録ユーザーの存在チェック
-    # idとtokenがマッチする場合のみ
-    puts(params)
-    if Register.exists? params.permit(:id, :token)
-      @member = Register.find_by params.permit :id, :token
-      return render ({ :template => "register/main_index" })
+    _existed = Register.exists?({
+      :id => params[:id],
+      :token => params[:token],
+      :is_registered => UtilitiesController::BINARY_TYPE[:off],
+    })
+
+    # 仮登録中ユーザーが存在する場合
+    if _existed == true
+
+      # memberモデル経由で取得する
+      @member = Member.find_by({
+        :id => params[:id],
+        :token => params[:token],
+        :is_registered => UtilitiesController::BINARY_TYPE[:off],
+      })
+      # @register = Register.find_by(params.permit(:id, :token))
+      # print("@register=====> ", @register)
+      # print("@register=====> ", @register.errors)
+      return render({ :template => "register/main_index", :aa => :aa })
     else
-      template = { :template => "register/error" }
-      return render template
+      _template = { :template => "register/error" }
+      return(render(_template))
     end
   end
 
+  ###########################################
+  # 本登録処実行処理
+  ###########################################
   def main_create
-    # idとパスワードのみを使ってレコードの存在チェック
-    p "Register.exists?({ :id => params[:id], :token => params[:token] })", Register.exists?({ :id => params[:id], :token => params[:token] })
-    if Register.exists?({ :id => params[:id], :token => params[:token] })
+    # 例外ハンドリング
+    begin
+      puts("----------------------------------------------------")
+      # memberオブジェクトの作成
+      @member = Member.new(member_params)
+      _valid = @member.validate()
 
-      # 更新処理の可否で制御
-      response = @member.update(member_params)
-      if response
-        redirect_to new_member_url
-      else
-        render({ :template => "register/main_index" })
+      if _valid != true
+        raise StandardError.new("バリデーションエラーが発生しています")
       end
+
+      # memberオブジェクトの再取得
+      @member = Member.find_by({
+        :id => member_params[:id],
+        :token => member_params[:token],
+        :is_registered => UtilitiesController::BINARY_TYPE[:off],
+      })
+      # postデータをHashオブジェクトに
+      member_params_hash = member_params.to_hash()
+      member_params_hash[:is_registered] = UtilitiesController::BINARY_TYPE[:on]
+      _updated = @member.update(member_params_hash)
+
+      # updateメソッドが成功した場合
+      if _updated != true
+        raise StandardError.new("本登録処理に失敗しました")
+      end
+
+      # ログインページにリダイレクト
+      return(redirect_to(login_url))
+    rescue => exception
+      # 例外発生時!
+      # puts("@register ------>", @register)
+      # puts("@register.email ------>", @register.email)
+      puts("exception.message ---->", exception.message)
+      # puts("exception.line ------->", exception.line)
+      render({ :template => "register/main_index" })
     end
   end
 
@@ -79,9 +123,23 @@ class RegisterController < ApplicationController
   def register_params
     params.fetch(:register, {})
       .permit(
+        :id,
         :email,
         :display_name,
-        :gender
+        :family_name,
+        :given_name,
+        :gender,
+        :height,
+        :weight,
+        :birthday,
+        :salary,
+        :message,
+        :memo,
+        :is_registered,
+        :password,
+        :password_confirmation,
+        :password_digest,
+        :token
       )
   end
 

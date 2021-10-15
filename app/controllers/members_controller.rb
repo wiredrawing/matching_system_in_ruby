@@ -4,8 +4,8 @@ class MembersController < ApplicationController
     { :id => 1, :data => "男性" },
     { :id => 2, :data => "女性" },
   ]
-  before_action :set_member, only: %i[ show edit update destroy ]
-
+  # before_action :set_member, only: %i[ show edit update destroy ]
+  before_action :set_member, only: %i[ edit update destroy ]
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
@@ -18,6 +18,24 @@ class MembersController < ApplicationController
 
   # GET /members/1 or /members/1.json
   def show
+    puts("---------------------------------------------")
+    begin
+
+      # 本登録完了済みのユーザーのみを取得する
+      @member = Member.find_by({
+        :id => params[:id],
+        :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      })
+
+      if @member == nil
+        raise StandardError.new("指定したユーザーが見つかりませんでした")
+      end
+    rescue => exception
+      puts("happen exception! ---------------------------------------")
+      render({
+        :template => "members/error",
+      })
+    end
   end
 
   # GET /members/new

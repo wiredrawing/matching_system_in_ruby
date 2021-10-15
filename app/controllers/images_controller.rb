@@ -1,5 +1,5 @@
 class ImagesController < ApplicationController
-  include ImagesHelper
+  include Api::ImagesHelper
   before_action :set_image, only: %i[ show edit update destroy ]
 
   # GET /images or /images.json
@@ -16,6 +16,7 @@ class ImagesController < ApplicationController
   #######################################################
   def show
     file_path = @image.fetch_file_path
+    p("file_path ===>", file_path)
     # 画像出力
     render({
       :file => file_path,

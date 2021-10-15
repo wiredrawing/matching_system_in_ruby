@@ -4,7 +4,22 @@ Rails.application.routes.draw do
   # api
   ##########################################
   namespace "api" do
-    resources :images
+
+    # 画像を取り扱うAPI
+    scope "images" do
+      scope "owner" do
+        get "/:id", {
+          :to => "images#show_owner",
+          :as => "images_owner_show",
+        }
+      end
+      scope "member" do
+        get "/:id", {
+          :to => "images#show_member",
+          :as => "images_show",
+        }
+      end
+    end
   end
 
   get "sessions/new"
