@@ -1,6 +1,20 @@
 class Register < ApplicationRecord
   self.table_name = "members"
 
+  # 任意の処理で指定のカラムをバリデーションする
+  validates_each :email do |object, attr, value|
+    _member = self.find_by ({
+      :email => value,
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+    })
+
+    # 既に本登録完了済みのメールアドレスの場合はエラーメッセージを追加する
+    if _member != nil
+      object.errors.add(attr, "このメールアドレスは使用できません")
+    end
+    next true
+  end
+
   # emailバリデーション
   validates(:email, {
     :presence => {
@@ -11,18 +25,18 @@ class Register < ApplicationRecord
       :maximum => 512,
       :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
     },
-    # 独自性の追加(※ memberテーブルに既に存在する場合はエラーとする)
-    :uniqueness => {
-      :message => lambda do |object, data|
-        print("validates->:uniquenes->:message内のlambda関数内処理")
-        p "uniquenessのmessegeラムダ内"
-        p "object ------>", object
-        p "data--------->", data
-        message = "このメールアドレスは現在使用できません"
-        return message
-      end,
-    # :message => "このメールアドレスは使用できません",
-    },
+  # # 独自性の追加(※ memberテーブルに既に存在する場合はエラーとする)
+  # :uniqueness => {
+  #   :message => lambda do |object, data|
+  #     print("validates->:uniquenes->:message内のlambda関数内処理")
+  #     p "uniquenessのmessegeラムダ内"
+  #     p "object ------>", object
+  #     p "data--------->", data
+  #     message = "このメールアドレスは現在使用できません"
+  #     return false
+  #   end,
+  # # :message => "このメールアドレスは使用できません",
+  # },
   })
 
   # display_name(本名とは違うニックネーム表示用)

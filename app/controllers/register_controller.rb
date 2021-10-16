@@ -13,22 +13,34 @@ class RegisterController < ApplicationController
   # 仮登録処理の実行
   ###########################################
   def create
-    # 仮登録では､メールアドレスとニックネームのみ登録する
-    # 仮登録用のトークンを生成
-    _register_params = register_params.to_h
-    _register_params[:token] = make_random_token
+    # 本登録用トークンを生成
+    _token = self.make_random_token (64)
+    print("生成された64文字のトークン ----->", _token)
+    # 重複仮登録の場合を検証
+    @register = Register.find_by ({
+      :email => register_params[:email],
+      :is_registered => UtilitiesController::BINARY_TYPE[:off],
+    })
 
-    @register = Register.new(_register_params)
+    update_params = register_params.to_hash
+    update_params["token"] = _token
 
-    # validation成功時は､そのまま新規insert後完了ページを表示
-    if @register.validate && @register.save
-      p ("@register.save()の実行結果 ===>"), (response)
-      return render :template => "register/completed"
+    _completed = false
+    if @register != nil
+      _response = @register.update(update_params)
+      _completed = true
+    else
+      @register = Register.new(update_params)
+      if @register.validate && @register.save
+        _completed = true
+      end
     end
 
-    # validationエラーを画面表示
-    p @register.errors.messages
-    return render ({ :template => "register/index" })
+    if _completed == true
+      return render :template => "register/completed"
+    else
+      return render ({ :template => "register/index" })
+    end
   end
 
   ###########################################
