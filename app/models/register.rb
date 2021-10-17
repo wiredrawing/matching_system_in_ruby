@@ -59,7 +59,7 @@ class Register < ApplicationRecord
       # mapメソッドで1以上の値で構成された配列を返却する
       :in => (lambda do
         gender_id_list = []
-        MembersController::GENDER_LIST.map do |gender|
+        UtilitiesController::GENDER_LIST.map do |gender|
           gender_id = gender[:id]
           if gender_id > 0
             gender_id_list.push(gender[:id])
@@ -72,7 +72,7 @@ class Register < ApplicationRecord
     },
   }
 
-  gender_list = MembersController::GENDER_LIST.map do |gender|
+  gender_list = UtilitiesController::GENDER_LIST.map do |gender|
     gender_id = gender[:id]
     if gender_id > 0
       next gender[:id]

@@ -30,10 +30,23 @@ Rails.application.routes.draw do
   resources :messages
   resources :timelines
   resources :footprints
-  resources :likes
+  # resources :likes
   resources :members
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+
+  ##########################################
+  # いいねを贈る
+  ##########################################
+  post "/like/send/:id", {
+    :to => "likes#inform",
+    :as => "inform_like",
+  } # 異性にいいねを贈る
+  post "/like/cancel/:id", {
+    :to => "likes#cancel",
+    :as => "cancel_like",
+  }
+  get "/likes/", { :to => "likes#index" } # 自身がもらったいいね一覧
 
   ##########################################
   # マイページ関連
@@ -43,6 +56,12 @@ Rails.application.routes.draw do
   patch "/mypage/edit", { :to => "mypage#update" }
   get ("/mypage/upload"), ({ :to => "mypage#upload" })
   post "/mypage/upload", { :to => "mypage#completed_uploading" }
+  # 受信､送信済みのいいね一覧
+  get ("/mypage/likes"), ({
+        :to => "mypage#likes",
+        :as => "mypage_likes",
+      })
+
   ##########################################
   # ログインページ
   ##########################################

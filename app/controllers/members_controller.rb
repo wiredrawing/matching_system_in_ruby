@@ -1,37 +1,27 @@
 class MembersController < ApplicationController
-  GENDER_LIST = [
-    { :id => 0, :data => "未設定" },
-    { :id => 1, :data => "男性" },
-    { :id => 2, :data => "女性" },
-  ]
+
   # before_action :set_member, only: %i[ show edit update destroy ]
   before_action :set_member, only: %i[ edit update destroy ]
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
-    @members = Member.where.not({
-      :id => @current_user.id,
-    }).where.not({
-      :gender => @current_user.gender,
-    })
+    # 異性のmembers一覧を取得する
+    @members = Member.hetero_members(@current_user)
   end
 
-  # GET /members/1 or /members/1.json
+  # 指定した任意のmember_idの情報を表示する
   def show
-    puts("---------------------------------------------")
     begin
-
-      # 本登録完了済みのユーザーのみを取得する
-      @member = Member.find_by({
-        :id => params[:id],
-        :is_registered => UtilitiesController::BINARY_TYPE[:on],
-      })
-
-      if @member == nil
-        raise StandardError.new("指定したユーザーが見つかりませんでした")
-      end
-    rescue => exception
-      puts("happen exception! ---------------------------------------")
+      puts("aaaaaaaaaaaaaaaaa")
+      @member = Member.showable_member(@current_user, params[:id])
+      print(@member.class)
+      puts("もらったいいね ===>", @member.getting_likes)
+      puts("もらったいいねの数 ===>", @member.getting_likes.length)
+      print("@member.display_name ---->", @member.display_name)
+      puts("show ===================================")
+      p(@member)
+    rescue => error
+      puts(error)
       render({
         :template => "members/error",
       })

@@ -38,6 +38,12 @@ class MypageController < ApplicationController
     end
   end
 
+  # ログイン中ユーザーが受けとったいいね一覧
+  def likes
+    puts("likes =====================>")
+    puts(@current_user.getting_likes)
+  end
+
   # 画像アップロード処理
   def upload
     render ({

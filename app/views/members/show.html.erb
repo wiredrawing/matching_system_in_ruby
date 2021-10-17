@@ -1,7 +1,11 @@
 <p id="notice"><%= notice %></p>
-
-
-<%= @member.display_name %>
-
-<%= link_to 'Edit', edit_member_path(@member) %> |
-<%= link_to 'Back', members_path %>
+<p><%= @member.display_name %></p>
+<p><%= @member.family_name %></p>
+<p><%= @member.given_name %></p>
+<p><%= @member.gender_string %></p>
+<p>この異性にいいねを贈る</p>
+<%= form_tag(inform_like_path(:id => @member.id), {:method => "post"}) do |form| %>
+  <input type="submit" value="いいねを贈る">
+<% end %>
+<p>このユーザーが受け取ったいいね数</p>
+<p><%= @member.getting_likes.length %> いいね</p>

@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
     if self.logged_in? == true
       return true
     end
-    return redirect_to signin_url
+    # 未ログイン時は､ログインフォームへ
+    return(redirect_to(login_url))
   end
 end

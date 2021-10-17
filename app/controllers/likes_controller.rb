@@ -6,6 +6,30 @@ class LikesController < ApplicationController
     @likes = Like.all
   end
 
+  def inform
+    begin
+      # いいね先member_id
+      to_member_id = params[:id]
+      from_member_id = @current_user.id
+      new_like = {
+        :to_member_id => params[:id],
+        :from_member_id => @current_user.id,
+      }
+      @like = Like.where(new_like).first()
+
+      if @like != nil
+        raise StandardError.new("既にいいねを送信済みです")
+      end
+      @like = Like.new(new_like)
+      response = @like.save()
+      print("@like =====>", @like)
+      print("response ====>", response)
+      return redirect_to member_url(:id => params[:id])
+    rescue => error
+      print("Error --->", error)
+    end
+  end
+
   # GET /likes/1 or /likes/1.json
   def show
   end
@@ -57,13 +81,14 @@ class LikesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_like
-      @like = Like.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def like_params
-      params.fetch(:like, {})
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_like
+    @like = Like.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def like_params
+    params.fetch(:like, {})
+  end
 end
