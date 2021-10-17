@@ -1,11 +1,17 @@
 class Image < ApplicationRecord
-  scope :showable, lambda do
+  showable_for_scope = -> {
     where({
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
       :is_deleted => UtilitiesController::BINARY_TYPE[:off],
     })
-  end
-
+  }
+  # scope :showable, showable_for_scope
+  scope :showable, (lambda do
+          where({
+            :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+            :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+          })
+        end)
   @member_id_list = Member.select(:id).all.map do |member|
     next member.id.to_i
   end
