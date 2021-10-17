@@ -20,7 +20,17 @@ class MembersController < ApplicationController
       print("@member.display_name ---->", @member.display_name)
       puts("show ===================================")
       p(@member)
+      # 公開中の画像一覧を取得する
+      # @images = @member.images.where ({
+      #   :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+      #   :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      # })
+      # 表示可能な画像一覧のみ
+      @images = @member.images.showable
+      print("公開中の画像一覧を取得する=================>")
+      puts(@images.length)
     rescue => error
+      puts("例外発生!!!!!!!!!!!")
       puts(error)
       render({
         :template => "members/error",

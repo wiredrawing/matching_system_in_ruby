@@ -1,4 +1,11 @@
 class Image < ApplicationRecord
+  scope :showable, lambda do
+    where({
+      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+    })
+  end
+
   @member_id_list = Member.select(:id).all.map do |member|
     next member.id.to_i
   end
@@ -50,5 +57,13 @@ class Image < ApplicationRecord
     p "file_path =====>", file_path
     # ファイル保管場所パスを返却
     return file_path
+  end
+
+  def owner_image_url
+    return api_image_owner_show_url(:id => self.id)
+  end
+
+  def member_image_url
+    return api_image_show_url(:id => self.id, :member_id => self.member_id)
   end
 end

@@ -46,6 +46,9 @@ class MypageController < ApplicationController
 
   # 画像アップロード処理
   def upload
+    @images = Image.where({
+      :member_id => @current_user.id,
+    })
     render ({
       :template => "mypage/upload",
     })

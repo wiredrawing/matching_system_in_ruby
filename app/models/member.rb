@@ -1,9 +1,8 @@
 class Member < ApplicationRecord
-
   # リレーションの関連付け
   has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id) # もらったいいいね
   has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id) # 贈ったいいね
-
+  has_many(:images, :class_name => "Image", :foreign_key => :member_id) # アップロード済み画像
   # いいねを贈ることができる異性のメンバー一覧を取得する
   def self.hetero_members(current_user = nil)
     print("ログインユーザーとは性別のことなるメンバー一覧を取得する")

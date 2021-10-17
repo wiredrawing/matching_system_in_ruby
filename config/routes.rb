@@ -6,18 +6,18 @@ Rails.application.routes.draw do
   namespace "api" do
 
     # 画像を取り扱うAPI
-    scope "images" do
+    scope "image" do
       scope "owner" do
         get "/:id", {
           :to => "images#show_owner",
-          :as => "images_owner_show",
+          :as => "image_owner_show",
         }
       end
       scope "member" do
-        get "/:id", {
-          :to => "images#show_member",
-          :as => "images_show",
-        }
+        get "/:id/:member_id", {
+              :to => "images#show",
+              :as => "image_show",
+            }
       end
     end
   end

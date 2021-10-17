@@ -9,3 +9,7 @@
 <% end %>
 <p>このユーザーが受け取ったいいね数</p>
 <p><%= @member.getting_likes.length %> いいね</p>
+<P>現在公開中の画像一覧</P>
+<% @images.each do | image | %>
+  <p><img width="100px" src="<%= image.member_image_url %>"></p>
+<% end %>
