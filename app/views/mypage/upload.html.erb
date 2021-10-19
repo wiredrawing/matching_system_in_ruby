@@ -11,6 +11,6 @@
   } %>
   <%= form.submit({:value => "ファイルアップロード"}) %>
 <% end  %>
-<% @current_user.images.each do | image | %>
+<% @current_user.all_images.each do | image | %>
   <p><img width="100px" src="<%= image.owner_image_url %>"></p>
 <% end %>

@@ -29,6 +29,11 @@ class SessionsController < ApplicationController
 
   # ログインページはログイン状態が不要なためoverride
   def login_check
-    return true
+    print("必ず実行される処理 ==========> login_check")
+    p(self.logged_in?)
+    if (self.logged_in? == true)
+      print("既にログイン中の場合はリダイレクトさせる")
+      return(redirect_to(mypage_url))
+    end
   end
 end

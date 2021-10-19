@@ -20,6 +20,8 @@ class MembersController < ApplicationController
       print("@member.display_name ---->", @member.display_name)
       puts("show ===================================")
       p(@member)
+      puts("閲覧中ユーザーがアップロードしている画像")
+      p(@member.images)
       # 公開中の画像一覧を取得する
       # @images = @member.images.where ({
       #   :is_displayed => UtilitiesController::BINARY_TYPE[:on],

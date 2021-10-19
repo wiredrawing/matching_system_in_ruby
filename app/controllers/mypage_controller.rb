@@ -4,6 +4,7 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
+    Like.fetch_matching_members(@current_user.id)
     return render({ :template => "mypage/index" })
   end
 

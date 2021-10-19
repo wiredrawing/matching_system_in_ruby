@@ -1,8 +1,10 @@
 <p id="notice"><%= notice %></p>
+<p><%= @member.email %></p>
 <p><%= @member.display_name %></p>
 <p><%= @member.family_name %></p>
 <p><%= @member.given_name %></p>
 <p><%= @member.gender_string %></p>
+<p><%= @member.password_digest %></p>
 <p>この異性にいいねを贈る</p>
 <%= form_tag(inform_like_path(:id => @member.id), {:method => "post"}) do |form| %>
   <input type="submit" value="いいねを贈る">
