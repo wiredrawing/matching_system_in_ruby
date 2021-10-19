@@ -8,11 +8,12 @@ class CreateImages < ActiveRecord::Migration[6.1]
       t.string :filename
       t.string :extension
       t.integer :blur_level
-      t.integer :is_approved
+      # 画像の承認状態
+      t.integer :is_approved, **{ :default => 0 }
       # 表示状態
-      t.integer :is_displayed, :default => 0
+      t.integer :is_displayed, **{ :default => 0 }
       # 削除状態
-      t.integer :is_deleted, :default => 0
+      t.integer :is_deleted, **{ :default => 0 }
       # 画像閲覧用のURLトークン
       t.string :token
       # アップロード先ディレクトリを取得するためのカラム

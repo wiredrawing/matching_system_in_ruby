@@ -16,7 +16,7 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
-  create_table "declines", force: :cascade do |t|
+  create_table "declines", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.datetime "created_at", precision: 6, null: false
@@ -38,7 +38,7 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
     t.string "filename"
     t.string "extension"
     t.integer "blur_level"
-    t.integer "is_approved"
+    t.integer "is_approved", default: 0
     t.integer "is_displayed", default: 0
     t.integer "is_deleted", default: 0
     t.string "token"
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
   create_table "likes", force: :cascade do |t|
     t.bigint "from_member_id"
     t.bigint "to_member_id"
-    t.integer "favorite"
+    t.integer "favorite", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -59,9 +59,10 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "action_id"
-    t.integer "is_browsed"
+    t.integer "is_browsed", default: 0
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["from_member_id", "to_member_id"], name: "index_logs_on_from_member_id_and_to_member_id"
   end
 
   create_table "members", force: :cascade do |t|
@@ -101,11 +102,14 @@ ActiveRecord::Schema.define(version: 2021_10_08_234124) do
     t.integer "is_browsed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["from_member_id", "to_member_id"], name: "index_timelines_on_from_member_id_and_to_member_id"
   end
 
   create_table "urls", force: :cascade do |t|
     t.bigint "member_id"
     t.string "url"
+    t.string "title"
+    t.string "thumbnail_url"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

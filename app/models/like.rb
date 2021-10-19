@@ -59,6 +59,9 @@ class Like < ApplicationRecord
 
     # puts("以下､マッチング済みユーザー一覧")
     # p(matching_members)
+    matching_members = Member.where({
+      :id => matching_members,
+    })
     return (matching_members)
   end
 end

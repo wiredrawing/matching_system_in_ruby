@@ -134,6 +134,12 @@ class MypageController < ApplicationController
     end
   end
 
+  # マッチング済み一覧ページ
+  def matching
+    @matching_members = Like.fetch_matching_members(@current_user.id)
+    puts("マッチング済みユーザーを取得する")
+  end
+
   private
 
   ##########################################
