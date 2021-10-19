@@ -21,14 +21,15 @@ class MembersController < ApplicationController
       puts("show ===================================")
       p(@member)
       puts("閲覧中ユーザーがアップロードしている画像")
-      p(@member.images)
+      p(@member.showable_images)
+      p(@member.all_images)
       # 公開中の画像一覧を取得する
       # @images = @member.images.where ({
       #   :is_displayed => UtilitiesController::BINARY_TYPE[:on],
       #   :is_deleted => UtilitiesController::BINARY_TYPE[:off],
       # })
       # 表示可能な画像一覧のみ
-      @images = @member.images.showable
+      @images = @member.showable_images
       print("公開中の画像一覧を取得する=================>")
       puts(@images.length)
     rescue => error

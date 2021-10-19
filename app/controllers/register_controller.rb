@@ -92,11 +92,18 @@ class RegisterController < ApplicationController
       @member = Member.find_by({
         :id => member_params[:id],
         :token => member_params[:token],
-        :is_registered => UtilitiesController::BINARY_TYPE[:off],
+      # :is_registered => UtilitiesController::BINARY_TYPE[:off],
       })
+      if (@member == nil)
+        raise StandardError.new("仮登録中ユーザーが見つかりませんでした")
+      end
+
+      print("is_exists ====>", @member)
       # postデータをHashオブジェクトに
       member_params_hash = member_params.to_hash()
-      member_params_hash[:is_registered] = UtilitiesController::BINARY_TYPE[:on]
+      member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
+      print("member_params_hash-------------->")
+      p(member_params_hash)
       _updated = @member.update(member_params_hash)
 
       # updateメソッドが成功した場合
@@ -170,6 +177,7 @@ class RegisterController < ApplicationController
         :salary,
         :message,
         :memo,
+        :is_registered,
         :password,
         :password_confirmation,
         :password_digest,

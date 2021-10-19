@@ -15,3 +15,13 @@
 <% @images.each do | image | %>
   <p><img width="100px" src="<%= image.member_image_url %>"></p>
 <% end %>
+<!-- //ユーザーブロック機能 -->
+<p>以下のボタンで､異性をブロックする</p>
+<%= form_for(:decline, {:url => declines_path}) do |form| %>
+  <p><%= form.hidden_field(:to_member_id, {:value => @member.id}) %></p>
+  <p><%= form.hidden_field(:from_member_id, {:value => @current_user.id}) %></p>
+  <p><%= form.submit ({:value => "このユーザーをブロックする",
+  :id => :id_button_to_block,
+  :class => :class_button_to_block})
+  %></p>
+<% end %>

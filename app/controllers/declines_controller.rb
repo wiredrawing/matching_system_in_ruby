@@ -21,17 +21,28 @@ class DeclinesController < ApplicationController
 
   # POST /declines or /declines.json
   def create
+    # @declineオブジェクトの作成
     @decline = Decline.new(decline_params)
-
-    respond_to do |format|
-      if @decline.save
-        format.html { redirect_to @decline, notice: "Decline was successfully created." }
-        format.json { render :show, status: :created, location: @decline }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @decline.errors, status: :unprocessable_entity }
-      end
+    # バリデーションチェック validate()メソッドがtrueを返せば
+    # バリデーションは成功している
+    if @decline.validate() == true
+      response = @decline.save()
+      p response
+    else
+      # validate()メソッドがfalseを返却した場合は
+      # エラー処理を実行
+      return redirect_to member_url :id => decline_params[:to_member_id]
     end
+
+    # respond_to do |format|
+    #   if @decline.save
+    #     format.html { redirect_to @decline, notice: "Decline was successfully created." }
+    #     format.json { render :show, status: :created, location: @decline }
+    #   else
+    #     format.html { render :new, status: :unprocessable_entity }
+    #     format.json { render json: @decline.errors, status: :unprocessable_entity }
+    #   end
+    # end
   end
 
   # PATCH/PUT /declines/1 or /declines/1.json
@@ -57,13 +68,17 @@ class DeclinesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_decline
-      @decline = Decline.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def decline_params
-      params.fetch(:decline, {})
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_decline
+    @decline = Decline.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def decline_params
+    params.fetch(:decline, {}).permit(
+      :to_member_id,
+      :from_member_id,
+    )
+  end
 end

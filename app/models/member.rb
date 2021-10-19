@@ -74,8 +74,18 @@ class Member < ApplicationRecord
   end
 
   # 特定のキーに対して､任意のバリデー処理を実行させる
-  validates_each(:gender) do |obj, attr, data|
+  validates_each(:token) do |object, attr, data|
+    _member = Member.where({
+      :token => data,
+      :id => object.id,
+    }).first
+
+    if (_member == nil)
+      object.errors.add(attr, "仮登録トークンが不正です")
+    end
+    next true
   end
+
   # emailバリデーション
   validates(:email, {
     :presence => true,
