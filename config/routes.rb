@@ -61,6 +61,11 @@ Rails.application.routes.draw do
         :to => "mypage#likes",
         :as => "mypage_likes",
       })
+  # マッチング中ユーザー一覧
+  get "/mypage/matching", {
+    :to => "mypage#matching",
+    :as => "mypage_matching",
+  }
 
   ##########################################
   # ログインページ

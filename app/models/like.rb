@@ -40,7 +40,7 @@ class Like < ApplicationRecord
 
   # 指定したユーザーがマッチングしたユーザー一覧を取得する
   def self.fetch_matching_members(member_id)
-    print("マッチング中ユーザー一覧を取得する")
+    # print("マッチング中ユーザー一覧を取得する")
     # いいねを贈ったmember_idの配列を作成
     informing_likes = self.select(:to_member_id).where({
       :from_member_id => member_id,
@@ -53,12 +53,12 @@ class Like < ApplicationRecord
       "to_member_id" => member_id,
       "from_member_id" => informing_likes,
     }).to_a.map do |like|
-      print("マッチング済みユーザー一覧を取得する")
+      # print("マッチング済みユーザー一覧を取得する")
       next like.from_member_id.to_i
     end
 
-    puts("以下､マッチング済みユーザー一覧")
-    p(matching_members)
+    # puts("以下､マッチング済みユーザー一覧")
+    # p(matching_members)
     return (matching_members)
   end
 end
