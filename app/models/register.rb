@@ -5,13 +5,14 @@ class Register < ApplicationRecord
   validates_each :email do |object, attr, value|
     # メールアドレスをすべて小文字に変換
     value = value.downcase
-    _member = self.find_by ({
+
+    member = self.find_by ({
       :email => value,
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
 
     # 既に本登録完了済みのメールアドレスの場合はエラーメッセージを追加する
-    if _member != nil
+    if member != nil
       object.errors.add(attr, "このメールアドレスは使用できません")
     end
     next true

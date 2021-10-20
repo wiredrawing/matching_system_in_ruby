@@ -4,7 +4,10 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
-    Like.fetch_matching_members(@current_user.id)
+    # 現在マッチング中のメンバーを取得
+    @matching_members = Like.fetch_matching_members(@current_user.id)
+    puts("matching_members ====>")
+    p(@matching_members)
     return render({ :template => "mypage/index" })
   end
 
@@ -15,18 +18,8 @@ class MypageController < ApplicationController
   # ログインユーザーの情報更新処理
   def update
     @member = Member.find(self.current_user.id)
-    # # POSTされたデータをHash化する
-    # _member_params_hash = member_params.permit([
-    #   :display_name,
-    #   :family_name,
-    #   :given_name,
-    #   :gender,
-    #   :message,
-    #   :memo,
-    # ]).to_hash()
-
     # 更新対象のカラムをオブジェクトにアサイン
-    @member.attributes = member_params
+    @member.attributes = member_params_to_update
 
     # バリデーション成功の場合はMyPageトップへリダイレクト
     _valid = @member.validate()
@@ -137,7 +130,13 @@ class MypageController < ApplicationController
   # マッチング済み一覧ページ
   def matching
     @matching_members = Like.fetch_matching_members(@current_user.id)
-    puts("マッチング済みユーザーを取得する")
+  end
+
+  # ブロック中一覧ページ
+  def blocking
+    @declining_members = Decline.fetch_blocking_members(@current_user.id)
+    print("ブロック中のメンバー一覧")
+    p(@declining_members)
   end
 
   private
@@ -159,22 +158,23 @@ class MypageController < ApplicationController
     @member = @current_user
   end
 
-  def member_params
+  # プロフィール情報の更新時の許可リスト
+  def member_params_to_update
     params.fetch(:member, {}).permit(
-      :id,
-      :email,
       :display_name,
       :family_name,
       :given_name,
-      :gender,
       :height,
       :weight,
-      :birthday,
       :salary,
       :message,
       :memo,
-      :password,
-      :password_confirmation,
+    )
+  end
+
+  # パスワード変更用のparams
+  def member_params_to_change_password
+    params.fetch(:member, {}).permig(
       :password_digest
     )
   end

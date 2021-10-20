@@ -1,0 +1,13 @@
+<p>現在あなたが､ブロックしているユーザー一覧です｡</p>
+<% @declining_members.each do |member| %>
+  <p><%= member.id %></p>
+  <p><%= member.display_name %></p>
+  <p><%= member.family_name %></p>
+  <p><%= member.given_name %></p>
+  <!-- 異性の画像 -->
+  <% if member.showable_images.length > 0%>
+    <% member.showable_images.each do |image| %>
+      <p><img width="100px" src="<%= image.member_image_url %>"></p>
+    <% end %>
+  <% end %>
+<% end %>

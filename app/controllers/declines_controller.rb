@@ -27,7 +27,11 @@ class DeclinesController < ApplicationController
     # バリデーションは成功している
     if @decline.validate() == true
       response = @decline.save()
-      p response
+      if (response == true)
+        return redirect_to member_url :id => decline_params[:to_member_id]
+      else
+        raise StandardError.new("指定したユーザーのブロックに失敗しました")
+      end
     else
       # validate()メソッドがfalseを返却した場合は
       # エラー処理を実行

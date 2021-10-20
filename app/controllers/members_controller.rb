@@ -12,6 +12,30 @@ class MembersController < ApplicationController
   # 指定した任意のmember_idの情報を表示する
   def show
     begin
+      # ブロックしていないかどうかをチェック
+      declining = Decline.where({
+        :from_member_id => @current_user.id,
+        :to_member_id => params[:id],
+      }).first()
+
+      print("ブロックしているかどうかをチェック")
+      p(declining)
+      if declining != nil
+        raise StandardError.new("このメンバーをブロックしています")
+      end
+
+      # ブロックされていないかどうかをチェック
+      declined = Decline.where({
+        :from_member_id => params[:id],
+        :to_member_id => current_user.id
+      }).first()
+
+      print("ブロックされていないかどうかをチェック")
+      p(declined)
+      if declined != nil then
+        raise StandardError.new("このメンバーからブロックされています")
+      end
+
       puts("aaaaaaaaaaaaaaaaa")
       @member = Member.showable_member(@current_user, params[:id])
       print(@member.class)

@@ -5,4 +5,12 @@
 <p><a href="<%= mypage_edit_url %>">ユーザー情報の編集へ</a></p>
 <p><a href="<%= mypage_upload_url %>">プロフィール写真のアップロードへ</a></p>
 <p>おくったいいね一覧をみる</p>
-<p><a href="<%= mypage_likes_url %>">いいね一覧</p>
+<p><a href="<%= mypage_likes_url %>">いいね一覧</a></p>
+<hr>
+<p>現在マッチング中のメンバー一覧</p>
+<% @matching_members.each do |member| %>
+  <p><%= member.id %></p>
+  <p><%= member.family_name %></p>
+  <p><%= member.given_name %></p>
+  <p><%= member.gender_string %></p>
+<% end %>

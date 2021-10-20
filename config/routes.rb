@@ -66,6 +66,11 @@ Rails.application.routes.draw do
     :to => "mypage#matching",
     :as => "mypage_matching",
   }
+  # ブロック中ユーザー一覧
+  get "/mypage/blocking", {
+    :to => "mypage#blocking",
+    :as => "mypage_blocking",
+  }
 
   ##########################################
   # ログインページ
