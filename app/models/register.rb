@@ -3,6 +3,8 @@ class Register < ApplicationRecord
 
   # 任意の処理で指定のカラムをバリデーションする
   validates_each :email do |object, attr, value|
+    # メールアドレスをすべて小文字に変換
+    value = value.downcase
     _member = self.find_by ({
       :email => value,
       :is_registered => UtilitiesController::BINARY_TYPE[:on],

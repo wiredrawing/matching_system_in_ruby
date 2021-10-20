@@ -24,6 +24,8 @@ class RegisterController < ApplicationController
 
     update_params = register_params.to_hash
     update_params["token"] = _token
+    # メールアドレスを小文字する
+    update_params["email"] = update_params["email"].downcase
 
     _completed = false
     if @register != nil
