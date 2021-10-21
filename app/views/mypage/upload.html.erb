@@ -3,14 +3,27 @@
 <p>セッションデータから</p>
 <%= @current_user %>
 <%= form_with ({:model => @member, :url => mypage_upload_url, :multipart => true, :method => "post",} )  do | form | %>
-  <%= form.hidden_field :id %>
-  <%= form.hidden_field :token %>
-  <%= form.file_field :upload_file, {
-    :id => "upload-file-id",
-    :class => "upload-file-class"
-  } %>
-  <%= form.submit({:value => "ファイルアップロード"}) %>
-<% end  %>
+  <div>
+    <%= form.hidden_field :id %>
+    <%= form.hidden_field :token %>
+    <%= form.file_field :upload_file, :id => "upload-file-id" %>
+    <%= form.submit :value => "ファイルアップロード" %>
+  </div>
+<% end %>
+<hr>
+<p>以下､ファイルアップロードに伴うエラー内容です</p>
+<% if @image.errors.any? then %>
+  <% @image.errors.each do | error | %>
+    <%= error.full_message %>
+  <% end %>
+<% end %>
+<hr>
 <% @current_user.all_images.each do | image | %>
   <p><img width="100px" src="<%= image.owner_image_url %>"></p>
-<% end %>
+  <%= form_for(:image, {:url => mypage_delete_image_path, :method => "delete"}) do |form| %>
+    <!-- 削除対象の画像IDをhiddenに持たせる -->
+    <%= form.hidden_field :id, :value => image.id %>
+    <p>この画像を削除する</p>
+    <p><%= form.submit :value => "この画像を削除", :id => "button-to-delet-this-image"%>
+    <% end %>
+  <% end %>

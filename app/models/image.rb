@@ -20,6 +20,14 @@ class Image < ApplicationRecord
     "application/pdf" => "pdf",
   }
 
+  # アップロードできるmimetypeを定義
+  validates :extension, {
+    :inclusion => {
+      :in => UtilitiesController::EXTENSION_LIST.keys,
+      :message => "画像ファイルのみアップロード可能です",
+    },
+  }
+
   validates :member_id, {
     :presence => true,
     :length => {

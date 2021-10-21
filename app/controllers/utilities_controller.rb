@@ -14,4 +14,12 @@ class UtilitiesController < ApplicationController
     { :id => 3, :value => "上記以外" },
     { :id => 4, :value => "未回答" },
   ]
+
+  # アップロード可能なファイル拡張子
+  EXTENSION_LIST = {
+    "image/png" => "png",
+    "image/jpeg" => "jpeg",
+    "image/gif" => "gif",
+    "application/pdf" => "pdf",
+  }
 end

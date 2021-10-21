@@ -56,6 +56,9 @@ Rails.application.routes.draw do
   patch "/mypage/edit", { :to => "mypage#update" }
   get ("/mypage/upload"), ({ :to => "mypage#upload" })
   post "/mypage/upload", { :to => "mypage#completed_uploading" }
+  delete "/mypage/delete_image", {
+    :to => "mypage#delete_image",
+  }
   # 受信､送信済みのいいね一覧
   get ("/mypage/likes"), ({
         :to => "mypage#likes",

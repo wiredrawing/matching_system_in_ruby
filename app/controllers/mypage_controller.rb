@@ -40,6 +40,7 @@ class MypageController < ApplicationController
 
   # 画像アップロード処理
   def upload
+    @image = Image.new()
     @images = Image.where({
       :member_id => @current_user.id,
     })
@@ -119,12 +120,31 @@ class MypageController < ApplicationController
         p "@image ----------------------->", @image
         p "response ---->", response
         p "@image.errors.messages ---> ", @image.errors.messages
+        render ({
+          :template => "mypage/upload",
+        })
       end
     rescue => error
       # 例外発生時は､アップロードフォームへ再度リダイレクト
       p "rescue ======>  ", error
       return redirect_to mypage_upload_url
     end
+  end
+
+  def delete_image
+    print("delete_image ==========================>")
+    params.fetch(:image, {}).permit(:id)
+    @image = Image.find(params[:image][:id])
+    @file_real_path = @image.fetch_file_path.to_s
+    # まずDBレコードを削除
+    response = @image.destroy()
+    p("削除したレコード ====>", response)
+    p(@image.fetch_file_path)
+    p("ファイルの物理削除 ====>", File.delete(@file_real_path))
+    p(params)
+    p(@image)
+    # ファイルアップロードページにリダイレクト
+    return (redirect_to(mypage_upload_url))
   end
 
   # マッチング済み一覧ページ
