@@ -4,6 +4,10 @@ class Member < ApplicationRecord
   has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id)
   # 贈ったいいね
   has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id)
+  # 自身をブロックしているユーザー
+  has_many(:declined, :class_name => "Decline", :foreign_key => :to_member_id)
+  # 自身がブロックしているユーザー
+  has_many(:declining, :class_name => "Decline", :foreign_key => :from_member_id)
   # メンバーが公開中にしているアップロード画像
   has_many(:showable_images, lambda do
     where({

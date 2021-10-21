@@ -2,6 +2,10 @@ class MembersController < ApplicationController
 
   # before_action :set_member, only: %i[ show edit update destroy ]
   before_action :set_member, only: %i[ edit update destroy ]
+  # メンバーページを閲覧するたびに足跡を更新する
+  before_action -> do
+                  visited_member(params[:id])
+                end, :only => [:show]
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
@@ -27,12 +31,12 @@ class MembersController < ApplicationController
       # ブロックされていないかどうかをチェック
       declined = Decline.where({
         :from_member_id => params[:id],
-        :to_member_id => current_user.id
+        :to_member_id => current_user.id,
       }).first()
 
       print("ブロックされていないかどうかをチェック")
       p(declined)
-      if declined != nil then
+      if declined != nil
         raise StandardError.new("このメンバーからブロックされています")
       end
 
@@ -144,5 +148,44 @@ class MembersController < ApplicationController
         :memo,
         :password_digest
       )
+  end
+
+  # 指定したユーザーに足跡をつける
+  def visited_member(member_id)
+    print("????異性のページにアクセスした際に足跡を残す")
+    # 足跡をつける
+
+    footprint = Footprint.where({
+      :from_member_id => @current_user.id,
+      :to_member_id => member_id,
+    }).first()
+    # logging
+    logger.debug "footprint => " + footprint.to_s
+
+    if (footprint == nil)
+      # 初めてアクセスしたとき
+      footprint = Footprint.new({
+        :from_member_id => @current_user.id,
+        :to_member_id => member_id,
+        :access_count => 1,
+        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+      })
+
+      # バリデーションチェック後､足跡を保存
+      if footprint.validate() == true
+        footprint.save()
+      end
+    else
+      # 二回目以降のアクセス
+      # updated_atとアクセス回数のみをアップデート
+      updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
+      access_count = footprint.access_count.to_i + 1 # アクセス回数
+      response = footprint.update({
+        :updated_at => updated_at,
+        :access_count => access_count,
+        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+      })
+      puts(updated_at)
+    end
   end
 end

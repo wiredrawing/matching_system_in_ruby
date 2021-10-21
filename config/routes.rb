@@ -71,6 +71,11 @@ Rails.application.routes.draw do
     :to => "mypage#blocking",
     :as => "mypage_blocking",
   }
+  # 足跡一覧
+  get "/mypage/footprints", {
+    :to => "mypage#footprints",
+    :as => "mypage_footprints",
+  }
 
   ##########################################
   # ログインページ

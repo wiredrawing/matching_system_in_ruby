@@ -139,6 +139,18 @@ class MypageController < ApplicationController
     p(@declining_members)
   end
 
+  # 足跡一覧ページ
+  def footprints
+    @footprints = Footprint.where({
+      :to_member_id => @current_user.id,
+    }).order(:updated_at => :desc)
+
+    print("ここはログインユーザーへの足跡一覧ページです")
+    p(@footprints)
+    p(@footprints.class)
+    p(@footprints.methods)
+  end
+
   private
 
   ##########################################
