@@ -10,4 +10,10 @@
       <p><img width="100px" src="<%= image.member_image_url %>"></p>
     <% end %>
   <% end %>
+  <!-- ブロックを解除する -->
+  <%= form_for(:decline , {:url => decline_path( :id => member.id ), :method => "delete"}) do |form| %>
+    <p>このユーザーのブロックを解除する</p>
+    <%= form.hidden_field :to_member_id, :value => member.id %>
+    <%= form.submit :value => "ブロックの解除", :id => "button-to-unblock-this-member" %>
+  <% end %>
 <% end %>

@@ -14,19 +14,20 @@ class Member < ApplicationRecord
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
       :is_deleted => UtilitiesController::BINARY_TYPE[:off],
     })
-  end, {
-    :class_name => "Image",
-    :foreign_key => :member_id,
-  })
+  end, **{
+         :class_name => "Image",
+         :foreign_key => :member_id,
+       })
   # メンバーがアップロードした全画像
-  has_many :all_images, -> { print("ただの無名関数を追加しただけ") }, ({
-    :class_name => "Image",
-    :foreign_key => :member_id,
-  })
+  has_many :all_images, -> { print("ただの無名関数を追加しただけ") }, **({
+                                                          :class_name => "Image",
+                                                          :foreign_key => :member_id,
+                                                        })
 
   # いいねを贈ることができる異性のメンバー一覧を取得する
-  def self.hetero_members(current_user = nil)
+  def self.hetero_members(current_user = nil, exculded_members = [])
     print("ログインユーザーとは性別のことなるメンバー一覧を取得する")
+    # ブロックしているユーザー
     begin
       @members = self.where({
         :is_registered => UtilitiesController::BINARY_TYPE[:on],
@@ -38,8 +39,11 @@ class Member < ApplicationRecord
             :gender => current_user.gender,
           })
         )
+      ).and(
+        self.where.not({
+          :id => exculded_members,
+        })
       )
-
       return(@members)
     rescue => error
       print("Happen error------------------>")
@@ -79,15 +83,19 @@ class Member < ApplicationRecord
 
   # 特定のキーに対して､任意のバリデー処理を実行させる
   validates_each(:token) do |object, attr, data|
-    _member = Member.where({
-      :token => data,
-      :id => object.id,
-    }).first
+    if (object.token == "from_seed")
+      next true
+    else
+      _member = Member.where({
+        :token => data,
+        :id => object.id,
+      }).first
 
-    if (_member == nil)
-      object.errors.add(attr, "仮登録トークンが不正です")
+      if (_member == nil)
+        object.errors.add(attr, "仮登録トークンが不正です")
+      end
+      next true
     end
-    next true
   end
 
   # emailバリデーション

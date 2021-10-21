@@ -1,5 +1,5 @@
 class DeclinesController < ApplicationController
-  before_action :set_decline, only: %i[ show edit update destroy ]
+  # before_action :set_decline, only: %i[ show edit update destroy ]
 
   # GET /declines or /declines.json
   def index
@@ -37,7 +37,6 @@ class DeclinesController < ApplicationController
       # エラー処理を実行
       return redirect_to member_url :id => decline_params[:to_member_id]
     end
-
     # respond_to do |format|
     #   if @decline.save
     #     format.html { redirect_to @decline, notice: "Decline was successfully created." }
@@ -64,19 +63,36 @@ class DeclinesController < ApplicationController
 
   # DELETE /declines/1 or /declines/1.json
   def destroy
-    @decline.destroy
-    respond_to do |format|
-      format.html { redirect_to declines_url, notice: "Decline was successfully destroyed." }
-      format.json { head :no_content }
+    # to_member_idキーを許可する
+    params.fetch(:decline, {}).permit(
+      :to_member_id,
+    )
+    response = Decline.destroy_by ({
+                                    :from_member_id => @current_user.id,
+                                    :to_member_id => params[:decline][:to_member_id],
+                                  })
+
+    print("削除したresponse変数結果")
+    p(response)
+    p(response.class)
+    if (response.length > 0)
+      print("削除成功")
+    else
+      print("削除失敗")
     end
+
+    # 削除完了後､マイページへリダイレクト
+    return redirect_to(mypage_url)
   end
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
-  def set_decline
-    @decline = Decline.find(params[:id])
-  end
+  # # Use callbacks to share common setup or constraints between actions.
+  # def set_decline
+  #   print("ユーザーのブロックを解除する")
+  #   p(params[:id])
+  #   @decline = Decline.find(params[:id])
+  # end
 
   # Only allow a list of trusted parameters through.
   def decline_params

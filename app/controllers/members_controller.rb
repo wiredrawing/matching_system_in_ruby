@@ -9,8 +9,13 @@ class MembersController < ApplicationController
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
+    # ブロック中のユーザー
+    @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do | member |
+      next member.id;
+    end
+
     # 異性のmembers一覧を取得する
-    @members = Member.hetero_members(@current_user)
+    @members = Member.hetero_members(@current_user, @declining_member_id_list)
   end
 
   # 指定した任意のmember_idの情報を表示する
