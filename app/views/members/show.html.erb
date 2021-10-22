@@ -13,6 +13,7 @@
 <p><%= @member.getting_likes.length %> いいね</p>
 <P>現在公開中の画像一覧</P>
 <% @images.each do | image | %>
+  <p>画像ID => <%= image.id %></p>
   <p><img width="100px" src="<%= image.member_image_url %>"></p>
 <% end %>
 <!-- //ユーザーブロック機能 -->

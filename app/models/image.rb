@@ -12,14 +12,6 @@ class Image < ApplicationRecord
     next member.id.to_i
   end
 
-  # アップロード可能なファイル拡張子
-  @extension_list = {
-    "image/png" => "png",
-    "image/jpeg" => "jpeg",
-    "image/gif" => "gif",
-    "application/pdf" => "pdf",
-  }
-
   # アップロードできるmimetypeを定義
   validates :extension, {
     :inclusion => {
@@ -75,5 +67,13 @@ class Image < ApplicationRecord
 
   def member_image_url
     return api_image_show_url(:id => self.id, :member_id => self.member_id)
+  end
+
+  def display_status
+    if self.is_displayed == UtilitiesController::BINARY_TYPE[:on]
+      return "表示中"
+    else
+      return "非表示中"
+    end
   end
 end

@@ -57,16 +57,23 @@ class Api::ImagesController < ApplicationController
       end
 
       file_path = @image.fetch_file_path
+      # imagemagickで読み込み
+      image = Magick::ImageList.new(file_path)
+      image = image.blur_image(50, 10)
+      p("Magick::ImageList.new(file_path)")
+      p(image.to_blob)
       # 画像出力
       render({
-        :file => file_path,
+        # 生のコンテンツを出力する場合
+        :body => image.to_blob,
         :content_type => @image.extension,
       })
     rescue => exception
       ###############################################
       # http 404 bad requestを表示
       ###############################################
-      p("exception.methods----------------->", exception.methods)
+      # p("exception.methods----------------->", exception.methods)
+      # p(exception.message)
       render ({
         :json => {
           :error => exception.message,

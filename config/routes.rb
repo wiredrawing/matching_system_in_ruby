@@ -35,6 +35,16 @@ Rails.application.routes.draw do
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
+  post "/images/active/:id", {
+    :to => "images#active",
+    :as => "active_image",
+  }
+
+  post "/images/deactive/:id", {
+    :to => "images#deactive",
+    :as => "deactive_image",
+  }
+
   ##########################################
   # いいねを贈る
   ##########################################
@@ -78,6 +88,10 @@ Rails.application.routes.draw do
   get "/mypage/footprints", {
     :to => "mypage#footprints",
     :as => "mypage_footprints",
+  }
+  post "/mypage/logout", {
+    :to => "mypage#logout",
+    :as => "logout",
   }
 
   ##########################################

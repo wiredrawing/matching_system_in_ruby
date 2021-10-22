@@ -20,10 +20,16 @@
 <hr>
 <% @current_user.all_images.each do | image | %>
   <p><img width="100px" src="<%= image.owner_image_url %>"></p>
+  <!-- 以下は表示有効化ボタン -->
+  <%= form_for(:image, {:url => active_image_path({:id => image.id}), :method => "post"}) do |form|%>
+    <%= form.hidden_field :id, :value => image.id %>
+    <p><%= form.submit :value => image.display_status , :id => "button-to-active-this-image"%></p>
+  <% end %>
+  <!-- 以下は削除ボタン -->
   <%= form_for(:image, {:url => mypage_delete_image_path, :method => "delete"}) do |form| %>
     <!-- 削除対象の画像IDをhiddenに持たせる -->
     <%= form.hidden_field :id, :value => image.id %>
     <p>この画像を削除する</p>
-    <p><%= form.submit :value => "この画像を削除", :id => "button-to-delet-this-image"%>
-    <% end %>
+    <p><%= form.submit :value => "この画像を削除", :id => "button-to-delet-this-image"%></p>
   <% end %>
+<% end %>

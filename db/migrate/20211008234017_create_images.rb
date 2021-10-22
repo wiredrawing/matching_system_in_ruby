@@ -7,7 +7,7 @@ class CreateImages < ActiveRecord::Migration[6.1]
       t.integer :use_type
       t.string :filename
       t.string :extension
-      t.integer :blur_level
+      t.integer :blur_level, :default => 0
       # 画像の承認状態
       t.integer :is_approved, **{ :default => 0 }
       # 表示状態

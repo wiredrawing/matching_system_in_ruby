@@ -24,6 +24,37 @@ class ImagesController < ApplicationController
     })
   end
 
+  # アップロードした画像をpublicにする
+  def active
+    print("画像の表示状態をpublicに切り替える")
+    begin
+      params.fetch(:image, {}).permit(:id)
+      @image = Image.find(params[:image][:id])
+
+      # 現在の表示状態を判定後,onとoffを切り替える
+      if @image.is_displayed == UtilitiesController::BINARY_TYPE[:on]
+        # 表示ステータスをoffにする
+        @image.update({
+          :is_displayed => UtilitiesController::BINARY_TYPE[:off],
+        })
+      else
+        # 表示ステータスをonにする
+        @image.update({
+          :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+        })
+      end
+      # 表示状態変更後､元のページへリダイレクト
+      return redirect_to mypage_upload_url
+    rescue => exception
+      p(exception)
+      return redirect_to mypage_upload_url
+    end
+  end
+
+  # アップロードした画像をprivateにする
+  def deactive
+  end
+
   # GET /images/new
   def new
     @image = Image.new

@@ -1,1 +1,7 @@
 <p>ここはheaderを設定</p>
+<% if @current_user != nil then %>
+  <%= form_for :session, :url => logout_url, :method => :post do |form| %>
+    <%= form.hidden_field :id, :value => @current_user.id %>
+    <p><%= form.submit :value => "ログアウトする" %></p>
+  <% end %>
+<%end%>

@@ -13,16 +13,23 @@ class Member < ApplicationRecord
     where({
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
       :is_deleted => UtilitiesController::BINARY_TYPE[:off],
-    })
+    }).order(:created_at => :desc)
   end, **{
          :class_name => "Image",
          :foreign_key => :member_id,
        })
+
   # メンバーがアップロードした全画像
-  has_many :all_images, -> { print("ただの無名関数を追加しただけ") }, **({
-                                                          :class_name => "Image",
-                                                          :foreign_key => :member_id,
-                                                        })
+  # 並び順sqlをlambda関数で渡す
+  _anonymous = lambda do
+    self.order({
+      :created_at => :desc,
+    })
+  end
+  has_many(:all_images, _anonymous, **{
+                                      :class_name => "Image",
+                                      :foreign_key => :member_id,
+                                    })
 
   # いいねを贈ることができる異性のメンバー一覧を取得する
   def self.hetero_members(current_user = nil, exculded_members = [])

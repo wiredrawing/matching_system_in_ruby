@@ -4,6 +4,9 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
+    puts("===========>mypage#index")
+    print(session)
+    p(session[:member_id])
     # 現在マッチング中のメンバーを取得
     @matching_members = Like.fetch_matching_members(@current_user.id)
     puts("matching_members ====>")
@@ -43,6 +46,8 @@ class MypageController < ApplicationController
     @image = Image.new()
     @images = Image.where({
       :member_id => @current_user.id,
+    }).order({
+      :created_at => :desc,
     })
     render ({
       :template => "mypage/upload",
@@ -171,6 +176,15 @@ class MypageController < ApplicationController
     p(@footprints.methods)
   end
 
+  # ログアウト
+  def logout
+    puts("@@@@@@@@@@@@@@@@@@@@@@SessionController#logout")
+    # セッションの破棄
+    p(params[:session])
+    session[:member_id] = nil
+    # return redirect_to(mypage_url)
+  end
+
   private
 
   ##########################################
@@ -183,7 +197,7 @@ class MypageController < ApplicationController
     p "self.current_user ====>", self.current_user
     p "======================================================"
     if self.logged_in? != true
-      return redirect_to(signin_url)
+      return redirect_to(login_url)
     end
 
     p "@current_user ===>", @current_user
