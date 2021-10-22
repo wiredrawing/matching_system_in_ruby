@@ -20,13 +20,20 @@
 <hr>
 <% @current_user.all_images.each do | image | %>
   <p><img width="100px" src="<%= image.owner_image_url %>"></p>
+  <!-- 画像のぼかしレベルを変更 -->
+  <%= form_for :image, :url => mypage_update_image_path(:id => image.id), :method => "post" do | form|%>
+    <%= form.hidden_field :member_id, :value => @current_user.id %>
+    <%= form.hidden_field :id, :value => image.id %>
+    <p><%= form.select :blur_level, @blur_level, :selected => image.blur_level %></p>
+    <p><%= form.submit :value => "ぼかしレベルの変更" %></p>
+  <%end%>
   <!-- 以下は表示有効化ボタン -->
   <%= form_for(:image, {:url => active_image_path({:id => image.id}), :method => "post"}) do |form|%>
     <%= form.hidden_field :id, :value => image.id %>
     <p><%= form.submit :value => image.display_status , :id => "button-to-active-this-image"%></p>
   <% end %>
   <!-- 以下は削除ボタン -->
-  <%= form_for(:image, {:url => mypage_delete_image_path, :method => "delete"}) do |form| %>
+  <%= form_for :image, :url => mypage_delete_image_path, :method => "delete" do |form| %>
     <!-- 削除対象の画像IDをhiddenに持たせる -->
     <%= form.hidden_field :id, :value => image.id %>
     <p>この画像を削除する</p>

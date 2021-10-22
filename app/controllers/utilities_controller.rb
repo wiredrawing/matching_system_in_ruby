@@ -22,4 +22,11 @@ class UtilitiesController < ApplicationController
     "image/gif" => "gif",
     "application/pdf" => "pdf",
   }
+
+  BLUR_LEVEL = [
+    ["ぼかさない", 0],
+    ["小", 5],
+    ["中", 15],
+    ["大", 30],
+  ]
 end

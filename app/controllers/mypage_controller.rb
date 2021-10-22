@@ -49,7 +49,8 @@ class MypageController < ApplicationController
     }).order({
       :created_at => :desc,
     })
-    render ({
+    @blur_level = UtilitiesController::BLUR_LEVEL
+    render({
       :template => "mypage/upload",
     })
   end
@@ -136,20 +137,57 @@ class MypageController < ApplicationController
     end
   end
 
+  def update_image
+    begin
+      p("---------------------------update_imge")
+      p(params)
+      # 更新対象の画像を取得
+      params.fetch(:image, {}).permit(
+        :id,
+        :blur_level,
+        :member_id,
+      )
+      @image = Image.find_by({
+        :id => params[:image][:id],
+        :member_id => @current_user.id,
+      })
+      if @image == nil
+        raise StandardError.new("指定した画像が見つかりません")
+      end
+      response = @image.update({
+        :blur_level => params[:image][:blur_level],
+      })
+      return redirect_to(mypage_upload_url)
+      print("アップロードした画像のぼかしレベルの変更")
+      p(response)
+      p(@image)
+    rescue => exception
+      p(exception)
+      p(exception.message)
+    end
+  end
+
   def delete_image
-    print("delete_image ==========================>")
-    params.fetch(:image, {}).permit(:id)
-    @image = Image.find(params[:image][:id])
-    @file_real_path = @image.fetch_file_path.to_s
-    # まずDBレコードを削除
-    response = @image.destroy()
-    p("削除したレコード ====>", response)
-    p(@image.fetch_file_path)
-    p("ファイルの物理削除 ====>", File.delete(@file_real_path))
-    p(params)
-    p(@image)
-    # ファイルアップロードページにリダイレクト
-    return (redirect_to(mypage_upload_url))
+    begin
+      print("delete_image ==========================>")
+      params.fetch(:image, {}).permit(:id)
+      @image = Image.find(params[:image][:id])
+      @file_real_path = @image.fetch_file_path.to_s
+      # まずDBレコードを削除
+      response = @image.destroy()
+      p("削除したレコード ====>", response)
+      p(@image.fetch_file_path)
+      p("ファイルの物理削除 ====>", File.delete(@file_real_path))
+      p(params)
+      p(@image)
+      # ファイルアップロードページにリダイレクト
+      return (redirect_to(mypage_upload_url))
+    rescue => exception
+      p("!!!!!!!!!!!!!!!! ------>例外発生")
+      p(exception)
+      p(exception.message)
+      return (redirect_to(mypage_upload_url))
+    end
   end
 
   # マッチング済み一覧ページ

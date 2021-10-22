@@ -64,6 +64,11 @@ Rails.application.routes.draw do
   get "/mypage", { :to => "mypage#index" }
   get "/mypage/edit", { :to => "mypage#edit" }
   patch "/mypage/edit", { :to => "mypage#update" }
+  # 画像のぼかし具合を設定
+  post "/mypage/upload/:id", {
+    :to => "mypage#update_image",
+    :as => "mypage_update_image",
+  }
   get ("/mypage/upload"), ({ :to => "mypage#upload" })
   post "/mypage/upload", { :to => "mypage#completed_uploading" }
   delete "/mypage/delete_image", {

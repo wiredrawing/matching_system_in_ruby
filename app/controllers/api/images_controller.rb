@@ -57,11 +57,16 @@ class Api::ImagesController < ApplicationController
       end
 
       file_path = @image.fetch_file_path
+
       # imagemagickで読み込み
       image = Magick::ImageList.new(file_path)
-      image = image.blur_image(50, 10)
-      p("Magick::ImageList.new(file_path)")
-      p(image.to_blob)
+      # ぼかし設定がonの場合
+      if (@image.blur_level > 0)
+        p(@image.blur_level)
+        image = image.blur_image(10, @image.blur_level)
+        p("Magick::ImageList.new(file_path)")
+      end
+      # p(image.to_blob)
       # 画像出力
       render({
         # 生のコンテンツを出力する場合
