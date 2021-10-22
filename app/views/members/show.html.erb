@@ -5,9 +5,14 @@
 <p><%= @member.given_name %></p>
 <p><%= @member.gender_string %></p>
 <p><%= @member.password_digest %></p>
-<p>この異性にいいねを贈る</p>
-<%= form_tag(inform_like_path(:id => @member.id), {:method => "post"}) do |form| %>
-  <input type="submit" value="いいねを贈る">
+<%= @member.like?(@current_user.id) %>
+<% if @member.like?(@current_user.id) == true then %>
+  <p>既にこのユーザーにいいねしています</p>
+<% else %>
+  <p>この異性にいいねを贈る</p>
+  <%= form_tag(inform_like_path(:id => @member.id), {:method => "post"}) do |form| %>
+    <input type="submit" value="いいねを贈る">
+  <% end %>
 <% end %>
 <p>このユーザーが受け取ったいいね数</p>
 <p><%= @member.getting_likes.length %> いいね</p>

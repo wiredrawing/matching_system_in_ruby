@@ -195,4 +195,20 @@ class Member < ApplicationRecord
       break gender[:value] if gender[:id] == self.gender
     end
   end
+
+  # 指定したmember_idの組み合わせでいいねを贈っているかどうかを検証
+  def like?(member_id = 0)
+    like = Like.where({
+      :from_member_id => member_id,
+      :to_member_id => self.id,
+    }).first()
+
+    if (like != nil)
+      logger.debug "#{member_id}は#{self.id}へいいねを贈っています"
+      return true
+    end
+    # logging
+    logger.debug "#{member_id}は#{self.id}へいいねを贈っていません"
+    return false
+  end
 end

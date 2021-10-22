@@ -220,6 +220,8 @@ class MypageController < ApplicationController
     # セッションの破棄
     p(params[:session])
     session[:member_id] = nil
+    # セッション破棄後､TOPページへ
+    return redirect_to(top_url)
     # return redirect_to(mypage_url)
   end
 

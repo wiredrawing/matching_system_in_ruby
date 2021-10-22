@@ -1,5 +1,10 @@
 Rails.application.routes.draw do
 
+  # TOPページ
+  get "/", {
+    :to => "top#index",
+    :as => "top",
+  }
   ##########################################
   # api
   ##########################################
@@ -48,15 +53,16 @@ Rails.application.routes.draw do
   ##########################################
   # いいねを贈る
   ##########################################
+  # 異性にいいねを贈る
   post "/like/send/:id", {
     :to => "likes#inform",
     :as => "inform_like",
-  } # 異性にいいねを贈る
+  }
+  # 贈ったいいねをキャンセル
   post "/like/cancel/:id", {
     :to => "likes#cancel",
     :as => "cancel_like",
   }
-  get "/likes/", { :to => "likes#index" } # 自身がもらったいいね一覧
 
   ##########################################
   # マイページ関連
