@@ -6,7 +6,6 @@ class Api::ImagesController < ApplicationController
   ###############################################
   def show_owner
     begin
-      puts("show_owner --------------------------->")
       target_image = {
         :id => params[:id],
         :member_id => @current_user.id,
@@ -42,7 +41,6 @@ class Api::ImagesController < ApplicationController
   # 自身以外のmemberの画像を閲覧
   def show
     begin
-      puts("show --------------------------->")
       target_image = {
         :id => params[:id],
         :member_id => params[:member_id],

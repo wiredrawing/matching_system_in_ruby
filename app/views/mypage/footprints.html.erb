@@ -1,3 +1,37 @@
-<% @footprints.each do | footprint| %>
-  <%= footprint.from_member_id %>
-<% end %>
+<a href="" class="backk">戻る</a>
+<section>
+  <h2 class="noto fontpink">足跡</h2>
+  <div class="oaitelists_wrap mt0">
+    <% if @footprints.length > 0 %>
+      <% @footprints.each do |footprint| %>
+        <% if footprint.from_member != nil then %>
+          <div class="oaitelists">
+            <a href="<%= member_url(:id => footprint.from_member.id) %>">
+              <% if footprint.from_member.showable_images.length > 0 then %>
+                <img src="<%= footprint.from_member.showable_images.first.member_image_url() %>">
+              <% else %>
+                <img src="/images/sample_user.jpg">
+              <% end %>
+            </a>
+            <p class="bold"><%= footprint.from_member.display_name %>(歳)</p>
+            <p>PR: <%= footprint.from_member.message %></p>
+            <p class="footdate">
+              <%= footprint.updated_at.strftime("%Y年%m月%d日 %H時%I分")%>
+            </p>
+          </div>
+          <!--oaitelists-->
+        <% end %>
+      <% end %>
+    <% end %>
+    <!-- ページング機能 -->
+    <div class="paging">
+      <a href="{{ $footprints->previousPageUrl() }}" rel="prev">
+        <img src="/images/back.png" width="24">
+      </a>
+      <a href="{{ $footprints->nextPageUrl() }}" rel="next">
+        <img src="/images/forward.png" width="24">
+      </a>
+    </div>
+  </div>
+  <!--oaitelists_wrap-->
+</section>

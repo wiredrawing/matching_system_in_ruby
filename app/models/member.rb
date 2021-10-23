@@ -196,19 +196,60 @@ class Member < ApplicationRecord
     end
   end
 
-  # 指定したmember_idの組み合わせでいいねを贈っているかどうかを検証
+  ##########################################
+  # いいねを贈っているかどうか
+  ##########################################
   def like?(member_id = 0)
+    like = Like.where({
+      :from_member_id => self.id,
+      :to_member_id => member_id,
+    }).first()
+
+    if (like != nil)
+      logger.debug "#{self.id}は#{member_id}にいいねをしています"
+      return true
+    end
+    return false
+  end
+
+  ##########################################
+  # いいねされているかどうか
+  ##########################################
+  def is_liked?(member_id = 0)
     like = Like.where({
       :from_member_id => member_id,
       :to_member_id => self.id,
     }).first()
 
     if (like != nil)
-      logger.debug "#{member_id}は#{self.id}へいいねを贈っています"
+      logger.debug "#{self.id}は#{member_id}にいいねされています"
       return true
     end
-    # logging
-    logger.debug "#{member_id}は#{self.id}へいいねを贈っていません"
     return false
+  end
+
+  ##########################################
+  # 指定したユーザーとマッチしているかどうか?
+  ##########################################
+  def match_you?(member_id)
+    likes = Like.where({
+      :from_member_id => member_id,
+      :to_member_id => self.id,
+    }).or(
+      Like.where({
+        :from_member_id => self.id,
+        :to_member_id => member_id,
+      })
+    )
+
+    if (likes.length == 2)
+      return true
+    else
+      return false
+    end
+  end
+
+  # 指定したユーザにおすすめのメンバー一覧を取得する
+  def recommended_members()
   end
 end

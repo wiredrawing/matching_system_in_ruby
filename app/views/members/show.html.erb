@@ -1,33 +1,129 @@
-<p id="notice"><%= notice %></p>
-<p><%= @member.email %></p>
-<p><%= @member.display_name %></p>
-<p><%= @member.family_name %></p>
-<p><%= @member.given_name %></p>
-<p><%= @member.gender_string %></p>
-<p><%= @member.password_digest %></p>
-<%= @member.like?(@current_user.id) %>
-<% if @member.like?(@current_user.id) == true then %>
-  <p>既にこのユーザーにいいねしています</p>
-<% else %>
-  <p>この異性にいいねを贈る</p>
-  <%= form_tag(inform_like_path(:id => @member.id), {:method => "post"}) do |form| %>
-    <input type="submit" value="いいねを贈る">
-  <% end %>
-<% end %>
-<p>このユーザーが受け取ったいいね数</p>
-<p><%= @member.getting_likes.length %> いいね</p>
-<P>現在公開中の画像一覧</P>
-<% @images.each do | image | %>
-  <p>画像ID => <%= image.id %></p>
-  <p><img width="100px" src="<%= image.member_image_url %>"></p>
-<% end %>
 <!-- //ユーザーブロック機能 -->
-<p>以下のボタンで､異性をブロックする</p>
-<%= form_for(:decline, {:url => declines_path}) do |form| %>
-  <p><%= form.hidden_field(:to_member_id, {:value => @member.id}) %></p>
-  <p><%= form.hidden_field(:from_member_id, {:value => @current_user.id}) %></p>
-  <p><%= form.submit ({:value => "このユーザーをブロックする",
-  :id => :id_button_to_block,
-  :class => :class_button_to_block})
-  %></p>
+<a href="" class="backk">戻る</a>
+<section class="opp_wrap_image">
+  <div class="opp_imgs">
+    <% if (@member.showable_images.length > 0) then %>
+      <% @member.showable_images.each do |image| %>
+        <div class="opp_img"><img src="<%= image.member_image_url %>"></div>
+      <%end%>
+    <%else%>
+      <div class="opp_img"><img src="/images/sample_user.jpg"></div>
+    <%end%>
+  </div>
+  <!--opp_imgs-->
+</section>
+<section class="opp_wrap">
+  <div class="opp_status">
+    <% if @member.match_you?(@current_user.id) %>
+      <p>相互マッチ中</p>
+    <% elsif @member.is_liked?(@current_user.id) %>
+      <p>Good済み</p>
+    <% else %>
+      <p>あなたをGoodしています</p>
+    <% end %>
+  </div>
+  <!--opp_status-->
+  <div class="box">
+    <div class="facebox">
+      <div class="tabbs">
+      </div>
+      <p><%= @member.display_name %>(歳)</p>
+      <p class="font12">本人確認済み</p>
+      <p>VIPユーザー</p>
+    </div>
+    <div class="opp_numberbox">
+      <p>もらったGood</p>
+      <p class="number"><%= @member.getting_likes.length %></p>
+    </div>
+  </div>
+  <!--box-->
+  <div class="balloon1-top">
+    <p><%= @member.message %></p>
+  </div>
+  <div class="box">
+    <table>
+      <tr>
+        <th>メールアドレス</th>
+        <td><%= @member.email %></td>
+      </tr>
+      <tr>
+        <th>ニックネーム</th>
+        <td><%= @member.display_name %></td>
+      </tr>
+      <tr>
+        <th>姓</th>
+        <td><%= @member.family_name %></td>
+      </tr>
+      <tr>
+        <th>名</th>
+        <td><%= @member.given_name %></td>
+      </tr>
+    </table>
+  </div>
+  <!--box-->
+  <!-- 自身のプロフィール閲覧時は表示させない -->
+  <div class="tex_c mt64">
+    <%= form_for :decline, :url => declines_path, "class".intern => :decline_form do |form| %>
+      <%= form.hidden_field :to_member_id, :value => @member.id %>
+      <%= form.hidden_field :from_member_id, :value => @current_user.id %>
+    <% end %>
+    <a href="" class="block_button">この人をブロックする</a>
+  </div>
+</section>
+<!-- 閲覧中ユーザーにいいねを贈る -->
+<% if (@member.is_liked?(@current_user.id) != true) then %>
+  <!-- Goodを贈っていない場合のみ -->
+  <div class="btn_follow_fixed">
+    <%= form_tag(inform_like_path(:id => @member.id), {"class".intern => :send_like_form, :method => "post"}) do |form| %>
+    <% end %>
+    <a href="" class="btn_follow sending_like"><%= @member.display_name %>さんにGoodを贈る</a>
+  </div>
 <% end %>
+<% if @member.match_you?(@current_user.id) == true then %>
+  <!-- マッチ済みの場合のみ表示させる -->
+  <div class="btn_follow_fixed">
+    <a href="" class="btn_follow">
+      <%= @member.display_name %>さんにメッセージを送る
+    </a>
+  </div>
+<% end %>
+<script>
+  // Good送信ボタン
+  $(".sending_like").on("click", function(e) {
+      e.preventDefault();
+      $(".send_like_form").eq(0).trigger("submit");
+  });
+  
+  // ブロック送信ボタン
+  $(".block_button").on("click", function(e) {
+      e.preventDefault();
+      $(".decline_form").eq(0).trigger("submit");
+  });
+  
+  
+  $('.opp_imgs').slick({
+      centerMode: true,
+      dots: true,
+      centerPadding: '64px',
+      slidesToShow: 1,
+      responsive: [{
+              breakpoint: 768,
+              settings: {
+                  arrows: false,
+                  centerMode: true,
+                  centerPadding: '64px',
+                  slidesToShow: 1
+              }
+          },
+          {
+              breakpoint: 480,
+              settings: {
+                  arrows: false,
+                  centerMode: true,
+                  centerPadding: '64px',
+                  slidesToShow: 1
+              }
+          }
+      ]
+  });
+</script>

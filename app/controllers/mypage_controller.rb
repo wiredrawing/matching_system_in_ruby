@@ -14,6 +14,16 @@ class MypageController < ApplicationController
     @matching_members = Like.fetch_matching_members(@current_user.id)
     puts("matching_members ====>")
     p(@matching_members)
+    # 異性のメンバーを取得
+
+    # ブロック中のユーザー
+    @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
+      next member.id
+    end
+    # 異性のmembers一覧を取得する
+    @hetero_members = Member.hetero_members(@current_user, @declining_member_id_list)
+    puts("[異性のメンバー----------------------------------------]")
+    pp(@hetero_members)
     return render({ :template => "mypage/index" })
   end
 
@@ -215,14 +225,15 @@ class MypageController < ApplicationController
 
   # 足跡一覧ページ
   def footprints
-    @footprints = Footprint.where({
+    puts("[マイページ内足跡一覧ページ----------------------------------------]")
+    @footprints = Footprint.includes(:from_member).where({
       :to_member_id => @current_user.id,
     }).order(:updated_at => :desc)
 
     print("ここはログインユーザーへの足跡一覧ページです")
-    p(@footprints)
-    p(@footprints.class)
-    p(@footprints.methods)
+    @footprints.each do |footprint|
+      pp(footprint.from_member)
+    end
   end
 
   # ログアウト
