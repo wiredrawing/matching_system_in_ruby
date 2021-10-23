@@ -8,6 +8,18 @@
     <meta name="keywords" content="<%= @keywords %>">
     <meta name="description" content="<%= @description %>">
     <meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1,viewport-fit=cover">
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="" />
+    <!-- ここからOGP -->
+    <meta property="og:title" content="">
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="">
+    <meta property="og:url" content="" />
+    <meta property="og:image" content="" />
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <!--<%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>-->
+    <!--<%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>-->
     <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/notosansjp.css">
     <link rel="stylesheet" href="https://use.typekit.net/nki7ezk.css">
     <link rel="stylesheet" type="text/css" href="/css/style.css">
@@ -16,17 +28,7 @@
     <link rel="stylesheet" type="text/css" href="/css/drawer.css">
     <link rel="shortcut icon" type="image/x-icon" href="/img/favicon.ico">
     <link rel="apple-touch-icon" href="/img/favicon.ico">
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="" />
-    <meta property="og:url" content="" />
-    <meta property="og:title" content="" />
-    <meta property="og:description" content="" />
-    <meta property="og:image" content="" />
     <link rel="canonical" href="">
-    <!-- ここからOGP -->
-    <meta property="og:title" content="">
-    <meta property="og:type" content="article">
-    <meta property="og:description" content="">
     <script src="/js/jquery-3.5.1.min.js"></script>
     <script src="/js/iscroll.min.js"></script>
     <script src="/js/drawer.min.js"></script>
@@ -54,8 +56,8 @@
           </div>
           <!--side_profile1-->
           <div class="side_profile2">
-            <a href="" class="side_profile2b"><%= @current_user.getting_likes.length %> もらったGood</a>
-            <a href="" class="side_profile2a"><%= @current_user.informing_likes.length %> 相互マッチ</a>
+            <a href="<%= mypage_getting_likes_url() %>" class="side_profile2b"><%= @current_user.getting_likes.length %> もらったGood</a>
+            <a href="<%= mypage_matching_url() %>" class="side_profile2a"><%= @current_user.informing_likes.length %> 相互マッチ</a>
           </div>
           <!--side_profile2-->
         </div>

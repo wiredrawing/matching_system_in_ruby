@@ -47,6 +47,22 @@
           <%= form.select :gender, @genders, :readonly => true %>
         </div>
       </div>
+      <!-- 自己PR -->
+      <% if @member.errors.messages.length > 0 then%>
+        <% @member.errors.messages[:message].each do |error|%>
+          <p class="input_red"><%= erorr %></p>
+        <%end%>
+      <%end%>
+      <p>自己PRメッセージ</p>
+      <%= form.text_area :message, :placeholder => "自己PR" %>
+      <!-- メモ -->
+      <% if @member.errors.messages.length > 0 then%>
+        <% @member.errors.messages[:memo].each do |error|%>
+          <p class="input_red"><%= erorr %></p>
+        <%end%>
+      <%end%>
+      <p>メモ</p>
+      <%= form.text_area :memo, :placeholder => "メモ" %>
       <div class="btnbox">
         <a href="" class="btn update_button">編集完了</a>
       </div>

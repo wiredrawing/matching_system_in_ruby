@@ -1,0 +1,40 @@
+<a href="" class="backk">戻る</a>
+<section>
+  <div class="opp_status">
+    <a href="<%= mypage_matching_url() %>">相互マッチ</a>
+    <a href="<%= mypage_informing_likes_url() %>" class="active">贈ったGood</a>
+    <a href="<%= mypage_getting_likes_url() %>">もらったGood</a>
+  </div>
+  <!--opp_status-->
+  <% if (@current_user.informing_likes.length > 0) then %>
+    <div class="oaitelists_wrap mt0">
+      <% @current_user.informing_likes.each do |like| %>
+        <div class="oaitelists">
+          <% if (like.to_member.showable_images.length > 0) then %>
+            <a href="<%= member_url :id => like.to_member.id %>" class="oaitelists_img">
+              <img src="<%= like.to_member.showable_images.first.member_image_url() %>">
+            </a>
+          <% else %>
+            <a href="" class="oaitelists_img">
+              <img src="/images/sample_user.jpg">
+            </a>
+          <% end %>
+          <p class="bold"><%= like.to_member.display_name %>(歳)</p>
+          <p>PR: <%= like.to_member.message %></p>
+        </div>
+      <% end %>
+      <!--oaitelists-->
+    </div>
+    <!--oaitelists_wrap-->
+  <% else %>
+    <p>まだ､一度もGoodをもらっていません｡</p>
+  <% end %>
+  <div class="paging">
+    <a href="{{ $getting_likes->previousPageUrl() }}" rel="prev">
+      <img src="/images/back.png" width="24">
+    </a>
+    <a href="{{ $getting_likes->nextPageUrl() }}" rel="next">
+      <img src="/images/forward.png" width="24">
+    </a>
+  </div>
+</section>

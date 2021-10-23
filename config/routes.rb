@@ -80,11 +80,17 @@ Rails.application.routes.draw do
   delete "/mypage/delete_image", {
     :to => "mypage#delete_image",
   }
-  # 受信､送信済みのいいね一覧
-  get ("/mypage/likes"), ({
-        :to => "mypage#likes",
-        :as => "mypage_likes",
-      })
+
+  # 贈ったいいね
+  get "/mypage/informing_likes", {
+        :to => "mypage#informing_likes",
+        :as => "mypage_informing_likes",
+      }
+  # もらったいいね
+  get "/mypage/getting_likes", {
+        :to => "mypage#getting_likes",
+        :as => "mypage_getting_likes",
+      }
   # マッチング中ユーザー一覧
   get "/mypage/matching", {
     :to => "mypage#matching",

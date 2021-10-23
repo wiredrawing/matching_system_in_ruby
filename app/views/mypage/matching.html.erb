@@ -1,13 +1,32 @@
-<p>ここにはマッチング済みユーザー情報を表示します｡</p>
-<% @matching_members.each do |member| %>
-  <p><%= member.id %></p>
-  <p><%= member.display_name %></p>
-  <p><%= member.family_name %></p>
-  <p><%= member.given_name %></p>
-  <!-- 異性の画像 -->
-  <% if member.showable_images.length > 0%>
-    <% member.showable_images.each do |image| %>
-      <p><img width="100px" src="<%= image.member_image_url %>"></p>
-    <% end %>
+<a href="" class="backk">戻る</a>
+<section>
+  <div class="opp_status">
+    <a href="<%= mypage_matching_url() %>" class="active">相互マッチ</a>
+    <a href="<%= mypage_informing_likes_url() %>">贈ったGood</a>
+    <a href="<%= mypage_getting_likes_url() %>">もらったGood</a>
+  </div>
+  <!--opp_status-->
+  <% if (@matching_members.length > 0) then %>
+    <div class="oaitelists_wrap mt0">
+      <% @matching_members.each do |member| %>
+        <div class="oaitelists">
+          <% if member.showable_images.length > 0 then %>
+            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+              <img src="<%= member.showable_images.first.member_image_url() %>">
+            </a>
+          <% else %>
+            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+              <img src="/images/sample_user.jpg">
+            </a>
+          <% end %>
+          <p class="bold"><%= member.display_name %>(歳)</p>
+          <p>PR: <%= member.message %></p>
+        </div>
+        <!--oaitelists-->
+      <%end%>
+    </div>
+  <% else %>
+    <!--oaitelists_wrap-->
+    <p>まだ､一度もマッチングしていません｡</p>
   <% end %>
-<% end %>
+</section>
