@@ -63,7 +63,7 @@
   <!--box-->
   <!-- 自身のプロフィール閲覧時は表示させない -->
   <div class="tex_c mt64">
-    <%= form_for :decline, :url => declines_path, "class".intern => :decline_form do |form| %>
+    <%= form_for :decline, :url => declines_path, :html => { "class".intern => :decline_form} do |form| %>
       <%= form.hidden_field :to_member_id, :value => @member.id %>
       <%= form.hidden_field :from_member_id, :value => @current_user.id %>
     <% end %>

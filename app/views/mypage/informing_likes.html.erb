@@ -6,21 +6,21 @@
     <a href="<%= mypage_getting_likes_url() %>">もらったGood</a>
   </div>
   <!--opp_status-->
-  <% if (@current_user.informing_likes.length > 0) then %>
+  <% if (@informing_likes.length > 0) then %>
     <div class="oaitelists_wrap mt0">
-      <% @current_user.informing_likes.each do |like| %>
+      <% @informing_likes.each do |member| %>
         <div class="oaitelists">
-          <% if (like.to_member.showable_images.length > 0) then %>
-            <a href="<%= member_url :id => like.to_member.id %>" class="oaitelists_img">
-              <img src="<%= like.to_member.showable_images.first.member_image_url() %>">
+          <% if (member.showable_images.length > 0) then %>
+            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+              <img src="<%= member.showable_images.first.member_image_url() %>">
             </a>
           <% else %>
-            <a href="" class="oaitelists_img">
+            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
               <img src="/images/sample_user.jpg">
             </a>
           <% end %>
-          <p class="bold"><%= like.to_member.display_name %>(歳)</p>
-          <p>PR: <%= like.to_member.message %></p>
+          <p class="bold"><%= member.display_name %>(歳)</p>
+          <p>PR: <%= member.message %></p>
         </div>
       <% end %>
       <!--oaitelists-->

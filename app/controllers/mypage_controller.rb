@@ -64,8 +64,12 @@ class MypageController < ApplicationController
 
   # ログイン中ユーザーが贈ったいいね一覧
   def informing_likes
-    puts("likes =====================>")
-    puts(@current_user.informing_likes)
+    puts("[マイページ内 informing_likes----------------------------]")
+    # 除外ユーザー一覧を取得する
+    excluded_members = Decline.fetch_blocking_members(@current_user.id).map do |member|
+      next member.id
+    end
+    @informing_likes = Member.hetero_members(@current_user, excluded_members)
   end
 
   # 画像アップロード処理
@@ -224,9 +228,8 @@ class MypageController < ApplicationController
 
   # ブロック中一覧ページ
   def blocking
-    @declining_members = Decline.fetch_blocking_members(@current_user.id)
-    print("ブロック中のメンバー一覧")
-    p(@declining_members)
+    @blocking_members = Decline.fetch_blocking_members(@current_user.id)
+    p(@blocking_members)
   end
 
   # 足跡一覧ページ

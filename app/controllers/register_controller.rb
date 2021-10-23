@@ -85,7 +85,7 @@ class RegisterController < ApplicationController
       # memberオブジェクトの作成
       @member = Member.new(member_params)
       _valid = @member.validate()
-
+      pp(@member.errors.messages)
       if _valid != true
         raise StandardError.new("バリデーションエラーが発生しています")
       end

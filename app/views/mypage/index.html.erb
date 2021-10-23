@@ -1,19 +1,3 @@
-<p>ここはマイページ</p>
-<p><%= @current_user.display_name %></p>
-<p><%= @current_user.email %></p>
-<p><%= @current_user.password_digest %></p>
-<p><a href="<%= mypage_edit_url %>">ユーザー情報の編集へ</a></p>
-<p><a href="<%= mypage_upload_url %>">プロフィール写真のアップロードへ</a></p>
-<p>おくったいいね一覧をみる</p>
-<p><a href="<%= mypage_informing_likes_url %>">いいね一覧</a></p>
-<hr>
-<p>現在マッチング中のメンバー一覧</p>
-<% @matching_members.each do |member| %>
-  <p><%= member.id %></p>
-  <p><%= member.family_name %></p>
-  <p><%= member.given_name %></p>
-  <p><%= member.gender_string %></p>
-<% end %>
 <section>
   <div class="mypagebox">
     <div class="face">
@@ -69,13 +53,17 @@
         <div class="numberbox2">
           <p>贈ったGood</p>
           <p class="number">
-            <a href="<% mypage_informing_likes_url() %>"><%= @current_user.informing_likes.length %></a>
+            <a href="<%= mypage_informing_likes_url() %>">
+              <%= @current_user.informing_likes.length %>
+            </a>
           </p>
         </div>
         <div class="numberbox1">
           <p>もらったGood</p>
           <p class="number">
-            <a href="<% mypage_getting_likes_url() %>"><%= @current_user.getting_likes.length %></a>
+            <a href="<%= mypage_getting_likes_url() %>">
+              <%= @current_user.getting_likes.length %>
+            </a>
           </p>
         </div>
       </div>

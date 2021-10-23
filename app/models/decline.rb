@@ -45,9 +45,10 @@ class Decline < ApplicationRecord
               }).call,
             }
 
+  # ログイン中ユーザーのブロック一覧画面でのみ使用する
   # 指定したメンバーがブロックしているメンバー一覧を取得する
   def self.fetch_blocking_members(member_id)
-    # ブロック中ユーザー
+    # 引数に指定したユーザーがブロックしているユーザー一覧
     declining_members = self.select(:to_member_id).where({
       :from_member_id => member_id,
     }).map do |decline|

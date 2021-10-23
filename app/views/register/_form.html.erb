@@ -1,48 +1,120 @@
-<%= form_with({
-  url: register_main_create_path,
-  model: member,
-  method: "post",
-}) do |form| %>
-  <% if member.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(member.errors.count, "error") %> prohibited this member from being saved:</h2>
-      <ul>
-        <% member.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+<section>
+  <div class="box">
+    <h2>会員登録</h2>
+    <%= form_with :url => register_main_create_path, :model => member, :method=>  "post"  do |form| %>
+      <!-- 仮登録時のトークン -->
+      <%= form.hidden_field :token %>
+      <%= form.hidden_field :id, :value => member.id %>
+      <!-- メールアドレス -->
+      <p>メールアドレス</p>
+      <% if (member.errors.messages.length > 0) then %>
+        <% member.errors.messages[:email].each do |error| %>
+          <p class="input_red"><%= error %></p>
         <% end %>
-      </ul>
-    </div>
-  <% end %>
-  <div class="actions">
-    <p><%= form.label "事前登録済みメールアドレス" %></p>
-    <p><%= form.text_field :email, {:readonly => true} %></p>
-    <p><%= form.label "サイト上のニックネーム" %></p>
-    <p><%= form.text_field :display_name, { :readonly => true } %></p>
-    <p><%= form.label "名字" %></p>
-    <p><%= form.text_field :family_name %></p>
-    <p><%= form.label "名前" %></p>
-    <p><%= form.text_field :given_name %></p>
-    <p><%= form.label "性別" %></p>
-    <p><%= form.select :gender, @genders %></p>
-    <p><%= form.label "自己PR" %></p>
-    <p><%= form.text_field :message %></p>
-    <p><%= form.label "メモ" %></p>
-    <p><%= form.text_field :memo %></p>
-    <p>
-      パスワード<br>
-      <%= form.text_field :password %>
-    </p>
-    <p>
-      確認用パスワード<br>
-      <%= form.text_field :password_confirmation %>
-    </p>
-    <!-- 本登録用トークン -->
-    <%= form.hidden_field :is_registered %>
-    <!-- 本登録用トークン -->
-    <%= form.hidden_field :token %>
-    <!-- 仮登録ユーザーID -->
-    <%= form.hidden_field :id %>
-    <p><%= form.submit %></p>
+      <% end %>
+      <%= form.text_field :email, :readonly => true %>
+      <!-- パスワード -->
+      <p>パスワード</p>
+      <% if member.errors.messages.length > 0 then%>
+        <% member.errors.messages[:password].each do |error| %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :password, {:placeholder => "パスワード"} %>
+      <p>確認用パスワード</p>
+      <% if member.errors.messages.length > 0 then%>
+        <% member.errors.messages[:password_confirmation].each do |error| %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :password_confirmation, {:placeholder => "確認用パスワード"} %>
+      <!--- ユーザー名 -->
+      <p>ユーザー名</p>
+      <% if member.errors.messages.length > 0 then %>
+        <% member.errors.messages[:display_name].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <%end%>
+      <%end%>
+      <%= form.text_field :display_name, :placeholder => "ユーザー名" %>
+      <!--- 姓 -->
+      <p>姓</p>
+      <% if member.errors.messages.length > 0 then %>
+        <% member.errors.messages[:family_name].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <%end%>
+      <%end%>
+      <%= form.text_field :family_name, :placeholder => "姓" %>
+      <!--- 名 -->
+      <p>名</p>
+      <% if member.errors.messages.length > 0 then %>
+        <% member.errors.messages[:given_name].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <%end%>
+      <%end%>
+      <%= form.text_field :given_name, :placeholder => "名" %>
+      <!-- 性別 -->
+      <% if member.errors.messages.length > 0 then %>
+        <% member.errors.messages[:gender].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <%end%>
+      <%end%>
+      <div class="selectors">
+        <p>性別</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :gender, @genders %>
+        </div>
+      </div>
+      <!--selectors-->
+      <div class="selectors mb32">
+        <p>通知の設定</p>
+        <label>
+          {{Form::checkbox("notification_good", 1, old("notification_good"))}} Goodを受信時メール
+        </label><br>
+        <label>
+          {{Form::checkbox("notification_message", 1, old("notification_message"))}} メッセージを受信時メール
+        </label>
+      </div>
+      <!--selectors-->
+      <div class="selectors mb32">
+        @if ($errors->has("agree"))
+        <p class="input_red">{{$errors->first("agree")}}</p>
+        @endif
+        <p>利用規約の同意</p>
+        <p>※本サービス利用については以下､利用規約に同意する必要があります｡</p>
+        <p><a target="_blank" href="/terms">利用規約</a></p>
+        <label>
+          {{Form::checkbox("agree", 1, old("agree"))}} 利用規約に同意する
+        </label>
+      </div>
+      <!--selectors-->
+      <div class="btnbox">
+        <a class="submit_button btn">登録してはじめる</a>
+      </div>
+    <% end %>
   </div>
-<% end %>
-<%= register_completed_path :id => member.id, :token => member.token %>
+  <!--box-->
+</section>
+<script>
+  $(function () {
+      $(".body_style .M, .body_style .M").hide();
+      $("select[name='gender']").on("change", function (e) {
+          var gender = {
+              "F" : "M",
+              "M" : "F",
+          };
+          $("." + $(this).val()).show();
+          $("." + gender[$(this).val()]).hide();
+      });
+      // ページ読み込み直後にイベントを発火
+      $("select[name='gender']").trigger("change");
+      // フォームの投稿ボタン
+      $(".submit_button").on("click", function (e) {
+          // 年月日を生年月日にフォーマットさせる。
+          var year = $("select[name=year]").val();
+          var month = $("select[name=month]").val();
+          var day = $("select[name=day]").val();
+          $("input[name=birthday]").val(year + "-" + month + "-" + day);
+          $("form").eq(0).trigger("submit");
+      })
+  });
+</script>

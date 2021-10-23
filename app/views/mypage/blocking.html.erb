@@ -1,19 +1,46 @@
-<p>現在あなたが､ブロックしているユーザー一覧です｡</p>
-<% @declining_members.each do |member| %>
-  <p><%= member.id %></p>
-  <p><%= member.display_name %></p>
-  <p><%= member.family_name %></p>
-  <p><%= member.given_name %></p>
-  <!-- 異性の画像 -->
-  <% if member.showable_images.length > 0%>
-    <% member.showable_images.each do |image| %>
-      <p><img width="100px" src="<%= image.member_image_url %>"></p>
-    <% end %>
-  <% end %>
-  <!-- ブロックを解除する -->
-  <%= form_for(:decline , {:url => decline_path( :id => member.id ), :method => "delete"}) do |form| %>
-    <p>このユーザーのブロックを解除する</p>
-    <%= form.hidden_field :to_member_id, :value => member.id %>
-    <%= form.submit :value => "ブロックの解除", :id => "button-to-unblock-this-member" %>
-  <% end %>
-<% end %>
+<a href="" class="backk">戻る</a>
+<section>
+  <h2 class="noto fontpink">あなたがブロックしているメンバー</h2>
+  <div class="oaitelists_wrap mt0">
+    <% if @blocking_members != nil && @blocking_members.length > 0 then %>
+      <% @blocking_members.each do |member|%>
+        <div class="oaitelists">
+          <% if member.showable_images.length > 0 then %>
+            <a class="oaitelists_img">
+              <img src="<%= member.showable_images.first.member_image_url() %>">
+            </a>
+          <% else %>
+            <a class="oaitelists_img"><img src="/images/sample_user.jpg"></a>
+          <% end %>
+          <p class="bold"><%= member.display_name %>(歳)</p>
+          <p>PR: <%= member.message %></p>
+          <a href="" class="unblock">ブロック解除</a>
+          <!-- 当該ユーザーのブロック解除処理 -->
+          <%= form_for :decline, :url => decline_path({:id => member.id}), :method=>"delete", :html => {"class".intern => "unblock_form"} do |form| %>
+            <%= form.hidden_field :to_member_id, :value => member.id %>
+          <% end %>
+        </div>
+        <!--oaitelists-->
+      <%end%>
+    <%end%>
+  </div>
+  <!--oaitelists_wrap-->
+  <div class="paging">
+    <a href="{{ $declining_users->previousPageUrl() }}" rel="prev">
+      <img src="/images/back.png" width="24">
+    </a>
+    <a href="{{ $declining_users->nextPageUrl() }}" rel="next">
+      <img src="/images/forward.png" width="24">
+    </a>
+  </div>
+  <script>
+    // ブロック解除処理の実行
+    $(function (e) {
+        $(".unblock").each(function (index) {
+            $(this).on("click", function (e) {
+                e.preventDefault();
+                $(".unblock_form").eq(index).trigger("submit");
+            });
+        });
+    })
+  </script>

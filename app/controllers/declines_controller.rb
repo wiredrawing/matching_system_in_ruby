@@ -72,17 +72,12 @@ class DeclinesController < ApplicationController
                                     :to_member_id => params[:decline][:to_member_id],
                                   })
 
-    print("削除したresponse変数結果")
-    p(response)
-    p(response.class)
     if (response.length > 0)
-      print("削除成功")
+      # 削除完了後､マイページへリダイレクト
+      return redirect_to(mypage_blocking_url())
     else
-      print("削除失敗")
+      return render(:template => "error/index")
     end
-
-    # 削除完了後､マイページへリダイレクト
-    return redirect_to(mypage_url)
   end
 
   private

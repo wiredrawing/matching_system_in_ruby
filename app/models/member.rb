@@ -34,6 +34,7 @@ class Member < ApplicationRecord
   # いいねを贈ることができる異性のメンバー一覧を取得する
   def self.hetero_members(current_user = nil, exculded_members = [])
     print("ログインユーザーとは性別のことなるメンバー一覧を取得する")
+    pp(current_user)
     # ブロックしているユーザー
     begin
       @members = self.where({
@@ -53,7 +54,7 @@ class Member < ApplicationRecord
       )
       return(@members)
     rescue => error
-      print("Happen error------------------>")
+      puts("Happen error------------------>")
       puts(error)
       # 例外発生時は[nil]を返却
       return(nil)
@@ -107,7 +108,9 @@ class Member < ApplicationRecord
 
   # emailバリデーション
   validates(:email, {
-    :presence => true,
+    :presence => {
+      :message => "メールアドレスは必須項目です",
+    },
     :length => {
       :minimum => 1,
       :maximum => 512,
@@ -117,7 +120,9 @@ class Member < ApplicationRecord
 
   # display_name(本名とは違うニックネーム表示用)
   validates :display_name, {
-    :presence => true,
+    :presence => {
+      :message => "ニックネームは必須項目です",
+    },
     :length => {
       :minimum => 5,
       :maximum => 128,
@@ -127,7 +132,9 @@ class Member < ApplicationRecord
 
   # 性別
   validates(:gender, {
-    :presence => true,
+    :presence => {
+      :message => "性別は必須項目です",
+    },
     :length => {
       :minimum => 0,
     },
@@ -149,7 +156,9 @@ class Member < ApplicationRecord
   })
 
   validates :given_name, {
-    :presence => true,
+    :presence => {
+      :message => "名は必須項目です",
+    },
     :length => {
       :minimum => 1,
       :maximum => 512,
@@ -158,7 +167,9 @@ class Member < ApplicationRecord
   }
 
   validates :family_name, {
-    :presence => true,
+    :presence => {
+      :message => "姓は必須項目です",
+    },
     :length => {
       :minimum => 1,
       :maximum => 512,
@@ -167,18 +178,22 @@ class Member < ApplicationRecord
   }
 
   # パスワード
-  validates(:password, {
-    :presence => true,
+  validates :password, {
+    :presence => {
+      :message => "パスワードは必須項目です",
+    },
     :length => {
       :minimum => 10,
       :maximun => 64,
     },
     :on => :member_update_password,
-  })
+  }
 
   # パスワード確認用
   validates (:password_confirmation), ({
-    :presence => true,
+    :presence => {
+      :message => "確認用パスワードは必須項目です",
+    },
     :length => {
       :minimum => 10,
       :maximun => 64,

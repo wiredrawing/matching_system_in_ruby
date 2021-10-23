@@ -72,20 +72,12 @@
           <li><a href="">設定</a></li>
           <li><a href="<%= logout_url() %>">ログアウト</a></li>
           <span class="sub_line"></span>
-          <li class="mini">{{$request->member->price_plan->name}}</li>
-          @if ($request->member->identity_image !== NULL && (int)$request->member->identity_image->is_approved === Config("const.image.approve_type.authenticated"))
+          <li class="mini"></li>
           <li class="mini"><img src="/images/checkicon.png" width="12"> 本人確認済</li>
-          @else
           <li class="mini"><a href="{{action("Member\\IndexController@identity")}}"><img src="/images/caitionicon.png" width="12"> 本人確認証明書アップロード</a></li>
-          @endif
-          @if ($request->member->gender === "M")
           <!-- 収入両名は男性のみ対応 -->
-          @if ($request->member->income_image !== NULL && (int)$request->member->income_image->is_approved === Config("const.image.approve_type.authenticated"))
           <li class="mini"><img src="/images/checkicon.png" width="12"> 収入証明確認済</li>
-          @else
           <li class="mini"><a href="{{action("Member\\IndexController@income")}}"><img src="/images/caitionicon.png" width="12"> 収入証明アップロード</a></li>
-          @endif
-          @endif
         </ul>
       </nav>
     <% else %>

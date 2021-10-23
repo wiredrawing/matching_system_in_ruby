@@ -15,7 +15,7 @@
               <img src="<%= like.from_member.showable_images.first.member_image_url() %>">
             </a>
           <% else %>
-            <a href="" class="oaitelists_img">
+            <a href="<%= member_url :id => like.from_member.id %>" class="oaitelists_img">
               <img src="/images/sample_user.jpg">
             </a>
           <% end %>
