@@ -1,15 +1,45 @@
-<h1>Sessions#new</h1>
-<p>ログインフォーム</p>
-<%= form_for(:session, {
-  url: login_path,
-}) do |form| %>
-  <div class="actions">
-    <p><%= form.label "メールアドレス" %></p>
-    <p><%= form.text_field :email %></p>
-    <p><%= form.label "パスワード" %></p>
-    <p><%= form.text_field :password %></p>
-    <p><%= form.submit %></p>
+<section>
+  <div class="box">
+    <h2>ログイン</h2>
+    <%= form_for(:login, :url => login_path, :method => "post") do | form |%>
+      <!-- ログイン用Email -->
+      <p>メールアドレス</p>
+      <!-- エラーメッセージ -->
+      <% if @login.errors.any? && @login.errors[:email] %>
+        <% @login.errors[:email].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <%end%>
+      <%= form.text_field :email, :placeholder => "メールアドレス", :class => "" %>
+      <!-- ログイン用Password -->
+      <p>パスワード</p>
+      <!-- エラーメッセージ -->
+      <% if @login.errors.any? && @login.errors[:password] %>
+        <% @login.errors[:password].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <%end%>
+      <%= form.text_field :password, :placeholder => "パスワード" %>
+      <div class="btnbox">
+        <a href="" id="login-button" class="btn">ログイン</a>
+      </div>
+      <p class="font12">
+        パスワードを忘れた方は<a href="">こちら</a>
+      </p>
+    <% end %>
   </div>
-<% end %>
-<p>ログイン処理のPOST先</p>
-<p> URLヘルパー login_path => <%= login_path %></p>
+  <!--box-->
+</section>
+<div class="out">
+  <p class="font12">
+    新規会員登録は<a href="">こちら</a>
+  </p>
+</div>
+<script>
+  $(function() {
+      $("#login-button").eq(0).on("click", function(e) {
+          e.preventDefault();
+          $("form").eq(0).trigger("submit");
+      });
+  })
+</script>

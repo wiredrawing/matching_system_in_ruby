@@ -12,7 +12,12 @@ module SessionsHelper
 
   def current_user
     if @current_user.nil?
-      @current_user = Member.find_by(id: session[:member_id])
+      @current_user = Member.includes(
+        :getting_likes,
+        :informing_likes,
+        :declined,
+        :declining,
+      ).find_by(id: session[:member_id])
     else
       return @current_user
     end

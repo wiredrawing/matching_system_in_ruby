@@ -1,43 +1,68 @@
-<p>ここはマイページ編集ページ</p>
-<p><%= @member.display_name %></p>
-<p><%= @member.email %></p>
-<p><%= @member.password_digest %></p>
-<%= form_with(:model => @member, :url => mypage_edit_path) do | form | %>
-  <div>
-    <p>フォーム</p>
-    <%= form  %>
-    <%= form.hidden_field(:id) %>
-    <p><%= form.label("メールアドレス") %></p>
-    <p><%= form.text_field(:email, {:readonly => true }) %></p>
-    <p><%= form.label("表示用ニックネーム") %></p>
-    <p><%= form.text_field(:display_name) %></p>
-    <p><%= form.label("名字") %></p>
-    <p><%= form.text_field(:family_name) %></p>
-    <p><%= form.label("名前") %></p>
-    <p><%= form.text_field(:given_name) %></p>
-    <p><%= form.label("性別") %></p>
-    <p><%= form.select :gender, @genders %></p>
-    <p><%= form.label("メッセージ") %></p>
-    <p><%= form.text_field(:message) %></p>
-    <p><%= form.label("メモ") %></p>
-    <p><%= form.text_field(:memo) %></p>
-    <p>パスワード<br>
-      <%= form.text_field(:password) %>
-    </p>
-    <p>パスワード<br>
-      <%= form.text_field(:password_confirmation) %>
-    </p>
-    <p><%= form . submit(:update, {
-      :value => "更新",
-      :id => "button-to-update",
-      :class => "button-to-update",
-      }) %></p>
+<a href="" class="backk">戻る</a>
+<section id="app">
+  <div class="box">
+    <h2>プロフィール編集</h2>
+    <%= form_with :model => @member, :url => mypage_edit_path do |form| %>
+      <!-- ユーザー名 -->
+      <p>ユーザー名</p>
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:display_name].each do |error| %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :dislay_name, :value => @member.display_name, :placeholder => "ニックネーム" %>
+      <!-- 名字 -->
+      <p>姓</p>
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:family_name].each do |error| %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :family_name, :value => @member.family_name, :placeholder => "名字" %>
+      <!-- 名前 -->
+      <p>名</p>
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:given_name].each do |error| %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :given_name, :value => @member.given_name, :placeholder => "名字" %>
+      <!-- メールアドレス -->
+      <p>メールアドレス</p>
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:email].each do |error | %>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <%= form.text_field :email, :value => @member.email, :readonly => true %>
+      <!-- 性別 -->
+      <% if @member.errors.messages.length > 0 then %>
+        <% @member.errors.messages[:gender].each do |error| %>
+          <p class="input_red"><%= erorr %></p>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>性別</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :gender, @genders, :readonly => true %>
+        </div>
+      </div>
+      <div class="btnbox">
+        <a href="" class="btn update_button">編集完了</a>
+      </div>
+    <%end%>
   </div>
-<% end %>
-<!-- 以下エラー表示 -->
-<% if @member.errors.messages.length > 0 %>
-  <%= @member.errors.messages[:display_name] %>
-  <%= @member.errors.messages[:family_name] %>
-  <%= @member.errors.messages[:given_name] %>
-  <%= @member.errors.messages[:gender] %>
-<% end %>
+  <!--box-->
+</section>
+<script>
+  // 画面表示時パスワードを非表示
+  $(function() {
+  
+    // Aタグを送信ボタンとして扱う
+    $(".update_button").on("click", function(e) {
+        e.preventDefault();
+        $("form").eq(0).trigger("submit");
+    })
+  
+  })
+</script>

@@ -4,7 +4,10 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
-    puts("===========>mypage#index")
+    puts("[マイページTOPページ------------------------------------]")
+    pp(@current_user)
+    pp(@current_user.getting_likes)
+    pp(@current_user.informing_likes)
     print(session)
     p(session[:member_id])
     # 現在マッチング中のメンバーを取得
@@ -15,7 +18,15 @@ class MypageController < ApplicationController
   end
 
   def edit
-    return render ({ :template => "mypage/edit", :aa => :aa })
+    puts("[マイページ内プロフィール編集ページ--------------------------------]")
+    @member = @current_user
+    pp(@member)
+    pp(@member.errors)
+    pp(@member.errors.messages)
+    pp(@member.errors.messages.length)
+    puts("[マイページ内プロフィール編集ページ--------------------------------]")
+    return true
+    return render :template => "mypage/edit"
   end
 
   # ログインユーザーの情報更新処理

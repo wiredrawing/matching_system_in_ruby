@@ -100,7 +100,7 @@ Rails.application.routes.draw do
     :to => "mypage#footprints",
     :as => "mypage_footprints",
   }
-  post "/mypage/logout", {
+  get "/mypage/logout", {
     :to => "mypage#logout",
     :as => "logout",
   }

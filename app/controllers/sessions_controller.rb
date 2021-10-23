@@ -1,30 +1,45 @@
 class SessionsController < ApplicationController
   def new
+    @login = Login.new()
     render ({
       :template => "sessions/new",
     })
   end
 
   def create
-    p "params[:session]", params[:session]
-
-    p "UtilitiesController.BINARY_TYPE", UtilitiesController::BINARY_TYPE
-    member = Member.find_by({
-      :email => params[:session][:email],
+    # 新規モデルを作成
+    params.fetch(:login, {}).permit(
+      :email,
+      :password,
+    )
+    @login = Login.new({
+      :email => params[:login][:email],
+      :password => params[:login][:password],
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
 
-    p "member ====>", member
-    if member && member.authenticate(params[:session][:password])
-      # ログイン処理を実行
-      self.login(member)
-      p "mypage_url => #{mypage_url}"
-      redirect_to(mypage_url)
-    else
-      render ({
-        :template => "sessions/new",
+    if @login.validate() == true
+
+      # バリデーションが成功した場合､改めてmemberオブジェクトを生成する
+      @member = Member.find_by({
+        :email => params[:login][:email],
+        :is_registered => UtilitiesController::BINARY_TYPE[:on],
       })
+
+      # ログイン処理を実行
+      self.login(@member)
+      return redirect_to(mypage_url)
     end
+    print("======================================")
+    p(@login.errors)
+    p(@login.errors.any?)
+    p(@login.errors[:email])
+    p(@login.errors[:password])
+    @login.errors.each do |error|
+      p(error.full_message)
+    end
+    # ログイン認証失敗時
+    render :template => "sessions/new"
   end
 
   # ログインページはログイン状態が不要なためoverride
