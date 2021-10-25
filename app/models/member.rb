@@ -1,4 +1,6 @@
 class Member < ApplicationRecord
+  # ページング処理
+  paginates_per 2
   # リレーションの関連付け
   # もらったいいいね
   has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id)
@@ -24,6 +26,7 @@ class Member < ApplicationRecord
   _anonymous = lambda do
     self.order({
       :created_at => :desc,
+      :updated_at => :desc,
     })
   end
   has_many(:all_images, _anonymous, **{

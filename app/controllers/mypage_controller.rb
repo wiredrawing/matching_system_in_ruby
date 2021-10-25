@@ -75,11 +75,12 @@ class MypageController < ApplicationController
   # 画像アップロード処理
   def upload
     @image = Image.new()
-    @images = Image.where({
-      :member_id => @current_user.id,
-    }).order({
-      :created_at => :desc,
-    })
+    @images = @current_user.all_images
+    # @images = Image.where({
+    #   :member_id => @current_user.id,
+    # }).order({
+    #   :created_at => :desc,
+    # })
     @blur_level = UtilitiesController::BLUR_LEVEL
     render({
       :template => "mypage/upload",
@@ -189,12 +190,9 @@ class MypageController < ApplicationController
         :blur_level => params[:image][:blur_level],
       })
       return redirect_to(mypage_upload_url)
-      print("アップロードした画像のぼかしレベルの変更")
-      p(response)
-      p(@image)
     rescue => exception
-      p(exception)
-      p(exception.message)
+      pp(exception)
+      return render :tempate => "errors/index"
     end
   end
 

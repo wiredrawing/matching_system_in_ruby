@@ -28,6 +28,8 @@ gem 'devise'
 
 gem 'mini_magick'
 
+gem 'kaminari'
+
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

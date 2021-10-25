@@ -110,7 +110,8 @@ Rails.application.routes.draw do
     :to => "mypage#logout",
     :as => "logout",
   }
-
+  # ログイン中ユーザーが自身のプロフィール画面を閲覧する
+  get "/mypage/profile", :to => "mypage#prfile", :as => "mypage_profile"
   ##########################################
   # ログインページ
   ##########################################

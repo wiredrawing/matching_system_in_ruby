@@ -3,71 +3,57 @@ class MembersController < ApplicationController
   # before_action :set_member, only: %i[ show edit update destroy ]
   before_action :set_member, only: %i[ edit update destroy ]
   # メンバーページを閲覧するたびに足跡を更新する
-  before_action -> do
-                  visited_member(params[:id])
-                end, :only => [:show]
+  before_action (-> { visited_member(params[:id]) }), :only => [:show]
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
   def index
     # ブロック中のユーザー
-    @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do | member |
-      next member.id;
+    @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
+      next member.id
     end
 
     # 異性のmembers一覧を取得する
-    @members = Member.hetero_members(@current_user, @declining_member_id_list)
+    @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list)
   end
 
   # 指定した任意のmember_idの情報を表示する
   def show
     begin
-      # ブロックしていないかどうかをチェック
-      declining = Decline.where({
-        :from_member_id => @current_user.id,
-        :to_member_id => params[:id],
-      }).first()
+      @is_yourself = false
+      # 閲覧中ユーザーがログインユーザーかどうか?
+      if params[:id].to_i == @current_user.id.to_i
+        @is_yourself = true
+        @member = Member.find params[:id]
+      else
+        # 自身以外のプロフィールを閲覧している場合
+        # ブロックしていないかどうかをチェック
+        declining = Decline.where({
+          :from_member_id => @current_user.id,
+          :to_member_id => params[:id],
+        }).first()
 
-      print("ブロックしているかどうかをチェック")
-      p(declining)
-      if declining != nil
-        raise StandardError.new("このメンバーをブロックしています")
+        if declining != nil
+          raise StandardError.new("このメンバーをブロックしています")
+        end
+
+        # ブロックされていないかどうかをチェック
+        declined = Decline.where({
+          :from_member_id => params[:id],
+          :to_member_id => current_user.id,
+        }).first()
+
+        if declined != nil
+          raise StandardError.new("このメンバーからブロックされています")
+        end
+
+        @member = Member.showable_member(@current_user, params[:id])
+        # 表示可能な画像一覧のみ
+        @images = @member.showable_images
       end
-
-      # ブロックされていないかどうかをチェック
-      declined = Decline.where({
-        :from_member_id => params[:id],
-        :to_member_id => current_user.id,
-      }).first()
-
-      print("ブロックされていないかどうかをチェック")
-      p(declined)
-      if declined != nil
-        raise StandardError.new("このメンバーからブロックされています")
-      end
-
-      puts("aaaaaaaaaaaaaaaaa")
-      @member = Member.showable_member(@current_user, params[:id])
-      print(@member.class)
-      puts("もらったいいね ===>", @member.getting_likes)
-      puts("もらったいいねの数 ===>", @member.getting_likes.length)
-      print("@member.display_name ---->", @member.display_name)
-      puts("show ===================================")
-      p(@member)
-      puts("閲覧中ユーザーがアップロードしている画像")
-      p(@member.showable_images)
-      p(@member.all_images)
-      # 公開中の画像一覧を取得する
-      # @images = @member.images.where ({
-      #   :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      #   :is_deleted => UtilitiesController::BINARY_TYPE[:off],
-      # })
-      # 表示可能な画像一覧のみ
-      @images = @member.showable_images
-      print("公開中の画像一覧を取得する=================>")
-      puts(@images.length)
     rescue => error
-      puts("例外発生!!!!!!!!!!!")
-      puts(error)
+      #--------------------------------------------
+      pp(error)
+      logger.debug(error)
       render({
         :template => "members/error",
       })
@@ -157,40 +143,43 @@ class MembersController < ApplicationController
 
   # 指定したユーザーに足跡をつける
   def visited_member(member_id)
-    print("????異性のページにアクセスした際に足跡を残す")
-    # 足跡をつける
-
-    footprint = Footprint.where({
-      :from_member_id => @current_user.id,
-      :to_member_id => member_id,
-    }).first()
-    # logging
-    logger.debug "footprint => " + footprint.to_s
-
-    if (footprint == nil)
-      # 初めてアクセスしたとき
-      footprint = Footprint.new({
+    # ログイン中ユーザーが自身のプロフィールを見た場合を除く
+    if member_id != @current_user.id
+      footprint = Footprint.where({
         :from_member_id => @current_user.id,
         :to_member_id => member_id,
-        :access_count => 1,
-        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
-      })
+      }).first()
+      # logging
+      logger.debug "footprint => " + footprint.to_s
 
-      # バリデーションチェック後､足跡を保存
-      if footprint.validate() == true
-        footprint.save()
+      if (footprint == nil)
+        # 初めてアクセスしたとき
+        footprint = Footprint.new({
+          :from_member_id => @current_user.id,
+          :to_member_id => member_id,
+          :access_count => 1,
+          :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+        })
+
+        # バリデーションチェック後､足跡を保存
+        if footprint.validate() == true
+          footprint.save()
+        end
+      else
+        # 二回目以降のアクセス
+        # updated_atとアクセス回数のみをアップデート
+        updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
+        access_count = footprint.access_count.to_i + 1 # アクセス回数
+        response = footprint.update({
+          :updated_at => updated_at,
+          :access_count => access_count,
+          :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+        })
       end
+      return footprint
     else
-      # 二回目以降のアクセス
-      # updated_atとアクセス回数のみをアップデート
-      updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
-      access_count = footprint.access_count.to_i + 1 # アクセス回数
-      response = footprint.update({
-        :updated_at => updated_at,
-        :access_count => access_count,
-        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
-      })
-      puts(updated_at)
+      logger.debug "#{@current_user.id}が自身のプロフィールページを閲覧しています｡"
+      return nil
     end
   end
 end

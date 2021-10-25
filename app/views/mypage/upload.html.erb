@@ -1,7 +1,3 @@
-<p>memberモデル</p>
-<%= @member %>
-<p>セッションデータから</p>
-<%= @current_user %>
 <%= form_with ({:model => @member, :url => mypage_upload_url, :multipart => true, :method => "post",} )  do | form | %>
   <div>
     <%= form.hidden_field :id %>
@@ -32,11 +28,47 @@
     <%= form.hidden_field :id, :value => image.id %>
     <p><%= form.submit :value => image.display_status , :id => "button-to-active-this-image"%></p>
   <% end %>
-  <!-- 以下は削除ボタン -->
-  <%= form_for :image, :url => mypage_delete_image_path, :method => "delete" do |form| %>
-    <!-- 削除対象の画像IDをhiddenに持たせる -->
-    <%= form.hidden_field :id, :value => image.id %>
-    <p>この画像を削除する</p>
-    <p><%= form.submit :value => "この画像を削除", :id => "button-to-delet-this-image"%></p>
-  <% end %>
 <% end %>
+<a href="" class="backk">戻る</a>
+<section>
+  <h2 class="noto fontpink">アップロード済み画像</h2>
+  <div class="oaitelists_wrap mt0">
+    <% if @current_user.all_images.length > 0 then %>
+      <% @current_user.all_images.each do |image|%>
+        <div class="oaitelists">
+          <a class="oaitelists_img">
+            <img src="<%= image.owner_image_url() %>">
+          </a>
+          <!-- 指定した画像の表示ステータス変更ボタン -->
+          <a href="" class="change-active"><%= image.display_status %></a>
+          <%= form_for :image, :url => active_image_path(:id => image.id), :method => "post" do | form |%>
+            <%= form.hidden_field :id, :value => image.id %>
+          <% end %>
+          <!-- 指定した画像の削除 -->
+          <a href="" class="unblock">画像の削除</a>
+          <%= form_for :image, :url => mypage_delete_image_path, :method => "delete", :html => {:"class" => "delete-image-form"} do |form| %>
+            <%= form.hidden_field :id, :value => image.id %>
+          <% end %>
+        </div>
+        <!--oaitelists-->
+      <%end%>
+    <%end%>
+  </div>
+  <!--oaitelists_wrap-->
+  <div class="paging">
+    <a href="{{ $declining_users->previousPageUrl() }}" rel="prev">
+      <img src="/images/back.png" width="24">
+    </a>
+    <a href="{{ $declining_users->nextPageUrl() }}" rel="next">
+      <img src="/images/forward.png" width="24">
+    </a>
+  </div>
+</section>
+<script>
+  $(".unblock").each((i) => {
+    $(".unblock").eq(i).on("click", (e) => {
+      e.preventDefault()
+      $("form.delete-image-form").eq(i).trigger("submit");
+    })
+  });
+</script>

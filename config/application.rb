@@ -6,6 +6,7 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 Bundler.require("rmagick")
+Bundler.require("kaminari")
 
 module MatchingSystem
   class Application < Rails::Application

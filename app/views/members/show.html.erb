@@ -13,15 +13,17 @@
   <!--opp_imgs-->
 </section>
 <section class="opp_wrap">
-  <div class="opp_status">
-    <% if @member.match_you?(@current_user.id) %>
-      <p>相互マッチ中</p>
-    <% elsif @member.is_liked?(@current_user.id) %>
-      <p>Good済み</p>
-    <% else %>
-      <p>あなたをGoodしています</p>
-    <% end %>
-  </div>
+  <% if @is_yourself == false then %>
+    <div class="opp_status">
+      <% if @member.match_you?(@current_user.id) %>
+        <p>相互マッチ中</p>
+      <% elsif @member.is_liked?(@current_user.id) %>
+        <p>Good済み</p>
+      <% else %>
+        <p>あなたをGoodしています</p>
+      <% end %>
+    </div>
+  <% end %>
   <!--opp_status-->
   <div class="box">
     <div class="facebox">
@@ -61,23 +63,27 @@
     </table>
   </div>
   <!--box-->
-  <!-- 自身のプロフィール閲覧時は表示させない -->
-  <div class="tex_c mt64">
-    <%= form_for :decline, :url => declines_path, :html => { "class".intern => :decline_form} do |form| %>
-      <%= form.hidden_field :to_member_id, :value => @member.id %>
-      <%= form.hidden_field :from_member_id, :value => @current_user.id %>
-    <% end %>
-    <a href="" class="block_button">この人をブロックする</a>
-  </div>
+  <% if @is_yourself == false then %>
+    <!-- 自身のプロフィール閲覧時は表示させない -->
+    <div class="tex_c mt64">
+      <%= form_for :decline, :url => declines_path, :html => { "class".intern => :decline_form} do |form| %>
+        <%= form.hidden_field :to_member_id, :value => @member.id %>
+        <%= form.hidden_field :from_member_id, :value => @current_user.id %>
+      <% end %>
+      <a href="" class="block_button">この人をブロックする</a>
+    </div>
+  <% end %>
 </section>
-<!-- 閲覧中ユーザーにいいねを贈る -->
-<% if (@member.is_liked?(@current_user.id) != true) then %>
-  <!-- Goodを贈っていない場合のみ -->
-  <div class="btn_follow_fixed">
-    <%= form_tag(inform_like_path(:id => @member.id), {"class".intern => :send_like_form, :method => "post"}) do |form| %>
-    <% end %>
-    <a href="" class="btn_follow sending_like"><%= @member.display_name %>さんにGoodを贈る</a>
-  </div>
+<% if @is_yourself == false then %>
+  <!-- 閲覧中ユーザーにいいねを贈る -->
+  <% if (@member.is_liked?(@current_user.id) != true) then %>
+    <!-- Goodを贈っていない場合のみ -->
+    <div class="btn_follow_fixed">
+      <%= form_tag(inform_like_path(:id => @member.id), {"class".intern => :send_like_form, :method => "post"}) do |form| %>
+      <% end %>
+      <a href="" class="btn_follow sending_like"><%= @member.display_name %>さんにGoodを贈る</a>
+    </div>
+  <% end %>
 <% end %>
 <% if @member.match_you?(@current_user.id) == true then %>
   <!-- マッチ済みの場合のみ表示させる -->

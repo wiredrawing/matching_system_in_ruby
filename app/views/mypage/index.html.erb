@@ -9,85 +9,75 @@
     </div>
     <div class="facebox">
       <!-- ID => {{$request->member->id}} -->
-      <p class="id_label"><%= current_user.display_name %></p>
-      <p class="id_label"><%= current_user.family_name %> <%= current_user.given_name %></p>
+      <p class="id_label"><%= @current_user.display_name %></p>
+      <p class="id_label"><%= @current_user.family_name %> <%= @current_user.given_name %></p>
       <!-- 契約中プランの表示 -->
       <p class="id_label">
-        @if (isset($request->member->price_plan))
-        {{$request->member->price_plan->name}}
-        @if ($request->member->valid_period !== null)
         <p class="font12">
-          有効期限<{{ $request->member->valid_period->format('Y年m月j日 H時i分') }}まで>
-          </p>
-          @endif
-          @endif
+          有効期限<%= @current_user.updated_at.strftime "%Y-%m-%d %H:%S" %>まで
         </p>
-        @if ($request->member->identity_image !== null && $request->member->identity_image->is_approved === Config('const.image.approve_type.authenticated'))
-        <p class="id_label">本人確認済</p>
-        @else
-        <div class="tex_c">
-          <a href="{{ action('Member\\IndexController@identity') }}" class="btn_mini_edit">
-            本人確認証明書アップロード
-          </a>
-        </div>
-        @endif
-        @if (isset($request->member->income_image) && $request->member->income_image->is_approved === Config("const.image.approve_type.authenticated"))
-        <p class="id_label">VIPユーザー</p>
-        @endif
-        <div class="tex_c">
-          <a href="<%= mypage_edit_url() %>" class="btn_mini_edit">プロフィール編集</a>
-        </div>
-        <div class="tex_c">
-          <a class="btn_mini_edit" href="">自身のプロフィールを閲覧</a>
-        </div>
+      </p>
+      <p class="id_label">本人確認済</p>
+      <div class="tex_c">
+        <a href="{{ action('Member\\IndexController@identity') }}" class="btn_mini_edit">
+          本人確認証明書アップロード
+        </a>
       </div>
-      <div class="numberbox">
-        <div class="numberbox1">
-          <p>相互マッチ</p>
-          <p class="number">
-            <a href="<%= mypage_matching_url() %>">
-              <%= @matching_members.length %>
-            </a>
-          </p>
-        </div>
-        <div class="numberbox2">
-          <p>贈ったGood</p>
-          <p class="number">
-            <a href="<%= mypage_informing_likes_url() %>">
-              <%= @current_user.informing_likes.length %>
-            </a>
-          </p>
-        </div>
-        <div class="numberbox1">
-          <p>もらったGood</p>
-          <p class="number">
-            <a href="<%= mypage_getting_likes_url() %>">
-              <%= @current_user.getting_likes.length %>
-            </a>
-          </p>
-        </div>
+      <p class="id_label">VIPユーザー</p>
+      <div class="tex_c">
+        <a href="<%= mypage_edit_url() %>" class="btn_mini_edit">プロフィール編集</a>
+      </div>
+      <div class="tex_c">
+        <a class="btn_mini_edit" href="<%= member_url :id => @current_user.id %>">自身のプロフィールを閲覧</a>
       </div>
     </div>
-    <!--box-->
-    <div class="oaitelists_wrap">
-      <% @hetero_members.each do |member| %>
-        <div class="oaitelists">
-          <a href="<%= member_url(member.id) %>" class="oaitelists_img">
-            <% if member.showable_images.length > 0 then %>
-              <img src="<%= member.showable_images.first.member_image_url %>">
-            <% else %>
-              <img src="/images/oaite.jpg">
-            <% end %>
+    <div class="numberbox">
+      <div class="numberbox1">
+        <p>相互マッチ</p>
+        <p class="number">
+          <a href="<%= mypage_matching_url() %>">
+            <%= @matching_members.length %>
           </a>
-          <p class="bold"><%= member.display_name %></p>
-          <p>本名: <%= member.family_name %> <%= member.given_name %></p>
-          <p>もらったいいね: &starf; <%= member.getting_likes.length %></p>
-          <p>贈ったいいね: &starf; <%= member.informing_likes.length %></p>
-          <p>PR: <%= member.message %></p>
-        </div>
-      <% end %>
-      <!--oaitelists-->
+        </p>
+      </div>
+      <div class="numberbox2">
+        <p>贈ったGood</p>
+        <p class="number">
+          <a href="<%= mypage_informing_likes_url() %>">
+            <%= @current_user.informing_likes.length %>
+          </a>
+        </p>
+      </div>
+      <div class="numberbox1">
+        <p>もらったGood</p>
+        <p class="number">
+          <a href="<%= mypage_getting_likes_url() %>">
+            <%= @current_user.getting_likes.length %>
+          </a>
+        </p>
+      </div>
     </div>
-    <!--oaitelists_wrap-->
   </div>
+  <!--box-->
+  <div class="oaitelists_wrap">
+    <% @hetero_members.each do |member| %>
+      <div class="oaitelists">
+        <a href="<%= member_url(member.id) %>" class="oaitelists_img">
+          <% if member.showable_images.length > 0 then %>
+            <img src="<%= member.showable_images.first.member_image_url %>">
+          <% else %>
+            <img src="/images/oaite.jpg">
+          <% end %>
+        </a>
+        <p class="bold"><%= member.display_name %></p>
+        <p>本名: <%= member.family_name %> <%= member.given_name %></p>
+        <p>もらったいいね: &starf; <%= member.getting_likes.length %></p>
+        <p>贈ったいいね: &starf; <%= member.informing_likes.length %></p>
+        <p>PR: <%= member.message %></p>
+      </div>
+    <% end %>
+    <!--oaitelists-->
+  </div>
+  <!--oaitelists_wrap-->
+</div>
 </section>
