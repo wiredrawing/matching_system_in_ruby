@@ -29,4 +29,12 @@ class UtilitiesController < ApplicationController
     ["中", 15],
     ["大", 30],
   ]
+
+  # ユーザーのアクションリスト
+  ACTION_ID_LIST = {
+    :like => 10, # 特定のメンバーからいいねをもらった場合
+    :match => 20, # 任意のメンバーとマッチングした場合
+    :message => 30, # マッチングしたメンバーからのメッセージ受信
+    :notice => 40, # システム側からのメッセージ通知があった場合
+  }
 end

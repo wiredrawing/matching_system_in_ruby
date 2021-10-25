@@ -38,6 +38,27 @@ class Like < ApplicationRecord
     },
   })
 
+  # 引数にわたしたメンバー同士がマッチしているかどうか
+  def is_matching?(from_member_id = 0, to_member_id = 0)
+    puts("[Member#is_match ----------------------------------------]")
+    begin
+      # 送信元
+      from_like = self.where :from_member_id => from_member_id, :to_member_id => to_member_id
+      pp(from_like)
+      # 送信先
+      to_like = self.where :from_member_id => to_member_id, :to_member_id => from_member_id
+      pp(to_like)
+      if from_like.length == 1 && to_like.length == 1
+        return true
+      else
+        return false
+      end
+    rescue => exception
+      pp(exception)
+      return false
+    end
+  end
+
   # 指定したユーザーがマッチングしたユーザー一覧を取得する
   def self.fetch_matching_members(member_id)
     # print("マッチング中ユーザー一覧を取得する")

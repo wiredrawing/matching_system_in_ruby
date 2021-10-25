@@ -22,6 +22,7 @@ class Api::ImagesController < ApplicationController
       render({
         :file => file_path,
         :content_type => @image.extension,
+        :status => 200,
       })
     rescue => exception
       ###############################################
@@ -70,6 +71,7 @@ class Api::ImagesController < ApplicationController
         # 生のコンテンツを出力する場合
         :body => image.to_blob,
         :content_type => @image.extension,
+        :status => 200,
       })
     rescue => exception
       ###############################################

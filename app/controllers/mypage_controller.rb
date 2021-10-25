@@ -254,6 +254,14 @@ class MypageController < ApplicationController
     # return redirect_to(mypage_url)
   end
 
+  # ログインユーザーに向けられたアクションログを表示
+  def logs
+    @logs = Log.find_by({
+      :to_member_id => @current_user.id,
+      :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+    })
+  end
+
   private
 
   ##########################################

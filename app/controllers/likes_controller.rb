@@ -24,9 +24,35 @@ class LikesController < ApplicationController
       response = @like.save()
       print("@like =====>", @like)
       print("response ====>", response)
+
+      # ユーザーのアクションログを記録
+      @log = Log.new({
+        :from_member_id => @current_user.id,
+        :to_member_id => params[:id],
+        :action_id => UtilitiesController::ACTION_ID_LIST[:like],
+      })
+      # ログ保存
+      response = @log.save()
+
+      # マッチングが完了した場合はマッチしたアクションログも残す
+      if Like.is_matching?(from_member_id, to_member_id) == true
+        @log = Log.new([{
+          :from_member_id => @current_user.id,
+          :to_member_id => params[:id],
+          :action_id => UtilitiesController::ACTION_ID_LIST[:match],
+        }, {
+          :from_member_id => params[:id],
+          :to_member_id => @current_user.id,
+          :action_id => UtilitiesController::ACTION_ID_LIST[:match],
+        }])
+        # マッチングログを記録
+        @log.save()
+      end
+
       return redirect_to member_url(:id => params[:id])
     rescue => error
       print("Error --->", error)
+      pp(error)
     end
   end
 
