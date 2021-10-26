@@ -7,7 +7,8 @@ class LikesController < ApplicationController
   end
 
   def inform
-    begin
+    puts("トランザクション開始---------------->>>>>>")
+    ActiveRecord::Base.transaction do
       # いいね先member_id
       to_member_id = params[:id]
       from_member_id = @current_user.id
@@ -15,11 +16,13 @@ class LikesController < ApplicationController
         :to_member_id => params[:id],
         :from_member_id => @current_user.id,
       }
-      @like = Like.where(new_like).first()
-
-      if @like != nil
-        raise StandardError.new("既にいいねを送信済みです")
-      end
+      # @like = Like.where(new_like).first()
+      # # raise StandardError.new "意図的な例外"
+      # if @like != nil
+      #   raise StandardError.new("既にいいねを送信済みです")
+      # end
+      @like = Like.new(new_like)
+      response = @like.save()
       @like = Like.new(new_like)
       response = @like.save()
       print("@like =====>", @like)
@@ -51,8 +54,9 @@ class LikesController < ApplicationController
 
       return redirect_to member_url(:id => params[:id])
     rescue => error
-      print("Error --->", error)
+      puts("ロールバックを実行--------------------------------------")
       pp(error)
+      # ActiveRecord::Rollback
     end
   end
 

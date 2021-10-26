@@ -37,4 +37,10 @@ class UtilitiesController < ApplicationController
     :message => 30, # マッチングしたメンバーからのメッセージ受信
     :notice => 40, # システム側からのメッセージ通知があった場合
   }
+  ACTION_STRING_LIST = [
+    10 => "いいねがきました",
+    20 => "マッチングしました",
+    30 => "メッセージがきました",
+    40 => "システムメッセージがきました",
+  ]
 end

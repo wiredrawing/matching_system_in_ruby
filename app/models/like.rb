@@ -39,7 +39,7 @@ class Like < ApplicationRecord
   })
 
   # 引数にわたしたメンバー同士がマッチしているかどうか
-  def is_matching?(from_member_id = 0, to_member_id = 0)
+  def self.is_matching?(from_member_id = 0, to_member_id = 0)
     puts("[Member#is_match ----------------------------------------]")
     begin
       # 送信元

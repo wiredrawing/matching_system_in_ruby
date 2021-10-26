@@ -170,6 +170,7 @@ class MypageController < ApplicationController
   end
 
   def update_image
+    puts("[Mypage#update_image----------------------------------]")
     begin
       p("---------------------------update_imge")
       p(params)
@@ -256,10 +257,13 @@ class MypageController < ApplicationController
 
   # ログインユーザーに向けられたアクションログを表示
   def logs
-    @logs = Log.find_by({
+    @logs = Log.where({
       :to_member_id => @current_user.id,
       :is_browsed => UtilitiesController::BINARY_TYPE[:off],
     })
+    @action_string_list = UtilitiesController::ACTION_STRING_LIST,
+    pp(@logs)
+    pp(@action_string_list)
   end
 
   private

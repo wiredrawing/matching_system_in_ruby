@@ -4,8 +4,8 @@
     <div class="box">
       <% @logs.each do |log| %>
         <a href="{{$value->url}}" class="topics_list">
-          <p><%= log.created_at.strftime("%Y年%d月%日 %H時$S分") %></p>
-          <p><%= log.from_member.dislay_name %>さんから アクション=><%= log.action_id %></p>
+          <p><%= log.created_at.strftime("%Y年%m月%d日 %H時%S分") %></p>
+          <p><%= log.from_member.display_name %>さんから <%= @action_string_list[log.action_id] %></p>
         </a>
       <% end %>
     </div>

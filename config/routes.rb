@@ -106,6 +106,11 @@ Rails.application.routes.draw do
     :to => "mypage#footprints",
     :as => "mypage_footprints",
   }
+  # ログ一覧
+  get "/mypage/logs", {
+    :to => "mypage#logs",
+    :as => "mypage_logs",
+  }
   get "/mypage/logout", {
     :to => "mypage#logout",
     :as => "logout",
