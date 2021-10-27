@@ -6,7 +6,6 @@ class Login < ApplicationRecord
 
   # Laravelでいう無名関数でのバリデーション
   validates_each(:email) do |object, attribute, value|
-    print("[メールアドレスのバリデーション開始]")
     member = Member.find_by({
       # メールアドレスを小文字で検索
       :email => value.downcase,
@@ -21,7 +20,6 @@ class Login < ApplicationRecord
   end
 
   validates_each(:password) do |object, attribute, value|
-    puts("[パスワードのバリデーション開始]")
     member = Member.find_by({
       # メールアドレスを小文字で検索
       :email => object.email.downcase,
@@ -32,14 +30,8 @@ class Login < ApplicationRecord
       object.errors.add(attribute, "パスワード認証に失敗しました")
       next false
     end
-    puts("PASSWORD =>", value, " <=")
-    p(object)
     response = member.authenticate(value)
-    p(response)
     if (response)
-      # パスワードの認証
-      print("PASSWORD => ", object)
-      p(object)
       next true
     else
       object.errors.add(attribute, "パスワード認証に失敗しました")

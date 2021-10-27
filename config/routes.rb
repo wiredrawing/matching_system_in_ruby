@@ -27,10 +27,10 @@ Rails.application.routes.draw do
     end
 
     # メッセージ送信用
-    scope "message" do
-      post "/:id", {
-        :to => "messages#create",
-        :as => "message_create",
+    scope "timeline" do
+      post "/", {
+        :to => "timelines#create_message",
+        :as => "timeline_create_message",
       }
     end
   end
@@ -41,7 +41,7 @@ Rails.application.routes.draw do
   resources :declines
   resources :images
   # resources :messages
-  resources :timelines
+  # resources :timelines
   resources :footprints
   # resources :likes
   resources :members
@@ -68,6 +68,10 @@ Rails.application.routes.draw do
   get "/messages/:id", {
     :to => "messages#talk",
     :as => "message_talk",
+  }
+  post "/messages/create", {
+    :to => "messages#create",
+    :as => "message_create",
   }
 
   ##########################################

@@ -1,0 +1,78 @@
+<% @timelines.each do |timeline|%>
+  <p><%= timeline.message.message %></p>
+<% end %>
+<a href="" class="backk">戻る</a>
+<div id="chat_area">
+  <section>
+    <div class="message_face">
+      <% if @opponent.showable_images.length > 0 then %>
+        <a href="">
+          <img src="<%= @opponent.showable_images.first.member_image_url() %>">
+        </a>
+      <% else %>
+        <a href="">
+          <img src="/images/sample_user.jpg">
+        </a>
+      <% end %>
+    </div>
+    <p><%= @opponent.display_name %></p>
+    <div class="talk">
+      <p v-on:click="getOldMessage" class="past_message_btn">過去のメッセージを取得</p>
+      <!-- メッセージのループ -->
+      <% @timelines.each do |timeline| %>
+        <% if timeline.message.member_id == @current_user.id %>
+          <div v-for="chat in chat_list" v-bind:key="chat.id" v-if="chat.from_member_id == from_member_id">
+            <div class="talkin_r">
+              <p class="kidokuornot"><%= timeline.is_browsed %></p>
+              <div v-if="chat.message != null" class="balloon1-right">
+                <p><%= timeline.message.message %></p>
+              </div>
+              <div v-if="chat.image != null" class="balloon1-right">
+                <p>
+                  <a target="_blank" v-bind:href="chat.image.image_url">
+                    <img width="100" v-bind:src="chat.image.image_thumbnail_url">
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div v-else>
+            <div class="talkin_l">
+              <div v-if="chat.message != null" class="balloon1-left">
+                <p><%= timeline.message.message %></p>
+              </div>
+              <div v-if="chat.image != null" class="balloon1-left">
+                <p>
+                  <a target="_blank" v-bind:href="chat.image.image_url">
+                    <img width="100" v-bind:src="chat.image.image_thumbnail_url">
+                  </a>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+      <div v-if="file != null" class="prepare_uploading_image">
+        <img v-if="file != null" src="" width="30%" id="selected_image">
+        <button v-on:click="uploadProfileImage">この画像をアップロードする</button>
+      </div>
+    </div>
+    <%= form_for :message, :url => message_create_path, :method => "post" do |form| %>
+      <%= form.hidden_field :from_member_id, :value => @current_user.id %>
+      <%= form.hidden_field :to_member_id, :value => @to_member_id  %>
+      <p><%= form.submit "submit-to-create-message", :value => "メッセージ送信" %></p>
+      <p><%= form.text_field :message, :placeholder => "※メッセージを入力して下さい" %></p>
+    <% end %>
+  </section>
+  <div class="talk_form">
+    <div class="talk_form2">
+      <%= form_for :message, :url => message_create_path, :method => "post" do |form| %>
+        <%= form.hidden_field :from_member_id, :value => @current_user.id %>
+        <%= form.hidden_field :to_member_id, :value => @to_member_id  %>
+        <p><%= form.submit "submit-to-create-message", :value => "メッセージ送信" %></p>
+        <p><%= form.text_field :message, :placeholder => "※メッセージを入力して下さい" %></p>
+      <% end %>
+    </div>
+  </div>
+</div>
