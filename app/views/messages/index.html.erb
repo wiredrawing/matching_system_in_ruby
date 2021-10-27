@@ -1,25 +1,56 @@
-<p id="notice"><%= notice %></p>
-
-<h1>Messages</h1>
-
-<table>
-  <thead>
-    <tr>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @messages.each do |message| %>
-      <tr>
-        <td><%= link_to 'Show', message %></td>
-        <td><%= link_to 'Edit', edit_message_path(message) %></td>
-        <td><%= link_to 'Destroy', message, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
-
-<br>
-
-<%= link_to 'New Message', new_message_path %>
+<a href="" class="backk">戻る</a>
+<section>
+  <% if @timelines.length > 0 %>
+    <div class="box">
+      <% @timelines.each do |timeline| %>
+        <a href="<%= message_talk_url :id => timeline.from_member.id %>" class="message_list">
+          <div class="message_list1">
+            <% if timeline.from_member.showable_images.length > 0 %>
+              <img src="<%= timeline.from_member.showable_images.first.member_image_url() %>">
+            <% else %>
+              <img src="/images/sample_user.jpg">
+            <% end %>
+          </div>
+          <div class="message_list2">
+            <p><%= timeline.created_at.strftime("%Y年%m月%d日 %H時%I分") %></p>
+            <p><%= timeline.from_member.display_name %>さんとのメッセージ</p>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="box">
+      <h2 class="noto">メッセージ</h2>
+      <p class="cation">現在､メッセージのやり取りが可能なマッチング済みのユーザーはいません｡</p>
+      <div class="tex_c">
+        <p class="font12">
+          <a class="button_to_back_previous_page" href="{{url()->previous()}}">前ページへ戻る</a>
+        </p>
+      </div>
+    </div>
+  <% end %>
+</section>
+<!-- ページング機能 -->
+@if ($matching_users->hasPages())
+<div class="paging">
+  {{-- Previous Page Link --}}
+  @if ($matching_users->onFirstPage())
+  {{-- <span class="disabled" aria-disabled="true">
+    <img src="/images/back.png" width="24">
+  </span> --}}
+  @else
+  <a href="{{ $matching_users->previousPageUrl() }}" rel="prev">
+    <img src="/images/back.png" width="24">
+  </a>
+  @endif
+  {{-- Next Page Link --}}
+  @if ($matching_users->hasMorePages())
+  <a href="{{ $matching_users->nextPageUrl() }}" rel="next">
+    <img src="/images/forward.png" width="24">
+  </a>
+  @else
+  {{-- <span class="disabled" aria-disabled="true">
+    <img src="/images/forward.png" width="24">
+  </span> --}}
+  @endif
+</div>

@@ -34,6 +34,24 @@ class Member < ApplicationRecord
                                       :foreign_key => :member_id,
                                     })
 
+  # 自身に送信されたメッセージ一覧を取得する
+  has_many :getting_timeline,
+           -> {
+             order(:created_at => :desc)
+           },
+           :class_name => "Timeline",
+           :foreign_key => :to_member_id,
+           :primary_key => :id
+
+  # 自身が送信したメッセージ一覧を取得する
+  has_many :informing_timeline,
+           -> {
+             order(:created_at => :desc)
+           },
+           :class_name => "Timeline",
+           :foreign_key => :from_member_id,
+           :primary_key => :id
+
   # いいねを贈ることができる異性のメンバー一覧を取得する
   def self.hetero_members(current_user = nil, exculded_members = [])
     print("ログインユーザーとは性別のことなるメンバー一覧を取得する")
@@ -265,9 +283,5 @@ class Member < ApplicationRecord
     else
       return false
     end
-  end
-
-  # 指定したユーザにおすすめのメンバー一覧を取得する
-  def recommended_members()
   end
 end

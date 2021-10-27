@@ -260,7 +260,7 @@ class MypageController < ApplicationController
     @logs = Log.where({
       :to_member_id => @current_user.id,
       :is_browsed => UtilitiesController::BINARY_TYPE[:off],
-    })
+    }).order(:created_at => :desc)
     @action_string_list = UtilitiesController::ACTION_STRING_LIST,
     pp(@logs)
     pp(@action_string_list)

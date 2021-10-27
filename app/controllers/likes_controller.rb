@@ -7,26 +7,25 @@ class LikesController < ApplicationController
   end
 
   def inform
-    puts("トランザクション開始---------------->>>>>>")
     ActiveRecord::Base.transaction do
       # いいね先member_id
       to_member_id = params[:id]
       from_member_id = @current_user.id
+
+      # 新規挿入レコード
       new_like = {
         :to_member_id => params[:id],
         :from_member_id => @current_user.id,
       }
-      # @like = Like.where(new_like).first()
-      # # raise StandardError.new "意図的な例外"
-      # if @like != nil
-      #   raise StandardError.new("既にいいねを送信済みです")
-      # end
+
+      # レコードの重複チェック
+      if (Like.find_by(new_like) != nil)
+        raise StandardError.new "既に登録済みです｡"
+      end
+
+      # レコード挿入処理
       @like = Like.new(new_like)
       response = @like.save()
-      @like = Like.new(new_like)
-      response = @like.save()
-      print("@like =====>", @like)
-      print("response ====>", response)
 
       # ユーザーのアクションログを記録
       @log = Log.new({
@@ -39,25 +38,35 @@ class LikesController < ApplicationController
 
       # マッチングが完了した場合はマッチしたアクションログも残す
       if Like.is_matching?(from_member_id, to_member_id) == true
-        @log = Log.new([{
+        # ログ登録1回目
+        @log = Log.new({
           :from_member_id => @current_user.id,
           :to_member_id => params[:id],
           :action_id => UtilitiesController::ACTION_ID_LIST[:match],
-        }, {
+        })
+        response = @log.save()
+        if (response == nil)
+          raise StandardError.new("マッチングログの登録に失敗しました")
+        end
+
+        # ログ登録回目
+        @log = Log.new({
           :from_member_id => params[:id],
           :to_member_id => @current_user.id,
           :action_id => UtilitiesController::ACTION_ID_LIST[:match],
-        }])
-        # マッチングログを記録
-        @log.save()
+        })
+        response = @log.save()
+        if (response == nil)
+          raise StandardError.new("マッチングログの登録に失敗しました")
+        end
       end
-
       return redirect_to member_url(:id => params[:id])
-    rescue => error
-      puts("ロールバックを実行--------------------------------------")
-      pp(error)
-      # ActiveRecord::Rollback
     end
+  rescue => error
+    puts("[例外発生]")
+    puts("[ロールバック]")
+    pp(error)
+    ActiveRecord::Rollback
   end
 
   # GET /likes/1 or /likes/1.json

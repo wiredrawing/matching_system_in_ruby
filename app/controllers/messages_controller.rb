@@ -1,9 +1,28 @@
 class MessagesController < ApplicationController
   before_action :set_message, only: %i[ show edit update destroy ]
 
-  # GET /messages or /messages.json
   def index
-    @messages = Message.all
+    puts("[メッセージ一覧-------------------------------------]")
+    # ログインユーザーが受け取った異性ごとのメッセージ
+    @timelines_to = Timeline.select(
+      "max(id) as id ",
+      "max(created_at) as created_at"
+    ).where({
+      :to_member_id => @current_user.id,
+    }).limit(
+      10
+    ).group(
+      :from_member_id,
+    ).to_a.map do |timeline|
+      next timeline.id
+    end
+
+    @timelines = Timeline.where({
+      :id => @timelines_to,
+    })
+    # # ログインユーザがマッチングしたメンバーとのメッセージリストを取得する
+    # @matching_members = Like.fetch_matching_members(@current_user.id)
+    return render :template => "messages/index"
   end
 
   # GET /messages/1 or /messages/1.json
@@ -57,13 +76,14 @@ class MessagesController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_message
-      @message = Message.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def message_params
-      params.fetch(:message, {})
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_message
+    @message = Message.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def message_params
+    params.fetch(:message, {})
+  end
 end

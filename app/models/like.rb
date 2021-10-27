@@ -68,21 +68,31 @@ class Like < ApplicationRecord
     }).to_a.map do |like|
       next like.to_member_id.to_i
     end
+    puts("贈ったいいね")
+    pp(informing_likes)
 
     # ログインユーザーがいいねしたメンバーが自身をいいねしているかどうか
-    matching_members = self.select(:from_member_id).where({
-      "to_member_id" => member_id,
-      "from_member_id" => informing_likes,
+    getting_members = self.select(:from_member_id).where({
+      :to_member_id => member_id,
     }).to_a.map do |like|
       # print("マッチング済みユーザー一覧を取得する")
       next like.from_member_id.to_i
     end
+    puts("もらったいいね")
+    pp(getting_members)
+
+    matching_members = getting_members & informing_likes
+
+    puts("マッチングしたいいね")
+    pp(matching_members)
 
     # puts("以下､マッチング済みユーザー一覧")
     # p(matching_members)
     matching_members = Member.where({
       :id => matching_members,
     })
+    p(matching_members)
+    pp(matching_members.class)
     return (matching_members)
   end
 end

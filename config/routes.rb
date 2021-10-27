@@ -25,6 +25,14 @@ Rails.application.routes.draw do
             }
       end
     end
+
+    # メッセージ送信用
+    scope "message" do
+      post "/:id", {
+        :to => "messages#create",
+        :as => "message_create",
+      }
+    end
   end
 
   get "sessions/new"
@@ -32,7 +40,7 @@ Rails.application.routes.draw do
   resources :urls
   resources :declines
   resources :images
-  resources :messages
+  # resources :messages
   resources :timelines
   resources :footprints
   # resources :likes
@@ -48,6 +56,18 @@ Rails.application.routes.draw do
   post "/images/deactive/:id", {
     :to => "images#deactive",
     :as => "deactive_image",
+  }
+
+  ##########################################
+  # メッセージ
+  ##########################################
+  get "/messages/", {
+    :to => "messages#index",
+    :as => "messages",
+  }
+  get "/messages/:id", {
+    :to => "messages#talk",
+    :as => "message_talk",
   }
 
   ##########################################
@@ -117,6 +137,7 @@ Rails.application.routes.draw do
   }
   # ログイン中ユーザーが自身のプロフィール画面を閲覧する
   get "/mypage/profile", :to => "mypage#prfile", :as => "mypage_profile"
+
   ##########################################
   # ログインページ
   ##########################################

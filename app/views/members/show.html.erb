@@ -19,8 +19,10 @@
         <p>相互マッチ中</p>
       <% elsif @member.is_liked?(@current_user.id) %>
         <p>Good済み</p>
-      <% else %>
+      <% elsif @member.like?(@current_user.id) %>
         <p>あなたをGoodしています</p>
+      <% else %>
+        <!-- 処理無し -->
       <% end %>
     </div>
   <% end %>

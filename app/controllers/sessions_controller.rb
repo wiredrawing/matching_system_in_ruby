@@ -30,7 +30,7 @@ class SessionsController < ApplicationController
       self.login(@member)
       return redirect_to(mypage_url)
     end
-    print("======================================")
+    puts("======================================")
     p(@login.errors)
     p(@login.errors.any?)
     p(@login.errors[:email])

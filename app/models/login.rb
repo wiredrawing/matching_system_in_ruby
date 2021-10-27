@@ -48,19 +48,25 @@ class Login < ApplicationRecord
   end
 
   validates(:email, {
-    :length => {
-      :minimum => 1,
-      :maximum => 256,
+    :presence => {
       :message => "ログイン用メールアドレスは必須項目です",
     },
+  # :length => {
+  #   :minimum => 1,
+  #   :maximum => 256,
+  #   :message => "ログイン用メールアドレスは必須項目です",
+  # },
   })
 
   validates(:password, {
-    :length => {
-      :minimum => 1,
-      :maximum => 256,
+    :presence => {
       :message => "ログイン用パスワードは必須項目です",
     },
+  # :length => {
+  #   :minimum => 1,
+  #   :maximum => 256,
+  #   :message => "ログイン用パスワードは必須項目です",
+  # },
   })
 
   has_secure_password
