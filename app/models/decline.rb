@@ -69,4 +69,20 @@ class Decline < ApplicationRecord
     })
     return (declining_members)
   end
+
+  # 指定したユーザーをブロックしているメンバーリスト
+  def self.members_blocking_you(member_id)
+    members = self.where({
+      :to_member_id => member_id,
+    })
+    return members
+  end
+
+  # 指定したユーザーがブロックしているメンバーリスト
+  def self.members_you_block(member_id)
+    members = self.where({
+      :from_member_id => member_id,
+    })
+    return members
+  end
 end

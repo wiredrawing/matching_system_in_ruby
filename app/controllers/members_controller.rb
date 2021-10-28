@@ -6,11 +6,20 @@ class MembersController < ApplicationController
   before_action (-> { visited_member(params[:id]) }), :only => [:show]
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
+
+  # 閲覧可能な全メンバー一覧を表示
   def index
-    # ブロック中のユーザー
-    @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
+
+    # ログインユーザーがブロックしたメンバー
+    @members_you_block = Decline.members_you_block(@current_user.id).map do |member|
       next member.id
     end
+    # ログインユーザーをブロックしているメンバー
+    @members_blocking_you = Decline.members_blocking_you(@current_user.id).map do |member|
+      next member.id
+    end
+    # ログインユーザーがアクセスできない全メンバー
+    @disable_access_members = @members_you_block + @members_blocking_you
 
     # 異性のmembers一覧を取得する
     @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list)
@@ -19,6 +28,9 @@ class MembersController < ApplicationController
   # 指定した任意のmember_idの情報を表示する
   def show
     begin
+      if @current_user.browsable?(params[:id]) != false
+        raise StandardError.new "このメンバーを閲覧できません"
+      end
       @is_yourself = false
       # 閲覧中ユーザーがログインユーザーかどうか?
       if params[:id].to_i == @current_user.id.to_i
@@ -144,42 +156,43 @@ class MembersController < ApplicationController
   # 指定したユーザーに足跡をつける
   def visited_member(member_id)
     # ログイン中ユーザーが自身のプロフィールを見た場合を除く
-    if member_id != @current_user.id
-      footprint = Footprint.where({
-        :from_member_id => @current_user.id,
-        :to_member_id => member_id,
-      }).first()
-      # logging
-      logger.debug "footprint => " + footprint.to_s
-
-      if (footprint == nil)
-        # 初めてアクセスしたとき
-        footprint = Footprint.new({
-          :from_member_id => @current_user.id,
-          :to_member_id => member_id,
-          :access_count => 1,
-          :is_browsed => UtilitiesController::BINARY_TYPE[:off],
-        })
-
-        # バリデーションチェック後､足跡を保存
-        if footprint.validate() == true
-          footprint.save()
-        end
-      else
-        # 二回目以降のアクセス
-        # updated_atとアクセス回数のみをアップデート
-        updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
-        access_count = footprint.access_count.to_i + 1 # アクセス回数
-        response = footprint.update({
-          :updated_at => updated_at,
-          :access_count => access_count,
-          :is_browsed => UtilitiesController::BINARY_TYPE[:off],
-        })
-      end
-      return footprint
-    else
+    if member_id == @current_user.id
       logger.debug "#{@current_user.id}が自身のプロフィールページを閲覧しています｡"
       return nil
     end
+
+    footprint = Footprint.where({
+      :from_member_id => @current_user.id,
+      :to_member_id => member_id,
+    }).first()
+    # logging
+    logger.debug "footprint => " + footprint.to_s
+
+    if (footprint == nil)
+      # 初めてアクセスしたとき
+      footprint = Footprint.new({
+        :from_member_id => @current_user.id,
+        :to_member_id => member_id,
+        :access_count => 1,
+        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+      })
+
+      # バリデーションチェック後､足跡を保存
+      if footprint.validate() == true
+        footprint.save()
+      end
+    else
+      # 二回目以降のアクセス
+      # updated_atとアクセス回数のみをアップデート
+      updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
+      access_count = footprint.access_count.to_i + 1 # アクセス回数
+      response = footprint.update({
+        :updated_at => updated_at,
+        :access_count => access_count,
+        :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+      })
+    end
+    # 足跡オブジェクトを返却
+    return footprint
   end
 end

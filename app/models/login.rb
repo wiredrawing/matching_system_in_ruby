@@ -54,11 +54,6 @@ class Login < ApplicationRecord
     :presence => {
       :message => "ログイン用パスワードは必須項目です",
     },
-  # :length => {
-  #   :minimum => 1,
-  #   :maximum => 256,
-  #   :message => "ログイン用パスワードは必須項目です",
-  # },
   })
 
   has_secure_password

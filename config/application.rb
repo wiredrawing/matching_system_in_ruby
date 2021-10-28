@@ -2,6 +2,7 @@ require_relative "boot"
 
 require "rails/all"
 
+require "./lib/middlewares/load_eager_model"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -25,5 +26,7 @@ module MatchingSystem
     config.action_view.field_error_proc = Proc.new do |html_tag, instance|
       %Q(#{html_tag}).html_safe
     end
+
+    config.middleware.use(::LoadEagerModel)
   end
 end

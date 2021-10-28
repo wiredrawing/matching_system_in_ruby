@@ -16,14 +16,14 @@ class Message < ApplicationRecord
     :presence => {
       :message => "発言者member_idは必須項目です",
     },
-    :inclusion => {
-      :in => lambda do
-        members = Member.where({
-          :is_registered => UtilitiesController::BINARY_TYPE[:on],
-        }).to_a.map do |member|
-          next member.id
-        end
-      end.call,
-    },
+  # :inclusion => {
+  #   :in => lambda do
+  #     members = Member.where({
+  #       :is_registered => UtilitiesController::BINARY_TYPE[:on],
+  #     }).to_a.map do |member|
+  #       next member.id
+  #     end
+  #   end.call,
+  # },
   }
 end

@@ -2,7 +2,7 @@ class CreateImages < ActiveRecord::Migration[6.1]
   def change
     # uuidを使うため
     enable_extension "pgcrypto" unless extension_enabled?("pgcrypto")
-    create_table :images, { :id => :uuid } do |t|
+    create_table :images, **{ :id => :uuid } do |t|
       t.bigint :member_id
       t.integer :use_type
       t.string :filename

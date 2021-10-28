@@ -1,11 +1,13 @@
 class Member < ApplicationRecord
+  # パスワード処理
+  has_secure_password
   # ページング処理
   paginates_per 2
   # リレーションの関連付け
   # もらったいいいね
-  has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id)
+  has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id, :primary_key => :id)
   # 贈ったいいね
-  has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id)
+  has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id, :primary_key => :id)
   # 自身をブロックしているユーザー
   has_many(:declined, :class_name => "Decline", :foreign_key => :to_member_id)
   # 自身がブロックしているユーザー
@@ -85,29 +87,27 @@ class Member < ApplicationRecord
   # 指定したmember_idのユーザーをログイン中ユーザーが閲覧できる場合のみ
   # member情報を返却する
   def self.showable_member(current_user = nil, member_id = 0)
-    begin
-      _member = self.where({
-        :is_registered => UtilitiesController::BINARY_TYPE[:on],
-        :id => member_id,
-      }).and(
+    _member = self.where({
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :id => member_id,
+    }).and(
+      self.where.not({
+        :id => current_user.id,
+      }).or(
         self.where.not({
-          :id => current_user.id,
-        }).or(
-          self.where.not({
-            :gender => current_user.gender,
-          })
-        )
-      ).first()
-      print(_member.class)
-      print("_member.first =========>", _member, ">>>")
-      print("_member == nil", _member == nil, ">>>")
-      if _member == nil
-        raise StandardError.new("指定したユーザーが見つかりませんでした")
-      end
-      return(_member)
-    rescue => error
-      print("error ----------->", error)
+          :gender => current_user.gender,
+        })
+      )
+    ).first()
+
+    if _member == nil
+      raise StandardError.new("指定したユーザーが見つかりませんでした")
     end
+    return(_member)
+  rescue => error
+    puts("[例外発生-------------------------------------------------]")
+    print("error ----------->", error)
+    return nil
   end
 
   # 特定のキーに対して､任意のバリデー処理を実行させる
@@ -222,8 +222,6 @@ class Member < ApplicationRecord
     :on => :member_update_password,
   })
 
-  has_secure_password
-
   # 文字列としての性別を取得する
   def gender_string()
     # 性別定数をループする
@@ -268,7 +266,8 @@ class Member < ApplicationRecord
   # 指定したユーザーとマッチしているかどうか?
   ##########################################
   def match_you?(member_id)
-    likes = Like.where({
+    likes = self.
+      likes = Like.where({
       :from_member_id => member_id,
       :to_member_id => self.id,
     }).or(
@@ -283,5 +282,33 @@ class Member < ApplicationRecord
     else
       return false
     end
+  end
+
+  ##########################################
+  # 指定したユーザーにブロックされてないかしていないか?
+  # You can browse member info which you selected, if return true on this method.
+  # if return value is false, you cannot browse this member info.
+  ##########################################
+  def browsable?(member_id)
+
+    # Does login user decline selected member?
+    browsable = self.declined.where({
+      :from_member_id => member_id,
+    }).first()
+
+    if browsable != nil
+      return false
+    end
+
+    # Is login user  declined by selected member?
+    browsable = self.declining.where({
+      :to_member_id => member_id,
+    }).first()
+
+    if browsable != nil
+      return false
+    end
+
+    return true
   end
 end

@@ -14,4 +14,26 @@ class Timeline < ApplicationRecord
 
   # URLアクション
   has_one :url, :class_name => "Url", :foreign_key => :id, :primary_key => :url_id
+
+  # 指定したメンバー間のタイムライン
+  def self.timelines(from_member_id, to_member_id)
+    # 指定したメンバーのみのやり取りを取得
+    ids = Timelines.select(:id).where({
+      :from_member_id => from_member_id,
+      :to_member_id => to_member_id,
+    }).or(Timeline.where(
+      :from_member_id => to_member_id,
+      :to_member_id => from_member_id,
+    ))
+
+    # 対象のタイムラインのみを取得する
+    timelines = Timeline.where({
+      :id => ids,
+    })
+
+    if timelines.first == nil
+      return nil
+    end
+    return @timelines
+  end
 end

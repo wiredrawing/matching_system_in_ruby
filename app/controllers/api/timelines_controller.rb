@@ -2,7 +2,6 @@ class Api::TimelinesController < ApplicationController
 
   # メッセージの投稿
   def create_message
-    pp(params)
     params.fetch(:message, {}).permit(
       :from_member_id,
       :to_member_id,
@@ -10,7 +9,7 @@ class Api::TimelinesController < ApplicationController
     )
     # 新規メッセージを作成
     new_message = {
-      :member_id => params[:message][:from_member_id],
+      :member_id => @current_user.id,
       :message => params[:message][:message],
     }
     # メッセージオブジェクトの作成
@@ -19,6 +18,7 @@ class Api::TimelinesController < ApplicationController
     if @message.validate() != true
       raise StandardError.new "メッセージの投稿に失敗しました"
     end
+
     # メッセージをテーブルに保存
     response = @message.save()
     @message_id = @message.id
@@ -40,8 +40,12 @@ class Api::TimelinesController < ApplicationController
     logger.debug exception
     puts("[例外発生----------------------------------------]")
     pp(exception)
+
+    # バリデーションエラーをjsonで返却する
+    return @message.errors.messages
   end
 
+  # 要ログインを一旦外す場合
   def login_check
     return true
   end

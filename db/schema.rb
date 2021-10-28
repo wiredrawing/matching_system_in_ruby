@@ -37,7 +37,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.integer "use_type"
     t.string "filename"
     t.string "extension"
-    t.integer "blur_level"
+    t.integer "blur_level", default: 0
     t.integer "is_approved", default: 0
     t.integer "is_displayed", default: 0
     t.integer "is_deleted", default: 0
