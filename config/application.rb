@@ -27,6 +27,9 @@ module MatchingSystem
       %Q(#{html_tag}).html_safe
     end
 
-    config.middleware.use(::LoadEagerModel)
+    config.autoload_paths += %W(#{config.root}/lib)
+    config.autoload_paths += %W(#{config.root}/app/forms)
+
+    # config.middleware.use(LoadEagerModel)
   end
 end

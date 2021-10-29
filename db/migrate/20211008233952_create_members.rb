@@ -2,8 +2,8 @@ class CreateMembers < ActiveRecord::Migration[6.1]
   def change
     create_table :members do |t|
       t.string :email, **{
-                :null => false,
-              }
+                         :null => false,
+                       }
       t.string :display_name
       t.string :family_name
       t.string :given_name
@@ -15,6 +15,7 @@ class CreateMembers < ActiveRecord::Migration[6.1]
       t.text :message
       t.text :memo
       t.string :token
+      t.string :token_for_api
       t.string :password_digest
       # 本登録完了の場合 => 1
       t.integer :is_registered, **{

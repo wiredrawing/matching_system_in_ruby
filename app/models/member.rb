@@ -111,7 +111,7 @@ class Member < ApplicationRecord
   end
 
   # 特定のキーに対して､任意のバリデー処理を実行させる
-  validates_each(:token) do |object, attr, data|
+  validates_each(:token) do |object, attribute, data|
     if (object.token == "from_seed")
       next true
     else
@@ -121,10 +121,30 @@ class Member < ApplicationRecord
       }).first
 
       if (_member == nil)
-        object.errors.add(attr, "仮登録トークンが不正です")
+        object.errors.add(attribute, "仮登録トークンが不正です")
       end
       next true
     end
+  end
+
+  # 性別は初期登録時から変更させない
+  validates_each :gender do |object, attribute, data|
+    # Get the member info while operating.
+    member = Member.where({
+      :token => object.token,
+      :id => object.id,
+    }).first()
+
+    if member == nil
+      object.errors.add(attribute, "仮登録トークンが不正です")
+      next false
+    end
+    if data.to_i != member.gender
+      object.errors.add(attribute, "性別は変更できません")
+      next false
+    end
+    # Exit successfully.
+    next true
   end
 
   # emailバリデーション
@@ -266,18 +286,19 @@ class Member < ApplicationRecord
   # 指定したユーザーとマッチしているかどうか?
   ##########################################
   def match_you?(member_id)
-    likes = self.
-      likes = Like.where({
+    # Have you gotten likes from member_id?
+    getting_like = self.getting_likes.where({
       :from_member_id => member_id,
       :to_member_id => self.id,
-    }).or(
-      Like.where({
-        :from_member_id => self.id,
-        :to_member_id => member_id,
-      })
-    )
+    }).first()
 
-    if (likes.length == 2)
+    # Have you send like to member_id?
+    informing_likes = self.informing_likes.where({
+      :from_member_id => self.id,
+      :to_member_id => member_id,
+    }).first()
+
+    if getting_like != nil && informing_likes != nil
       return true
     else
       return false
@@ -295,7 +316,8 @@ class Member < ApplicationRecord
     browsable = self.declined.where({
       :from_member_id => member_id,
     }).first()
-
+    pp "# Does login user decline selected member?"
+    pp(browsable)
     if browsable != nil
       return false
     end
@@ -305,6 +327,8 @@ class Member < ApplicationRecord
       :to_member_id => member_id,
     }).first()
 
+    pp "# Is login user  declined by selected member?"
+    pp(browsable)
     if browsable != nil
       return false
     end

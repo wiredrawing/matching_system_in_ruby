@@ -19,22 +19,28 @@ class LikesController < ApplicationController
       }
 
       # レコードの重複チェック
-      if (Like.find_by(new_like) != nil)
-        raise StandardError.new "既に登録済みです｡"
+      if Like.find_by(new_like) != nil
+        raise StandardError.new "既に登録済みです"
       end
 
       # レコード挿入処理
       @like = Like.new(new_like)
-      response = @like.save()
+      if @like.save() != true
+        raise StandardError.new "いいねの送信に失敗しました"
+      end
 
       # ユーザーのアクションログを記録
-      @log = Log.new({
+      new_log = {
         :from_member_id => @current_user.id,
         :to_member_id => params[:id],
         :action_id => UtilitiesController::ACTION_ID_LIST[:like],
-      })
+      }
+      @log = Log.new(new_log)
+
       # ログ保存
-      response = @log.save()
+      if @log.save() != true
+        raise StandardError.new "いいねの送信は成功しましたが､ログの保存に失敗しました"
+      end
 
       # マッチングが完了した場合はマッチしたアクションログも残す
       if Like.is_matching?(from_member_id, to_member_id) == true
@@ -44,8 +50,7 @@ class LikesController < ApplicationController
           :to_member_id => params[:id],
           :action_id => UtilitiesController::ACTION_ID_LIST[:match],
         })
-        response = @log.save()
-        if (response == nil)
+        if @log.save() != true
           raise StandardError.new("マッチングログの登録に失敗しました")
         end
 
@@ -55,18 +60,17 @@ class LikesController < ApplicationController
           :to_member_id => @current_user.id,
           :action_id => UtilitiesController::ACTION_ID_LIST[:match],
         })
-        response = @log.save()
-        if (response == nil)
+        if @log.save() != true
           raise StandardError.new("マッチングログの登録に失敗しました")
         end
       end
       return redirect_to member_url(:id => params[:id])
     end
   rescue => error
-    puts("[例外発生]")
-    puts("[ロールバック]")
-    pp(error)
+    p "[例外発生--------------------------------------------------]"
+    pp error
     ActiveRecord::Rollback
+    return redirect_to member_url(:id => params[:id])
   end
 
   # GET /likes/1 or /likes/1.json

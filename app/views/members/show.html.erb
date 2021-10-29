@@ -90,7 +90,7 @@
 <% if @member.match_you?(@current_user.id) == true then %>
   <!-- マッチ済みの場合のみ表示させる -->
   <div class="btn_follow_fixed">
-    <a href="" class="btn_follow">
+    <a href="<%= message_talk_path :id => @member.id %>" class="btn_follow">
       <%= @member.display_name %>さんにメッセージを送る
     </a>
   </div>

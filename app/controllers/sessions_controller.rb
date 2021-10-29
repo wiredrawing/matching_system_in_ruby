@@ -1,13 +1,12 @@
 class SessionsController < ApplicationController
   def new
     @login = Login.new()
-    render ({
+    render(
       :template => "sessions/new",
-    })
+    )
   end
 
   def create
-    # 新規モデルを作成
     params.fetch(:login, {}).permit(
       :email,
       :password,
@@ -18,27 +17,33 @@ class SessionsController < ApplicationController
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
 
-    if @login.validate() == true
-
-      # バリデーションが成功した場合､改めてmemberオブジェクトを生成する
-      @member = Member.find_by({
-        :email => params[:login][:email],
-        :is_registered => UtilitiesController::BINARY_TYPE[:on],
-      })
-
-      # ログイン処理を実行
-      self.login(@member)
-      return redirect_to(mypage_url)
+    if @login.validate() != true
+      raise StandardError.new "メンバー情報が見つかりませんでした"
     end
-    puts("======================================")
-    p(@login.errors)
-    p(@login.errors.any?)
-    p(@login.errors[:email])
-    p(@login.errors[:password])
-    @login.errors.each do |error|
-      p(error.full_message)
+    # Forge new member object again, if vaildation to login is successfully.
+    @member = Member.find_by({
+      :email => params[:login][:email],
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+    })
+    # validation check.
+    if @member == nil
+      raise StandardError.new "メンバー情報が見つかりませんでした"
     end
-    # ログイン認証失敗時
+
+    # Reforge the token to request for api, and update record of login user's info.
+    new_token = TokenForApi.make_random_token(128)
+    response = @member.update({
+      :token_for_api => new_token,
+    })
+    if response != true
+      raise StandardError.new "ログインに失敗しました"
+    end
+
+    # Execute logging in.
+    self.login(@member)
+    return redirect_to(mypage_url)
+  rescue => exception
+    # When failed logging in.
     render :template => "sessions/new"
   end
 

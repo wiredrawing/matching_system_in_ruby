@@ -14,7 +14,7 @@ class RegisterController < ApplicationController
   ###########################################
   def create
     # 本登録用トークンを生成
-    _token = self.make_random_token (64)
+    _token = TokenForApi.make_random_token(128)
     print("生成された64文字のトークン ----->", _token)
     # 重複仮登録の場合を検証
     @register = Register.find_by ({
@@ -43,6 +43,8 @@ class RegisterController < ApplicationController
     else
       return render ({ :template => "register/index" })
     end
+  rescue => exception
+    pp(exception)
   end
 
   ###########################################
@@ -101,9 +103,11 @@ class RegisterController < ApplicationController
       end
 
       print("is_exists ====>", @member)
+
       # postデータをHashオブジェクトに
       member_params_hash = member_params.to_hash()
       member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
+      member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
       print("member_params_hash-------------->")
       p(member_params_hash)
       _updated = @member.update(member_params_hash)

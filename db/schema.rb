@@ -78,6 +78,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.text "message"
     t.text "memo"
     t.string "token"
+    t.string "token_for_api"
     t.string "password_digest"
     t.integer "is_registered", limit: 2, default: 0, null: false
     t.datetime "created_at", precision: 6, null: false

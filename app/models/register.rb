@@ -28,23 +28,13 @@ class Register < ApplicationRecord
       :maximum => 512,
       :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
     },
-  # # 独自性の追加(※ memberテーブルに既に存在する場合はエラーとする)
-  # :uniqueness => {
-  #   :message => lambda do |object, data|
-  #     print("validates->:uniquenes->:message内のlambda関数内処理")
-  #     p "uniquenessのmessegeラムダ内"
-  #     p "object ------>", object
-  #     p "data--------->", data
-  #     message = "このメールアドレスは現在使用できません"
-  #     return false
-  #   end,
-  # # :message => "このメールアドレスは使用できません",
-  # },
   })
 
   # display_name(本名とは違うニックネーム表示用)
   validates :display_name, {
-    :presence => true,
+    :presence => {
+      :message => "ニックネームは必須項目です",
+    },
     :length => {
       :minimum => 5,
       :maximum => 128,

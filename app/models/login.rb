@@ -43,11 +43,6 @@ class Login < ApplicationRecord
     :presence => {
       :message => "ログイン用メールアドレスは必須項目です",
     },
-  # :length => {
-  #   :minimum => 1,
-  #   :maximum => 256,
-  #   :message => "ログイン用メールアドレスは必須項目です",
-  # },
   })
 
   validates(:password, {

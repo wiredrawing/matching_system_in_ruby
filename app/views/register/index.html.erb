@@ -1,30 +1,50 @@
-<hr>
-<p>仮登録用フォーム</p>
-<%= form_with({
-  url: register_create_path,
-  model: @register,
-}) do |form| %>
-  <% if @register.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@register.errors.count, "error") %> prohibited this member from being saved:</h2>
-      <ul>
-        <% @register.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+<section>
+  <div class="box">
+    <h2>新規会員仮登録</h2>
+    <p class="font12">
+      アカウント本登録に関してのメールをお送りいたしますので、<br>
+      メールアドレスをご入力ください。
+    </p>
+    <%= form_with :model => @register, :url => register_create_path, :method => "post", :html => {:"class" => "submit-form-to-temp" } do |form|%>
+      <!-- email /////////////////////////////// -->
+      <p>メールアドレス</p>
+      <% if @register.errors.messages.length > 0 then %>
+        <% @register.errors.messages[:email].each do |error|%>
+          <p class="input_red"><%= error %></p>
         <% end %>
-      </ul>
-    </div>
-  <% end %>
-  <div class="actions">
-    <p><%= form.label "メールアドレス" %></p>
-    <p><%= form.text_field :email, :class => :email %></p>
-    <p><%= form.label "表示用ユーザー名" %></p>
-    <p><%= form.text_field :display_name %></p>
-    <p><%= form.label "性別の選択" %></p>
-    <p><%= form.select :gender, @genders  %></p>
-    <p><%= form.submit %></p>
+      <% end %>
+      <p><%= form.text_field :email %></p>
+      <!-- display_name /////////////////////////////// -->
+      <p>ニックネーム</p>
+      <% if @register.errors.messages.length > 0 then %>
+        <% @register.errors.messages[:display_name].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <p><%= form.text_field :display_name %></p>
+      <!-- 性別 /////////////////////////////// -->
+      <% if @register.errors.messages.length > 0 then %>
+        <% @register.errors.messages[:gender].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <%end%>
+      <%end%>
+      <div class="selectors">
+        <p>性別</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :gender, @genders %>
+        </div>
+      </div>
+      <div class="btnbox">
+        <a id="submit-form" class="btn">登録</a>
+      </div>
+    <% end %>
   </div>
-<% end %>
-<p>register_create_path => <%= register_create_path %></p>
-<p>register_create_path :id => @register.id, :token => @register.token <br>
-  => <%= register_create_path :id => @register.id, :token => @register.token %></p>
-<hr>
+  <!--box-->
+</section>
+<script>
+  $(function() {
+      $("#submit-form").on("click", function (e) {
+        $(".submit-form-to-temp").eq(0).trigger("submit")
+      });
+  });
+</script>

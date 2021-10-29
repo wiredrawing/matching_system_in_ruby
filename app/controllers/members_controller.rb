@@ -28,7 +28,7 @@ class MembersController < ApplicationController
   # 指定した任意のmember_idの情報を表示する
   def show
     begin
-      if @current_user.browsable?(params[:id]) != false
+      if @current_user.browsable?(params[:id]) != true
         raise StandardError.new "このメンバーを閲覧できません"
       end
       @is_yourself = false
