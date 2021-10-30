@@ -14,6 +14,8 @@ class Api::ImagesController < ApplicationController
   # Get all images that user who has logged in has.
   # /api/image/list/:id/:token_for_api
   def owner_images
+    p("request.headers-----------------------")
+    pp(request.headers["token-for-api"])
     @token_check = TokenCheck.new({
       :id => owner_images_params[:id].to_i,
       :token_for_api => owner_images_params[:token_for_api],
