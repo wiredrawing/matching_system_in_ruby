@@ -28,6 +28,16 @@ Rails.application.routes.draw do
             }
       end
 
+      # 画像表示用 URL
+      get "/:id/:token", {
+        :to => "images#image_url",
+        :as => "showable_image",
+      }
+      # ログインユーザーがアップ済みの画像一覧を取得する
+      get "/list/:id/:token_for_api", {
+        :to => "images#owner_images",
+        :as => "images_owner_has",
+      }
       # To upload any images.
       post "/update/:id", {
         :to => "images#update",
@@ -56,7 +66,7 @@ Rails.application.routes.draw do
   resources :logs
   resources :urls
   resources :declines
-  resources :images
+  # resources :images
   # resources :messages
   # resources :timelines
   resources :footprints

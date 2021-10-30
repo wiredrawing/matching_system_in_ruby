@@ -1,21 +1,26 @@
 # Use upload image with api.
-class FormImage
+class TokenCheck
   include ActiveModel::Model
 
-  attr_accessor :member_id, :extension, :token_for_api, :upload_file
-  validates :member_id, {
+  attr_accessor :id, :token_for_api
+
+  validates :id, {
     :presence => {
       :message => "画像送信者IDは必須項目です",
     },
     :inclusion => {
       # membersテーブルに存在するmember_idであることを保証する
-      :in => lambda do
+      :in => (lambda do
         members = Member.select(:id).where({
           :is_registered => UtilitiesController::BINARY_TYPE[:on],
-        }).map do |member|
+        }).to_a.map do |member|
           next member.id
         end
-      end[],
+        p("members----------->")
+        p(members)
+        return members
+      end).call,
+      :message => "不正なメンバーIDです",
     },
   }
 
@@ -26,22 +31,9 @@ class FormImage
     },
   }
 
-  validates_each :extension do |object, attribute, data|
-    if data.nil?
-      object.errors.add(attribute, "ファイルアップロードは必須項目です")
-      next false
-    end
-    content_type = data.content_type.to_s
-    if UtilitiesController::EXTENSION_LIST.keys.include?(content_type) != true
-      object.errors.add(attribute, "無効なファイル拡張子です")
-      next false
-    end
-    next true
-  end
-
   validates_each :token_for_api do |object, attribute, data|
     member = Member.find_by({
-      :id => object.member_id,
+      :id => object.id,
       :token_for_api => data,
     })
     if member == nil

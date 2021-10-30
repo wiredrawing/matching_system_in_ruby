@@ -1,4 +1,13 @@
 class Image < ApplicationRecord
+  before_validation :owner_image_url, :member_image_url
+
+  # 画像の所有者
+  has_one :member, :class_name => "Member", :foreign_key => :id, :primary_key => :member_id
+
+  attribute :member_image_url
+  attribute :owner_image_url
+  attribute :image_url
+
   showable_for_scope = -> {
     where({
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
@@ -54,7 +63,7 @@ class Image < ApplicationRecord
                 uploaded_path[:month] + "/" +
                 uploaded_path[:day] + "/" +
                 uploaded_path[:hour] + "/" +
-                self.id
+                self.filename
     file_path = Rails.root.join file_path
     p "file_path =====>", file_path
     # ファイル保管場所パスを返却
@@ -62,11 +71,21 @@ class Image < ApplicationRecord
   end
 
   def owner_image_url
-    return api_image_owner_show_url(:id => self.id)
+    owner_image_url = api_image_owner_show_url(:id => self.id)
+    # self.__owner_image_url = owner_image_url
+    # return self.__owner_image_url
   end
 
   def member_image_url
-    return api_image_show_url(:id => self.id, :member_id => self.member_id)
+    member_image_url = api_image_show_url(:id => self.id, :member_id => self.member_id)
+    # self.__member_image_url = member_image_url
+    # return self.__member_image_url
+  end
+
+  # URL to show the image.
+  def image_url
+    image_url = api_showable_image_url(:id => self.id, :token => self.token)
+    return image_url
   end
 
   def display_status

@@ -7,11 +7,49 @@ class Api::ImagesController < ApplicationController
     :upload,
     :update,
     :delete,
+    :owner_images,
+    :image_url,
   ]
 
-  ###############################################
-  # ログインユーザーが自身の画像を参照する
-  ###############################################
+  # Get all images that user who has logged in has.
+  # /api/image/list/:id/:token_for_api
+  def owner_images
+    @token_check = TokenCheck.new({
+      :id => owner_images_params[:id].to_i,
+      :token_for_api => owner_images_params[:token_for_api],
+    })
+    if @token_check.validate() != true
+      raise StandardError.new "バリデーションエラー"
+    end
+
+    # 対象の画像一覧を取得する
+    @images = Image.where({
+      :member_id => owner_images_params[:id].to_i,
+    }).order(:created_at => :desc)
+    return render :json => @images.to_json
+  rescue => exception
+    p(exception)
+    logger.debug "#{exception.message}"
+    return render :json => @token_check.errors.messages
+  end
+
+  def image_url
+    # エラー配列
+    @errors = Array.new()
+    pp (@errors)
+    @image = Image.find_by({
+      :id => params[:id],
+      :token => params[:token],
+      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+    })
+    if @image == nil
+      raise StandardError.new @errors.push("画像がみつかりません")
+    end
+    return render :file => @image.fetch_file_path, :content_type => @image.extension, :status => 200
+  rescue => exception
+    return render :json => @errors
+  end
+
   def show_owner
     begin
       target_image = {
@@ -33,9 +71,6 @@ class Api::ImagesController < ApplicationController
         :status => 200,
       })
     rescue => exception
-      ###############################################
-      # http 404 bad requestを表示
-      ###############################################
       p("exception.methods----------------->", exception.methods)
       render ({
         :json => {
@@ -105,66 +140,64 @@ class Api::ImagesController < ApplicationController
 
   # 自身の画像をアップロードする(※非Timeline)
   def upload
-    begin
-      # トークンとIDの組み合わせのチェック
-      @image = FormImage.new({
-        :member_id => upload_params[:member_id].to_i,
-        :extension => upload_params[:upload_file].content_type.to_s,
-        :token_for_api => upload_params[:token_for_api].to_s,
-      })
-      if @image.validate != true
-        raise ActiveModel::ValidationError.new(@image)
-      end
-      # Reset @image
-      @image = nil
-
-      # 既存レコードにuuidが存在していないかどうかを検証
-      @uuid = SecureRandom.uuid
-      @uuid_hash = Digest::SHA256.hexdigest @uuid
-      @image = Image.find_by({
-        :id => @uuid,
-      })
-      if @image != nil
-        raise StandardError.new "UUIDの重複がありました"
-      end
-
-      @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[upload_params[:upload_file].content_type]
-
-      # アップロードファイルの確定フルパス
-      uploaded_file_path = save_path.to_s + "/" + @uuid
-      response = FileUtils.cp(upload_params[:upload_file].tempfile.path, uploaded_file_path)
-
-      # 仮パス -> 確定ディレクトリ へのコピー完了後
-      uploaded_at = @today.strftime("%Y-%m-%d %H:%M:%S")
-      random_token = TokenForApi.make_random_token 128
-
-      @image = Image.new ({
-        :id => @uuid,
-        :member_id => upload_params[:member_id],
-        :filename => @filename,
-        :use_type => 1,
-        :blur_level => 0,
-        :extension => upload_params[:upload_file].content_type,
-        :is_approved => true,
-        :token => random_token,
-        :uploaded_at => uploaded_at,
-      })
-
-      if @image.validate != true
-        p @image.errors.messages
-        raise ActiveModel::ValidationError.new(@image)
-      end
-
-      # If validation is successfully so execute inserting new image data to table.
-      @image.save
-      return render :json => @image.to_json
-    rescue ActiveModel::ValidationError => error
-      p error.class
-      return render :json => @image.errors.messages
-    rescue => error
-      pp error
-      return render :json => error
+    # トークンとIDの組み合わせのチェック
+    @image = FormImage.new({
+      :member_id => upload_params[:member_id].to_i,
+      :extension => upload_params[:upload_file],
+      :token_for_api => upload_params[:token_for_api].to_s,
+    })
+    if @image.validate != true
+      raise ActiveModel::ValidationError.new(@image)
     end
+    # Reset @image
+    @image = nil
+    # 既存レコードにuuidが存在していないかどうかを検証
+    @uuid = SecureRandom.uuid
+    @uuid_hash = Digest::SHA256.hexdigest @uuid
+    @image = Image.find_by({
+      :id => @uuid,
+    })
+    if @image != nil
+      raise StandardError.new "UUIDの重複がありました"
+    end
+
+    @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[upload_params[:upload_file].content_type]
+
+    # アップロードファイルの確定フルパス
+    uploaded_file_path = save_path.to_s + "/" + @filename
+    response = FileUtils.cp(upload_params[:upload_file].tempfile.path, uploaded_file_path)
+
+    # 仮パス -> 確定ディレクトリ へのコピー完了後
+    uploaded_at = @today.strftime("%Y-%m-%d %H:%M:%S")
+    random_token = TokenForApi.make_random_token 128
+
+    new_image = {
+      :id => @uuid,
+      :member_id => upload_params[:member_id],
+      :filename => @filename,
+      :use_type => 1,
+      :blur_level => 0,
+      :extension => upload_params[:upload_file].content_type,
+      :is_approved => true,
+      :token => random_token,
+      :uploaded_at => uploaded_at,
+    }
+    @image = Image.new(new_image)
+
+    if @image.validate != true
+      raise ActiveModel::ValidationError.new(@image)
+    end
+
+    # If validation is successfully so execute inserting new image data to table.
+    @image.save
+    # return
+    return render :json => @image.to_json(:include => [:member])
+  rescue ActiveModel::ValidationError => error
+    p(error)
+    return render :json => @image.errors.messages
+  rescue => error
+    pp error
+    return render :json => error
   end
 
   def login_check
@@ -174,11 +207,24 @@ class Api::ImagesController < ApplicationController
   private
 
   def upload_params
-    return params.fetch(:image, {}).permit(
-             :member_id,
-             :upload_file,
-             :token_for_api
-           )
+    upload_params = params.fetch(:image, {
+      :member_id => nil,
+      :upload_file => nil,
+      :token_for_api => nil,
+    }).permit(
+      :member_id,
+      :upload_file,
+      :token_for_api
+    )
+    return upload_params
+  end
+
+  def owner_images_params
+    owner_images_params = params.permit(
+      :id,
+      :token_for_api
+    )
+    return owner_images_params
   end
 
   # Return absolute path to save image file uploaded by logged in user.
