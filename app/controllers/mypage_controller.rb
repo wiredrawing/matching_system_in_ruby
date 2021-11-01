@@ -76,11 +76,6 @@ class MypageController < ApplicationController
   def upload
     @image = Image.new()
     @images = @current_user.all_images
-    # @images = Image.where({
-    #   :member_id => @current_user.id,
-    # }).order({
-    #   :created_at => :desc,
-    # })
     @blur_level = UtilitiesController::BLUR_LEVEL
     render({
       :template => "mypage/upload",

@@ -14,6 +14,7 @@ class Register < ApplicationRecord
     # 既に本登録完了済みのメールアドレスの場合はエラーメッセージを追加する
     if member != nil
       object.errors.add(attr, "このメールアドレスは使用できません")
+      next false
     end
     next true
   end
@@ -36,7 +37,7 @@ class Register < ApplicationRecord
       :message => "ニックネームは必須項目です",
     },
     :length => {
-      :minimum => 5,
+      :minimum => 1,
       :maximum => 128,
       :message => "ニックネームは5文字以上128文字以内で入力して下さい",
     },
@@ -46,29 +47,12 @@ class Register < ApplicationRecord
   validates :gender, {
     :presence => true,
     :length => {
-      :minimum => 0,
+      :minimum => 1,
     },
     :inclusion => {
       # mapメソッドで1以上の値で構成された配列を返却する
-      :in => (lambda do
-        gender_id_list = []
-        UtilitiesController::GENDER_LIST.map do |gender|
-          gender_id = gender[:id]
-          if gender_id > 0
-            gender_id_list.push(gender[:id])
-          end
-        end
-        # 0以外の定数数値を返却する
-        return gender_id_list
-      end)[],
+      :in => UtilitiesController.gender_id_list,
       :message => "性別は未設定以外を選択して下さい",
     },
   }
-
-  gender_list = UtilitiesController::GENDER_LIST.map do |gender|
-    gender_id = gender[:id]
-    if gender_id > 0
-      next gender[:id]
-    end
-  end
 end

@@ -2,11 +2,16 @@ class Image < ApplicationRecord
   before_validation :owner_image_url, :member_image_url
 
   # 画像の所有者
+  # has_oneの場合
   has_one :member, :class_name => "Member", :foreign_key => :id, :primary_key => :member_id
-
-  attribute :member_image_url
+  # belongs_toの場合
+  belongs_to :member_blongs_to, :class_name => "Member", :foreign_key => :member_id, :primary_key => :id
   attribute :owner_image_url
   attribute :image_url
+  attribute :image_url_to_active
+  attribute :image_url_to_update
+  attribute :image_url_to_delete
+  attribute :display_status
 
   showable_for_scope = -> {
     where({
@@ -70,18 +75,6 @@ class Image < ApplicationRecord
     return file_path
   end
 
-  # def owner_image_url
-  #   owner_image_url = api_image_owner_show_url(:id => self.id)
-  #   # self.__owner_image_url = owner_image_url
-  #   # return self.__owner_image_url
-  # end
-
-  # def member_image_url
-  #   member_image_url = api_image_show_url(:id => self.id, :member_id => self.member_id)
-  #   # self.__member_image_url = member_image_url
-  #   # return self.__member_image_url
-  # end
-
   # URL to show the public image .
   def image_url
     image_url = api_public_image_url(:id => self.id, :token => self.token)
@@ -95,7 +88,27 @@ class Image < ApplicationRecord
       :member_id => self.member_id,
       :token_for_api => self.member.token_for_api,
     )
-    puts("image_url => ", image_url)
+    return image_url
+  end
+
+  def image_url_to_active
+    image_url_to_active = active_image_url(:id => self.id)
+    return image_url_to_active
+  end
+
+  def image_url_to_update
+    image_url_to_update = mypage_update_image_url(:id => self.id)
+    return image_url_to_update
+  end
+
+  def image_url_to_delete
+    image_url_to_delete = mypage_delete_image_url()
+    return image_url_to_delete
+  end
+
+  def image_url_to_delete
+    image_url_to_delete = api_image_delete_url(:id => self.id)
+    return image_url_to_delete
   end
 
   def display_status

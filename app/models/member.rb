@@ -181,17 +181,7 @@ class Member < ApplicationRecord
     },
     :inclusion => {
       # mapメソッドで1以上の値で構成された配列を返却する
-      :in => (lambda do
-        gender_id_list = []
-        UtilitiesController::GENDER_LIST.map do |gender|
-          gender_id = gender[:id]
-          if gender_id > 0
-            gender_id_list.push(gender[:id])
-          end
-        end
-        # 0以外の定数数値を返却する
-        return gender_id_list
-      end)[],
+      :in => UtilitiesController.gender_id_list,
       :message => "性別は未設定以外を選択して下さい",
     },
   })

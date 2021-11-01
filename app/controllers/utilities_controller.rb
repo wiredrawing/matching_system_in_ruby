@@ -43,4 +43,12 @@ class UtilitiesController < ApplicationController
     30 => "メッセージがきました",
     40 => "システムメッセージがきました",
   ]
+
+  #
+  def self.gender_id_list
+    gender_id_list = self::GENDER_LIST.map do |gender|
+      next gender[:id]
+    end
+    return gender_id_list
+  end
 end

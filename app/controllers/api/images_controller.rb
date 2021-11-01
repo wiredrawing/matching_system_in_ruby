@@ -28,13 +28,17 @@ class Api::ImagesController < ApplicationController
     end
 
     # 対象の画像一覧を取得する
-    @images = Image.where({
+    @images = Image.includes(:member, :member_blongs_to).where({
       :member_id => @member_id,
     }).order(:created_at => :desc)
 
-    return render :json => @images.to_json
+    return render :json => @images.to_json(:include => [
+                                             :member,
+                                             :member_blongs_to,
+                                           ])
   rescue => exception
-    p(exception)
+    puts("[例外発生--------------------------------------------]")
+    pp(exception)
     logger.error "#{exception.message}"
     return render :json => @token_check.errors.messages
   end
@@ -106,37 +110,37 @@ class Api::ImagesController < ApplicationController
     return render :json => exception.message
   end
 
-  def show_owner
-    begin
-      target_image = {
-        :id => params[:id],
-        :member_id => @current_user.id,
-      }
-      @image = Image.find_by(target_image)
+  # def show_owner
+  #   begin
+  #     target_image = {
+  #       :id => params[:id],
+  #       :member_id => @current_user.id,
+  #     }
+  #     @image = Image.find_by(target_image)
 
-      if @image == nil
-        # 画像が有効でない場合は例外raise
-        raise StandardError.new "有効な画像が見つかりません in show_owner"
-      end
+  #     if @image == nil
+  #       # 画像が有効でない場合は例外raise
+  #       raise StandardError.new "有効な画像が見つかりません in show_owner"
+  #     end
 
-      file_path = @image.fetch_file_path
-      # 画像出力
-      render({
-        :file => file_path,
-        :content_type => @image.extension,
-        :status => 200,
-      })
-    rescue => exception
-      p("exception.methods----------------->", exception.methods)
-      render ({
-        :json => {
-          :error => exception.message,
-        },
-        :content_type => "application/json",
-        :status => 404,
-      })
-    end
-  end
+  #     file_path = @image.fetch_file_path
+  #     # 画像出力
+  #     render({
+  #       :file => file_path,
+  #       :content_type => @image.extension,
+  #       :status => 200,
+  #     })
+  #   rescue => exception
+  #     p("exception.methods----------------->", exception.methods)
+  #     render ({
+  #       :json => {
+  #         :error => exception.message,
+  #       },
+  #       :content_type => "application/json",
+  #       :status => 404,
+  #     })
+  #   end
+  # end
 
   # 自身以外のmemberの画像を閲覧
   def show
@@ -191,7 +195,34 @@ class Api::ImagesController < ApplicationController
   def update
   end
 
+  # 指定した画像を所持しているユーザーであれば削除可能
   def delete
+    p("=============================================")
+    @member_id = request.headers["member-id"].to_i
+    @token_for_api = request.headers["token-for-api"]
+    p @member_id
+    p @token_for_api
+
+    # 削除リクエストの認証処理
+    @token_check = TokenCheck.new({
+      :id => @member_id,
+      :token_for_api => @token_for_api,
+    })
+    pp(@token_check)
+    # バリデーションチェック
+    if @token_check.validate() != true
+      raise StandardError.new "認証エラー"
+    end
+
+    response = Image.find_by({
+      :id => params[:id],
+      :member_id => @member_id,
+    }).destroy()
+
+    pp(response)
+  rescue => exception
+    p(exception)
+    return render(:json => exception)
   end
 
   # 自身の画像をアップロードする(※非Timeline)

@@ -11,21 +11,21 @@ Rails.application.routes.draw do
 
     # 画像を取り扱うAPI
     scope "image" do
-      # ログインユーザー用
-      scope "owner" do
-        get "/:id", {
-          :to => "images#show_owner",
-          :as => "image_owner_show",
-        }
-      end
+      # # ログインユーザー用
+      # scope "owner" do
+      #   get "/:id", {
+      #     :to => "images#show_owner",
+      #     :as => "image_owner_show",
+      #   }
+      # end
 
-      # 異性のユーザー用
-      scope "member" do
-        get "/:id/:member_id", {
-              :to => "images#show",
-              :as => "image_show",
-            }
-      end
+      # # 異性のユーザー用
+      # scope "member" do
+      #   get "/:id/:member_id", {
+      #         :to => "images#show",
+      #         :as => "image_show",
+      #       }
+      # end
 
       # ログインユーザーがアップ済みの画像一覧を取得する
       get "/list", {
@@ -135,7 +135,9 @@ Rails.application.routes.draw do
     :to => "mypage#update_image",
     :as => "mypage_update_image",
   }
-  get ("/mypage/upload"), ({ :to => "mypage#upload" })
+  get "/mypage/upload", {
+    :to => "mypage#upload",
+  }
   post "/mypage/upload", { :to => "mypage#completed_uploading" }
   delete "/mypage/delete_image", {
     :to => "mypage#delete_image",
