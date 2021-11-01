@@ -5,9 +5,8 @@ Rails.application.routes.draw do
     :to => "top#index",
     :as => "top",
   }
-  ##########################################
+
   # api
-  ##########################################
   namespace "api" do
 
     # 画像を取り扱うAPI
@@ -28,15 +27,25 @@ Rails.application.routes.draw do
             }
       end
 
-      # 画像表示用 URL
+      # ログインユーザーがアップ済みの画像一覧を取得する
+      get "/list", {
+        :to => "images#list",
+        :as => "images_owner_has",
+      }
+      # 指定した異性ユーザーの全画像を取得する
+      get "/list/:member_id", {
+        :to => "images#member",
+        :as => "images_selected_member_has",
+      }
+      # 画像表示用 URL(※所有者のみ閲覧可能)
+      get "/:id/:member_id/:token_for_api", {
+        :to => "images#owner_image_url",
+        :as => "private_image",
+      }
+      # 画像表示用 URL(※第三者閲覧用)
       get "/:id/:token", {
         :to => "images#image_url",
-        :as => "showable_image",
-      }
-      # ログインユーザーがアップ済みの画像一覧を取得する
-      get "/list/:id/:token_for_api", {
-        :to => "images#owner_images",
-        :as => "images_owner_has",
+        :as => "public_image",
       }
       # To upload any images.
       post "/update/:id", {

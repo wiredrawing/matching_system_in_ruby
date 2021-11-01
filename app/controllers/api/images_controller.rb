@@ -8,26 +8,58 @@ class Api::ImagesController < ApplicationController
     :update,
     :delete,
     :owner_images,
+    :owner_image_url,
     :image_url,
   ]
 
   # Get all images that user who has logged in has.
   # /api/image/list/:id/:token_for_api
-  def owner_images
-    p("request.headers-----------------------")
-    pp(request.headers["token-for-api"])
+  # Set token with key named 'token-for-api' to authenticate on the headers.
+  def list
+    @member_id = request.headers["member-id"].to_i
+    @token_for_api = request.headers["token-for-api"]
     @token_check = TokenCheck.new({
-      :id => owner_images_params[:id].to_i,
-      :token_for_api => owner_images_params[:token_for_api],
+      :id => @member_id,
+      :token_for_api => @token_for_api,
     })
+    # Check the validation.
     if @token_check.validate() != true
-      raise StandardError.new "バリデーションエラー"
+      raise StandardError.new "認証エラー"
     end
 
     # 対象の画像一覧を取得する
     @images = Image.where({
-      :member_id => owner_images_params[:id].to_i,
+      :member_id => @member_id,
     }).order(:created_at => :desc)
+
+    return render :json => @images.to_json
+  rescue => exception
+    p(exception)
+    logger.error "#{exception.message}"
+    return render :json => @token_check.errors.messages
+  end
+
+  # Return images list which other member has.
+  def member
+    # Check the authentication user who requested other member's images to watch.
+    @member_id = request.headers["member-id"].to_i
+    @token_for_api = request.headers["token-for-api"]
+    @token_check = TokenCheck.new({
+      :id => @member_id,
+      :token_for_api => @token_for_api,
+    })
+    # Check the validation.
+    if @token_check.validate() != true
+      raise StandardError.new "認証エラー"
+    end
+
+    # 対象の画像一覧を取得する
+    @images = Image.where({
+      :member_id => params[:member_id].to_i,
+      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+    }).order(:created_at => :desc)
+
     return render :json => @images.to_json
   rescue => exception
     p(exception)
@@ -35,21 +67,43 @@ class Api::ImagesController < ApplicationController
     return render :json => @token_check.errors.messages
   end
 
+  # Show the images published by owner.
   def image_url
-    # エラー配列
-    @errors = Array.new()
-    pp (@errors)
     @image = Image.find_by({
       :id => params[:id],
       :token => params[:token],
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
     })
     if @image == nil
       raise StandardError.new @errors.push("画像がみつかりません")
     end
     return render :file => @image.fetch_file_path, :content_type => @image.extension, :status => 200
   rescue => exception
-    return render :json => @errors
+    return render :json => exception.message
+  end
+
+  # Show the image owner who has.
+  def owner_image_url
+    @errors = Array.new
+    # オーナーの認証
+    @token_check = TokenCheck.new({
+      :id => params[:member_id].to_i,
+      :token_for_api => params[:token_for_api],
+    })
+    if @token_check.validate() != true
+      raise StandardError.new "ユーザー認証に失敗しました"
+    end
+    @image = Image.find_by({
+      :id => params[:id],
+      :member_id => params[:member_id],
+    })
+    if @image == nil
+      raise StandardError.new @errors.push("画像がみつかりません")
+    end
+    return render :file => @image.fetch_file_path, :content_type => @image.extension, :status => 200
+  rescue => exception
+    return render :json => exception.message
   end
 
   def show_owner

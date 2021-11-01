@@ -2,9 +2,10 @@
 <a href="" class="backk">戻る</a>
 <section class="opp_wrap_image">
   <div class="opp_imgs">
+    <%=  @member.showable_images.length %>
     <% if (@member.showable_images.length > 0) then %>
       <% @member.showable_images.each do |image| %>
-        <div class="opp_img"><img src="<%= image.member_image_url %>"></div>
+        <div class="opp_img"><img src="<%= image.image_url %>"></div>
       <%end%>
     <%else%>
       <div class="opp_img"><img src="/images/sample_user.jpg"></div>

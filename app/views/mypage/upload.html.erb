@@ -5,11 +5,8 @@
     <% if @current_user.all_images.length > 0 then %>
       <% @current_user.all_images.each do |image|%>
         <div class="oaitelists">
-          <!--<a class="oaitelists_img">
-            <img src="<%= image.owner_image_url() %>">
-          </a>-->
           <a class="oaitelists_img">
-            <img src="<%= image.member_image_url() %>">
+            <img src="<%= image.image_url() %>">
           </a>
           <!-- 指定した画像の表示ステータス変更ボタン -->
           <hr>
@@ -36,6 +33,11 @@
       <%end%>
     <%end%>
   </div>
+  <%= form_for :member do |form| %>
+    <%= form.hidden_field :id, :value => @current_user.id %>
+    <%= form.hidden_field :token_for_api, :value => @current_user.token_for_api %>
+    <%= form.hidden_field :request_url, :value => api_images_owner_has_path() %>
+  <% end %>
   <!--oaitelists_wrap-->
   <div class="paging">
     <a href="{{ $declining_users->previousPageUrl() }}" rel="prev">
@@ -46,25 +48,42 @@
     </a>
   </div>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-  $(".unblock").each((i) => {
-    $(".unblock").eq(i).on("click", (e) => {
-      e.preventDefault()
-      $("form.delete-image-form").eq(i).trigger("submit");
-    })
-  });
+  $(function () {
+    let member_id = $("#member_id").val()
+    let member_token_for_api = $("#member_token_for_api").val()
+    let request_url = $("#member_request_url").val()
+    let options = {
+      headers: {
+        "MEMBER-ID": member_id,
+        "TOKEN-FOR_API": member_token_for_api,
+      }
+    }
+    axios.get(request_url, options).then((data) => {
+      console.log(data)
+    }).catch((error) => {
+      console.log(error)
+    });
+    $(".unblock").each((i) => {
+      $(".unblock").eq(i).on("click", (e) => {
+        e.preventDefault()
+        $("form.delete-image-form").eq(i).trigger("submit");
+      })
+    });
   
-  $(".change-blur-level").each( (index) => {
-    $(".change-blur-level").eq(index).on("click", function (e) {
-      e.preventDefault();
-      $("form.change-blur-level-form").eq(index).trigger("submit");
+    $(".change-blur-level").each( (index) => {
+      $(".change-blur-level").eq(index).on("click", function (e) {
+        e.preventDefault();
+        $("form.change-blur-level-form").eq(index).trigger("submit");
+      });
+    })
+  
+    $(".change-active").each(index => {
+      $(".change-active").eq(index).on("click", function (e) {
+        e.preventDefault();
+        $("form.change-active-form").eq(index).trigger("submit");
+      });
     });
   })
-  
-  $(".change-active").each(index => {
-    $(".change-active").eq(index).on("click", function (e) {
-      e.preventDefault();
-      $("form.change-active-form").eq(index).trigger("submit");
-    });
-  });
 </script>

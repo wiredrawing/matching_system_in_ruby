@@ -70,22 +70,32 @@ class Image < ApplicationRecord
     return file_path
   end
 
-  def owner_image_url
-    owner_image_url = api_image_owner_show_url(:id => self.id)
-    # self.__owner_image_url = owner_image_url
-    # return self.__owner_image_url
-  end
+  # def owner_image_url
+  #   owner_image_url = api_image_owner_show_url(:id => self.id)
+  #   # self.__owner_image_url = owner_image_url
+  #   # return self.__owner_image_url
+  # end
 
-  def member_image_url
-    member_image_url = api_image_show_url(:id => self.id, :member_id => self.member_id)
-    # self.__member_image_url = member_image_url
-    # return self.__member_image_url
-  end
+  # def member_image_url
+  #   member_image_url = api_image_show_url(:id => self.id, :member_id => self.member_id)
+  #   # self.__member_image_url = member_image_url
+  #   # return self.__member_image_url
+  # end
 
-  # URL to show the image.
+  # URL to show the public image .
   def image_url
-    image_url = api_showable_image_url(:id => self.id, :token => self.token)
+    image_url = api_public_image_url(:id => self.id, :token => self.token)
     return image_url
+  end
+
+  # URL to show the private image which owner doesn't allow to.
+  def owner_image_url
+    image_url = api_private_image_url(
+      :id => self.id,
+      :member_id => self.member_id,
+      :token_for_api => self.member.token_for_api,
+    )
+    puts("image_url => ", image_url)
   end
 
   def display_status
