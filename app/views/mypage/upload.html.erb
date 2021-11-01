@@ -21,6 +21,11 @@
     <%= form.hidden_field :token_for_api, :value => @current_user.token_for_api, :ref => "tokenForApi" %>
     <%= form.hidden_field :request_url, :value => api_images_owner_has_path(), :ref => "requestUrl" %>
   <% end %>
+  <img v-bind:src="selected_image_source">
+  <input type="hidden" name="member_id" value="<%= @current_user.id %>">
+  <input type="hidden" name="member_id" value="<%= @current_user.token_for_api %>">
+  <input type="file" name="upload_file" v-on:change="selectFile($event)">
+  <input type="submit" name="submit" v-on:click="uploadSelectedFile" id="button-to-upload-image" value="ファイルをアップロード">
   <!--oaitelists_wrap-->
   <div class="paging">
     <a href="{{ $declining_users->previousPageUrl() }}" rel="prev">
@@ -38,6 +43,8 @@
     data: function() {
       return {
         images: [],
+        selected_file: null,
+        selected_image_source: null,
       }
     },
     setup: function () {
@@ -69,6 +76,37 @@
           this.fetchImagesOwnerHas();
         }).catch((error) => {
           console.log(error)
+        });
+      },
+      selectFile: function (event) {
+        let file = event.target.files[0]
+        this.selected_image_source = URL.createObjectURL(file)
+        // let reader = new FileReader();
+        // let self = this;
+        this.selected_file = file
+        // reader.onload = function (event) {
+        //   console.log(event);
+        //   self.selected_image_source = event.target.result
+        // }
+        // reader.readAsBinaryString(file);
+      },
+      uploadSelectedFile: function () {
+        let member_id = this.memberId.value
+        let member_token_for_api = this.tokenForApi.value
+        let request_url = this.requestUrl.value
+        let options = {
+          headers: {
+            "member_id": member_id,
+            "token_for_api": member_token_for_api,
+          }
+        }
+        let formData = new FormData()
+        formData.append("image[upload_file]", this.selected_file)
+        formData.append("image[member_id]", member_id)
+        formData.append("image[token_for_api]", member_token_for_api)
+        axios.post("/api/image", formData).then((response) => {
+          console.log(response);
+          this.fetchImagesOwnerHas();
         });
       },
       fetchImagesOwnerHas: function () {

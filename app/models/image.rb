@@ -1,5 +1,5 @@
 class Image < ApplicationRecord
-  before_validation :owner_image_url, :member_image_url
+  before_validation :owner_image_url, :image_url
 
   # 画像の所有者
   # has_oneの場合
@@ -11,6 +11,7 @@ class Image < ApplicationRecord
   attribute :image_url_to_active
   attribute :image_url_to_update
   attribute :image_url_to_delete
+  attribute :image_url_to_upload
   attribute :display_status
 
   showable_for_scope = -> {
@@ -109,6 +110,11 @@ class Image < ApplicationRecord
   def image_url_to_delete
     image_url_to_delete = api_image_delete_url(:id => self.id)
     return image_url_to_delete
+  end
+
+  def image_url_to_upload
+    image_url_to_upload = api_image_upload_url()
+    return image_url_to_upload
   end
 
   def display_status

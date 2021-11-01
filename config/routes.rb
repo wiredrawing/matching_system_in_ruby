@@ -11,21 +11,6 @@ Rails.application.routes.draw do
 
     # 画像を取り扱うAPI
     scope "image" do
-      # # ログインユーザー用
-      # scope "owner" do
-      #   get "/:id", {
-      #     :to => "images#show_owner",
-      #     :as => "image_owner_show",
-      #   }
-      # end
-
-      # # 異性のユーザー用
-      # scope "member" do
-      #   get "/:id/:member_id", {
-      #         :to => "images#show",
-      #         :as => "image_show",
-      #       }
-      # end
 
       # ログインユーザーがアップ済みの画像一覧を取得する
       get "/list", {

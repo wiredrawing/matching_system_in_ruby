@@ -2,7 +2,7 @@
   <div class="mypagebox">
     <div class="face">
       <% if @current_user.showable_images.length > 0 then %>
-        <img src="<%= @current_user.showable_images.first.member_image_url %>">
+        <img src="<%= @current_user.showable_images.first.image_url %>">
       <% else %>
         <img src="/images/sample_user.jpg">
       <% end %>

@@ -17,6 +17,10 @@ class LoadEagerModel
       puts("APIリクエスト用トークン -->")
       puts(env["HTTP_TOKEN_FOR_API"])
     end
+
+    pp env.keys
+    p env["action_dispatch.routes"].class
+    pp env["action_dispatch.routes"].url_helpers
     # p("===========================================")
     # p env.class
     # env.each do |key, value|
