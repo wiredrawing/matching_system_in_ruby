@@ -7,7 +7,7 @@
         <div class="oaitelists">
           <% if member.showable_images.length > 0 then %>
             <a class="oaitelists_img">
-              <img src="<%= member.showable_images.first.member_image_url() %>">
+              <img src="<%= member.showable_images.first.image_url() %>">
             </a>
           <% else %>
             <a class="oaitelists_img"><img src="/images/sample_user.jpg"></a>

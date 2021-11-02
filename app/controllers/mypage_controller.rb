@@ -4,17 +4,12 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
-    puts("[マイページTOPページ------------------------------------]")
-    pp(@current_user)
-    pp(@current_user.getting_likes)
-    pp(@current_user.informing_likes)
-    print(session)
-    p(session[:member_id])
+    pp @current_user
+
+    # # 有効ないいねを取得
+    # @valid_likes = @current_user.informing_valid_likes()
     # 現在マッチング中のメンバーを取得
     @matching_members = Like.fetch_matching_members(@current_user.id)
-    puts("matching_members ====>")
-    p(@matching_members)
-    # 異性のメンバーを取得
 
     # ブロック中のユーザー
     @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
@@ -22,8 +17,6 @@ class MypageController < ApplicationController
     end
     # 異性のmembers一覧を取得する
     @hetero_members = Member.hetero_members(@current_user, @declining_member_id_list)
-    puts("[異性のメンバー----------------------------------------]")
-    pp(@hetero_members)
     return render({ :template => "mypage/index" })
   end
 

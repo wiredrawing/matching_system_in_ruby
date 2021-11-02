@@ -44,7 +44,8 @@
         <p>贈ったGood</p>
         <p class="number">
           <a href="<%= mypage_informing_likes_url() %>">
-            <%= @current_user.informing_likes.length %>
+            <!-- 有効ないいね件数のみを取得する -->
+            <%= @current_user.informing_valid_likes().length %>
           </a>
         </p>
       </div>
@@ -52,7 +53,7 @@
         <p>もらったGood</p>
         <p class="number">
           <a href="<%= mypage_getting_likes_url() %>">
-            <%= @current_user.getting_likes.length %>
+            <%= @current_user.getting_valid_likes.length %>
           </a>
         </p>
       </div>
@@ -64,7 +65,7 @@
       <div class="oaitelists">
         <a href="<%= member_url(member.id) %>" class="oaitelists_img">
           <% if member.showable_images.length > 0 then %>
-            <img src="<%= member.showable_images.first.member_image_url %>">
+            <img src="<%= member.showable_images.first.image_url %>">
           <% else %>
             <img src="/images/oaite.jpg">
           <% end %>

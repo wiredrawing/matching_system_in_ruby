@@ -12,7 +12,7 @@
         <div class="oaitelists">
           <% if (like.from_member.showable_images.length > 0) then %>
             <a href="<%= member_url :id => like.from_member.id %>" class="oaitelists_img">
-              <img src="<%= like.from_member.showable_images.first.member_image_url() %>">
+              <img src="<%= like.from_member.showable_images.first.image_url() %>">
             </a>
           <% else %>
             <a href="<%= member_url :id => like.from_member.id %>" class="oaitelists_img">

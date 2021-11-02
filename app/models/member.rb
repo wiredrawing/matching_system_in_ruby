@@ -1,8 +1,12 @@
 class Member < ApplicationRecord
+  attribute :forbidden_members
+  attribute :informing_valid_likes
+  attribute :getting_valid_likes
   # パスワード処理
   has_secure_password
   # ページング処理
   paginates_per 2
+
   # リレーションの関連付け
   # もらったいいいね
   has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id, :primary_key => :id)
@@ -324,5 +328,37 @@ class Member < ApplicationRecord
     end
 
     return true
+  end
+
+  # 自身が贈った現時点で有効なlike
+  def informing_valid_likes
+    puts("valid_likes--------------------->")
+    valid_likes = Array.new()
+    likes = self.informing_likes.map do |like|
+      next like.to_member_id
+    end
+    valid_likes = likes - self.forbidden_members
+  end
+
+  # 自身がもらった現時点で有効なlike
+  def getting_valid_likes
+    puts("valid_likes--------------------->")
+    valid_likes = Array.new()
+    likes = self.getting_likes.map do |like|
+      next like.to_member_id
+    end
+    valid_likes = likes - self.forbidden_members
+  end
+
+  # アクセスできないメンバー一覧
+  def forbidden_members
+    forbidden_members = Array.new
+    declining = self.declining.map do |d|
+      next d.to_member_id
+    end
+    declined = self.declined.map do |d|
+      next d.to_member_id
+    end
+    forbidden_members = declined + declining
   end
 end

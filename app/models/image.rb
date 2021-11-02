@@ -13,6 +13,7 @@ class Image < ApplicationRecord
   attribute :image_url_to_delete
   attribute :image_url_to_upload
   attribute :display_status
+  attribute :add_column
 
   showable_for_scope = -> {
     where({
@@ -123,5 +124,9 @@ class Image < ApplicationRecord
     else
       return "非表示中"
     end
+  end
+
+  def add_column
+    return "ああああああ"
   end
 end
