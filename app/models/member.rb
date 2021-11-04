@@ -338,6 +338,9 @@ class Member < ApplicationRecord
       next like.to_member_id
     end
     valid_likes = likes - self.forbidden_members
+    p("贈った有効ないいね")
+    pp(valid_likes)
+    return valid_likes
   end
 
   # 自身がもらった現時点で有効なlike
@@ -345,19 +348,24 @@ class Member < ApplicationRecord
     puts("valid_likes--------------------->")
     valid_likes = Array.new()
     likes = self.getting_likes.map do |like|
-      next like.to_member_id
+      next like.from_member_id
     end
     valid_likes = likes - self.forbidden_members
+    p("もらった有効ないいね")
+    pp(valid_likes)
+    return valid_likes
   end
 
   # アクセスできないメンバー一覧
   def forbidden_members
     forbidden_members = Array.new
+    # ブロックしているユーザー
     declining = self.declining.map do |d|
       next d.to_member_id
     end
+    # ブロックされているユーザー
     declined = self.declined.map do |d|
-      next d.to_member_id
+      next d.from_member_id
     end
     forbidden_members = declined + declining
   end

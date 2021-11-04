@@ -7,7 +7,7 @@
     <div class="message_face">
       <% if @opponent.showable_images.length > 0 then %>
         <a href="">
-          <img src="<%= @opponent.showable_images.first.member_image_url() %>">
+          <img src="<%= @opponent.showable_images.first.image_url() %>">
         </a>
       <% else %>
         <a href="">

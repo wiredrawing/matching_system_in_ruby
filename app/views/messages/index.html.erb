@@ -6,7 +6,7 @@
         <a href="<%= message_talk_url :id => timeline.from_member.id %>" class="message_list">
           <div class="message_list1">
             <% if timeline.from_member.showable_images.length > 0 %>
-              <img src="<%= timeline.from_member.showable_images.first.member_image_url() %>">
+              <img src="<%= timeline.from_member.showable_images.first.image_url() %>">
             <% else %>
               <img src="/images/sample_user.jpg">
             <% end %>

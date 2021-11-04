@@ -6,17 +6,18 @@ class MypageController < ApplicationController
   def index
     pp @current_user
 
-    # # 有効ないいねを取得
-    # @valid_likes = @current_user.informing_valid_likes()
-    # 現在マッチング中のメンバーを取得
-    @matching_members = Like.fetch_matching_members(@current_user.id)
+    # 有効なマッチング済みメンバー
+    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members)
 
     # ブロック中のユーザー
     @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
       next member.id
     end
     # 異性のmembers一覧を取得する
-    @hetero_members = Member.hetero_members(@current_user, @declining_member_id_list)
+    puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+    pp @current_user.forbidden_members
+    @hetero_members = Member.hetero_members(@current_user, @current_user.forbidden_members)
+    pp @hetero_members
     return render({ :template => "mypage/index" })
   end
 
@@ -215,8 +216,9 @@ class MypageController < ApplicationController
 
   # ブロック中一覧ページ
   def blocking
-    @blocking_members = Decline.fetch_blocking_members(@current_user.id)
-    p(@blocking_members)
+    puts("[blocking--------------------------------------]")
+    @members_you_block = Decline.members_you_block @current_user.id
+    pp @members_you_block
   end
 
   # 足跡一覧ページ

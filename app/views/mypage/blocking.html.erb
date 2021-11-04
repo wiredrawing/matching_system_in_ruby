@@ -2,8 +2,8 @@
 <section>
   <h2 class="noto fontpink">あなたがブロックしているメンバー</h2>
   <div class="oaitelists_wrap mt0">
-    <% if @blocking_members != nil && @blocking_members.length > 0 then %>
-      <% @blocking_members.each do |member|%>
+    <% if @members_you_block != nil && @members_you_block.length > 0 then %>
+      <% @members_you_block.each do |member|%>
         <div class="oaitelists">
           <% if member.showable_images.length > 0 then %>
             <a class="oaitelists_img">

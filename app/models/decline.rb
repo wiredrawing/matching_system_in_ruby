@@ -72,16 +72,22 @@ class Decline < ApplicationRecord
 
   # 指定したユーザーをブロックしているメンバーリスト
   def self.members_blocking_you(member_id)
-    members = self.where({
+    members_blocking_you = self.select(:from_member_id).where({
       :to_member_id => member_id,
+    })
+    members = Member.where({
+      :id => members_blocking_you,
     })
     return members
   end
 
   # 指定したユーザーがブロックしているメンバーリスト
   def self.members_you_block(member_id)
-    members = self.where({
+    members_you_block = self.select(:to_member_id).where({
       :from_member_id => member_id,
+    })
+    members = Member.where({
+      :id => members_you_block,
     })
     return members
   end

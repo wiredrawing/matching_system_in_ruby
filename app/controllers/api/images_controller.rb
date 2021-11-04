@@ -83,9 +83,20 @@ class Api::ImagesController < ApplicationController
     if @image == nil
       raise StandardError.new @errors.push("画像がみつかりません")
     end
-    return render :file => @image.fetch_file_path, :content_type => @image.extension, :status => 200
+
+    # Fetch a filepath of raw an image.
+    original = @image.fetch_file_path
+
+    # If blur level is greater than zero, return resource scaled an image.
+    if @image.blur_level > 0
+      img = Magick::ImageList.new(original)
+      resize_img = img.blur_image(@image.blur_level, @image.blur_level)
+      resize_img = resize_img.write(original.to_s + ".resize")
+      return render :file => original.to_s + ".resize", :content_type => @image.extension, :status => 200
+    end
+    return render :file => original, :content_type => @image.extension, :status => 200
   rescue => exception
-    logger.debug "#{exception.messsage}"
+    logger.debug "#{exception.message}"
     return render :json => exception.message
   end
 

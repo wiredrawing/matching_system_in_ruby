@@ -72,8 +72,7 @@ class Image < ApplicationRecord
                 uploaded_path[:hour] + "/" +
                 self.filename
     file_path = Rails.root.join file_path
-    p "file_path =====>", file_path
-    # ファイル保管場所パスを返却
+    # ファイル保管場所パスを返却(※文字列型で返却)
     return file_path
   end
 

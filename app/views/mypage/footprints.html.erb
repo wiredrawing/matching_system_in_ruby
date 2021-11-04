@@ -8,7 +8,7 @@
           <div class="oaitelists">
             <a class="oaitelists_img" href="<%= member_url(:id => footprint.from_member.id) %>">
               <% if footprint.from_member.showable_images.length > 0 then %>
-                <img src="<%= footprint.from_member.showable_images.first.member_image_url() %>">
+                <img src="<%= footprint.from_member.showable_images.first.image_url() %>">
               <% else %>
                 <img src="/images/sample_user.jpg">
               <% end %>

@@ -60,39 +60,30 @@ class Like < ApplicationRecord
   end
 
   # 指定したユーザーがマッチングしたユーザー一覧を取得する
-  def self.fetch_matching_members(member_id)
-    # print("マッチング中ユーザー一覧を取得する")
-    # いいねを贈ったmember_idの配列を作成
+  def self.fetch_matching_members(member_id, excluded_members = [])
+    # Fetch likes which logged in user send.
     informing_likes = self.select(:to_member_id).where({
       :from_member_id => member_id,
     }).to_a.map do |like|
       next like.to_member_id.to_i
     end
-    puts("贈ったいいね")
-    pp(informing_likes)
 
     # ログインユーザーがいいねしたメンバーが自身をいいねしているかどうか
     getting_members = self.select(:from_member_id).where({
       :to_member_id => member_id,
     }).to_a.map do |like|
-      # print("マッチング済みユーザー一覧を取得する")
       next like.from_member_id.to_i
     end
-    puts("もらったいいね")
-    pp(getting_members)
 
+    # 双方いいねしている場合かつ､ブロックしてない且つされていないメンバーを取得
     matching_members = getting_members & informing_likes
-
-    puts("マッチングしたいいね")
-    pp(matching_members)
-
-    # puts("以下､マッチング済みユーザー一覧")
-    # p(matching_members)
     matching_members = Member.where({
       :id => matching_members,
-    })
-    p(matching_members)
-    pp(matching_members.class)
+    }).and(
+      Member.where.not({
+        :id => excluded_members,
+      })
+    )
     return (matching_members)
   end
 end
