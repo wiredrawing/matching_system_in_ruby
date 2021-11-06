@@ -338,8 +338,8 @@ class Member < ApplicationRecord
       next like.to_member_id
     end
     valid_likes = likes - self.forbidden_members
-    p("贈った有効ないいね")
-    pp(valid_likes)
+    # p("贈った有効ないいね")
+    # pp(valid_likes)
     return valid_likes
   end
 
@@ -351,8 +351,8 @@ class Member < ApplicationRecord
       next like.from_member_id
     end
     valid_likes = likes - self.forbidden_members
-    p("もらった有効ないいね")
-    pp(valid_likes)
+    # p("もらった有効ないいね")
+    # pp(valid_likes)
     return valid_likes
   end
 

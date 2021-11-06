@@ -6,11 +6,25 @@
       <a class="oaitelists_img">
         <img v-bind:src="img.owner_image_url">
       </a>
-      <a v-bind:href="img.image_url_to_active" class="change-active">{{img.display_status}}</a>
-      <!-- ぼかしレベルの変更 -->
-      <hr>
-      <a v-bind:href="img.image_url_to_update" class="change-blur-level">ぼかしレベルの変更</a>
-      <!-- 指定した画像の削除 -->
+      <!-- 画像のアップデートを行う箇所 -->
+      <div class="update-image-form">
+        <a v-bind:href="img.image_url_to_active" class="change-active">{{img.display_status}}</a>
+        <select v-model="img.is_displayed" v-on:change="changeBlurLevel(img)">
+          <option v-for="display in utilities.display_status_list" v-bind:value="display.id">
+            {{display.value}}
+          </option>
+        </select>
+        <!-- ぼかしレベルの変更 -->
+        <hr>
+        <a v-bind:href="img.image_url_to_update" class="change-blur-level">{{img.blur_level}}ぼかしレベルの変更</a>
+        {{img.updated_at}}
+        <select v-model="img.blur_level" v-on:change="changeBlurLevel(img)">
+          <option v-for="blur_level in utilities.blur_level_list" v-bind:value="blur_level.id">
+            {{blur_level.value}}
+          </option>
+        </select>
+        <!-- 指定した画像の削除 -->
+      </div>
       <hr>
       <a v-bind:href="img.image_url_to_delete" v-on:click="deleteSelectedImage(img.image_url_to_delete, $event)" class="unblock">画像の削除</a>
     </div>
@@ -35,6 +49,8 @@
       <img src="/images/forward.png" width="24">
     </a>
   </div>
+  <!-- ユーティリティー取得用API  -->
+  <input ref="apiUtilitiesListUrl" type="hidden" id="api_utilities_list_url" name="api_utilities_list_url" value="<%= api_utilities_list_url() %>">
 </section>
 <script src="https://unpkg.com/vue@next"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
@@ -45,6 +61,7 @@
         images: [],
         selected_file: null,
         selected_image_source: null,
+        utilities: [],
       }
     },
     setup: function () {
@@ -52,10 +69,13 @@
         memberId: Vue.ref(0),
         tokenForApi: Vue.ref(""),
         requestUrl: Vue.ref(""),
+        apiUtilitiesListUrl: Vue.ref(""),
+        apiImageUpdateUrl: Vue.ref(""),
       }
     },
     mounted: function () {
       this.fetchImagesOwnerHas()
+      this.fetchUtilities();
     },
     methods: {
       deleteSelectedImage: function (image_url_to_delete, event) {
@@ -81,14 +101,7 @@
       selectFile: function (event) {
         let file = event.target.files[0]
         this.selected_image_source = URL.createObjectURL(file)
-        // let reader = new FileReader();
-        // let self = this;
         this.selected_file = file
-        // reader.onload = function (event) {
-        //   console.log(event);
-        //   self.selected_image_source = event.target.result
-        // }
-        // reader.readAsBinaryString(file);
       },
       uploadSelectedFile: function () {
         let member_id = this.memberId.value
@@ -124,6 +137,41 @@
         }).catch((error) => {
           console.log(error)
         });
+      },
+      fetchUtilities: function () {
+        // ユーティリティー取得用APIエンドポイント
+        axios.get(this.apiUtilitiesListUrl.value).then((response) => {
+          this.utilities = response.data
+          return true;
+        }).catch((error) => {
+          console.log(error);
+          return false;
+        });
+      },
+      changeBlurLevel: function (image) {
+        // this.images = [];
+        console.log(image)
+        let postData = {
+          image: {
+            blur_level: image.blur_level,
+            is_displayed: image.is_displayed,
+            id: image.id,
+          }
+        }
+        let member_id = this.memberId.value
+        let member_token_for_api = this.tokenForApi.value
+        let options = {
+          headers: {
+            "member_id": member_id,
+            "token_for_api": member_token_for_api,
+          }
+        }
+        axios.post(image.image_url_to_update, postData, options).then((response) => {
+          console.log(response);
+          this.fetchImagesOwnerHas();
+        }).catch((error) => {
+          console.log(error);
+        })
       }
     }
   })
@@ -131,21 +179,21 @@
   console.log(application);
   console.log(vm);
   $(function () {
-  
+
     $(".unblock").each((i) => {
       $(".unblock").eq(i).on("click", (e) => {
         e.preventDefault()
         $("form.delete-image-form").eq(i).trigger("submit");
       })
     });
-  
+
     $(".change-blur-level").each( (index) => {
       $(".change-blur-level").eq(index).on("click", function (e) {
         e.preventDefault();
         $("form.change-blur-level-form").eq(index).trigger("submit");
       });
     })
-  
+
     $(".change-active").each(index => {
       $(".change-active").eq(index).on("click", function (e) {
         e.preventDefault();

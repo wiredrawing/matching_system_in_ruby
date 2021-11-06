@@ -6,6 +6,8 @@ class Image < ApplicationRecord
   has_one :member, :class_name => "Member", :foreign_key => :id, :primary_key => :member_id
   # belongs_toの場合
   belongs_to :member_blongs_to, :class_name => "Member", :foreign_key => :member_id, :primary_key => :id
+
+  # 動的に追加するプロパティ
   attribute :owner_image_url
   attribute :image_url
   attribute :image_url_to_active
@@ -13,7 +15,6 @@ class Image < ApplicationRecord
   attribute :image_url_to_delete
   attribute :image_url_to_upload
   attribute :display_status
-  attribute :add_column
 
   showable_for_scope = -> {
     where({
@@ -78,7 +79,7 @@ class Image < ApplicationRecord
 
   # URL to show the public image .
   def image_url
-    image_url = api_public_image_url(:id => self.id, :token => self.token)
+    image_url = api_public_image_url(:id => self.id, :token => self.token, :query => self.updated_at)
     return image_url
   end
 
@@ -88,6 +89,7 @@ class Image < ApplicationRecord
       :id => self.id,
       :member_id => self.member_id,
       :token_for_api => self.member.token_for_api,
+      :query => self.updated_at,
     )
     return image_url
   end
@@ -98,7 +100,7 @@ class Image < ApplicationRecord
   end
 
   def image_url_to_update
-    image_url_to_update = mypage_update_image_url(:id => self.id)
+    image_url_to_update = api_image_update_url({ :id => self.id })
     return image_url_to_update
   end
 
@@ -123,9 +125,5 @@ class Image < ApplicationRecord
     else
       return "非表示中"
     end
-  end
-
-  def add_column
-    return "ああああああ"
   end
 end

@@ -49,9 +49,21 @@ Rails.application.routes.draw do
 
     # メッセージ送信用
     scope "timeline" do
+      get "/messages/:from_member_id/:to_member_id", {
+        :to => "timelines#message_list",
+        :as => "timeline_messages",
+      }
       post "/", {
         :to => "timelines#create_message",
         :as => "timeline_create_message",
+      }
+    end
+
+    # API用ユーティリティー情報
+    scope "utilities" do
+      get "/get", {
+        :to => "utilities#get",
+        :as => "utilities_list",
       }
     end
   end

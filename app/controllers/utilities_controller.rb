@@ -30,6 +30,25 @@ class UtilitiesController < ApplicationController
     ["大", 30],
   ]
 
+  BLUR_LEVEL_LIST = [
+    {
+      :id => 0,
+      :value => "ぼかさない",
+    },
+    {
+      :id => 5,
+      :value => "小",
+    },
+    {
+      :id => 15,
+      :value => "中",
+    },
+    {
+      :id => 30,
+      :value => "大",
+    },
+  ]
+
   # ユーザーのアクションリスト
   ACTION_ID_LIST = {
     :like => 10, # 特定のメンバーからいいねをもらった場合
@@ -42,6 +61,18 @@ class UtilitiesController < ApplicationController
     20 => "マッチングしました",
     30 => "メッセージがきました",
     40 => "システムメッセージがきました",
+  ]
+
+  # 画像の表示ステータス
+  DISPLAY_STATUS_LIST = [
+    {
+      :id => 1,
+      :value => "表示中",
+    },
+    {
+      :id => 0,
+      :value => "非表示",
+    },
   ]
 
   #

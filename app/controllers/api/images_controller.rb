@@ -89,9 +89,7 @@ class Api::ImagesController < ApplicationController
 
     # If blur level is greater than zero, return resource scaled an image.
     if @image.blur_level > 0
-      img = Magick::ImageList.new(original)
-      resize_img = img.blur_image(@image.blur_level, @image.blur_level)
-      resize_img = resize_img.write(original.to_s + ".resize")
+      # Return resized image.
       return render :file => original.to_s + ".resize", :content_type => @image.extension, :status => 200
     end
     return render :file => original, :content_type => @image.extension, :status => 200
@@ -118,12 +116,65 @@ class Api::ImagesController < ApplicationController
     if @image == nil
       raise StandardError.new @errors.push("画像がみつかりません")
     end
-    return render :file => @image.fetch_file_path, :content_type => @image.extension, :status => 200
+
+    original = @image.fetch_file_path
+    # If blur level is greater than zero, return resource scaled an image.
+    if @image.blur_level > 0
+      # img = Magick::ImageList.new(original)
+      # resize_img = img.blur_image(@image.blur_level, @image.blur_level)
+      # resize_img = resize_img.write(original.to_s + ".resize")
+      return render :file => original.to_s + ".resize", :content_type => @image.extension, :status => 200
+    end
+    return render :file => original, :content_type => @image.extension, :status => 200
   rescue => exception
     return render :json => exception.message
   end
 
   def update
+    p("==============================================")
+    # ログインユーザーの認証チェック
+    @member_id = request.headers["member-id"].to_i
+    @token_for_api = request.headers["token-for-api"]
+    p @token_for_api
+    p @member_id
+    @token_check = TokenCheck.new({
+      :id => @member_id,
+      :token_for_api => @token_for_api,
+    })
+
+    # 認証バリデーション
+    if @token_check.validate() != true
+      raise StandardError.new "認証用トークンがマッチしません"
+    end
+
+    @image = Image.find(update_params[:id])
+
+    if @image == nil
+      raise StandardError.new "画像データが見つかりません"
+    end
+
+    # Update blur level and display status.
+    response = @image.update({
+      :blur_level => update_params[:blur_level],
+      :is_displayed => update_params[:is_displayed],
+    })
+    if response != true
+      raise StandardError.new "画像の更新に失敗しました"
+    end
+
+    original = @image.fetch_file_path
+    # If blur level is greater than zero, return resource scaled an image.
+    if @image.blur_level > 0
+      img = Magick::ImageList.new(original)
+      resize_img = img.blur_image(@image.blur_level, @image.blur_level)
+      resize_img = resize_img.write(original.to_s + ".resize")
+      return render :file => original.to_s + ".resize", :content_type => @image.extension, :status => 200
+    end
+    return render :file => original, :content_type => @image.extension, :status => 200
+  rescue => exception
+    puts "[例外発生-------------------------------------------------]"
+    p exception.message
+    return render :json => exception.message
   end
 
   # 指定した画像を所持しているユーザーであれば削除可能
@@ -156,19 +207,22 @@ class Api::ImagesController < ApplicationController
     return render(:json => exception)
   end
 
-  # 自身の画像をアップロードする(※非Timeline)
-  def upload
+  private
+
+  def upload_process(parameters)
     # トークンとIDの組み合わせのチェック
     @image = FormImage.new({
-      :member_id => upload_params[:member_id].to_i,
-      :extension => upload_params[:upload_file],
-      :token_for_api => upload_params[:token_for_api].to_s,
+      :member_id => parameters[:member_id].to_i,
+      :extension => parameters[:upload_file],
+      :token_for_api => parameters[:token_for_api].to_s,
     })
+    # Check validation of post data.
     if @image.validate != true
       raise ActiveModel::ValidationError.new(@image)
     end
-    # Reset @image
-    @image = nil
+    # Make variable named '@image' nil.
+    remove_instance_variable :@image
+
     # 既存レコードにuuidが存在していないかどうかを検証
     @uuid = SecureRandom.uuid
     @uuid_hash = Digest::SHA256.hexdigest @uuid
@@ -179,6 +233,7 @@ class Api::ImagesController < ApplicationController
       raise StandardError.new "UUIDの重複がありました"
     end
 
+    # Make file name wtih hash text from uuid maded by random function.
     @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[upload_params[:upload_file].content_type]
 
     # アップロードファイルの確定フルパス
@@ -189,7 +244,7 @@ class Api::ImagesController < ApplicationController
     uploaded_at = @today.strftime("%Y-%m-%d %H:%M:%S")
     random_token = TokenForApi.make_random_token 128
 
-    new_image = {
+    @image = Image.new({
       :id => @uuid,
       :member_id => upload_params[:member_id],
       :filename => @filename,
@@ -199,23 +254,94 @@ class Api::ImagesController < ApplicationController
       :is_approved => true,
       :token => random_token,
       :uploaded_at => uploaded_at,
-    }
-    @image = Image.new(new_image)
+    })
 
     if @image.validate != true
+      raise StandardError.new "ああああああああああ"
       raise ActiveModel::ValidationError.new(@image)
     end
 
     # If validation is successfully so execute inserting new image data to table.
-    @image.save
-    # return
-    return render :json => @image.to_json(:include => [:member])
-  rescue ActiveModel::ValidationError => error
-    p(error)
-    return render :json => @image.errors.messages
+    if (@image.save != true)
+      raise StandardError.new "画像のアップロードに失敗しました"
+    end
+    # Return the new uuid on images table.
+    return @image.id
   rescue => error
-    pp error
-    return render :json => error
+    logger.debug "#{error.message}"
+    return 0
+  end
+
+  public
+
+  # 自身の画像をアップロードする(※非Timeline)
+  def upload
+    response = self.upload_process(upload_params)
+    p("===============================================================")
+    p(response)
+    # # トークンとIDの組み合わせのチェック
+    # @image = FormImage.new({
+    #   :member_id => upload_params[:member_id].to_i,
+    #   :extension => upload_params[:upload_file],
+    #   :token_for_api => upload_params[:token_for_api].to_s,
+    # })
+    # if @image.validate != true
+    #   raise ActiveModel::ValidationError.new(@image)
+    # end
+
+    # # Make variable named '@image' nil.
+    # remove_instance_variable :@image
+
+    # # 既存レコードにuuidが存在していないかどうかを検証
+    # @uuid = SecureRandom.uuid
+    # @uuid_hash = Digest::SHA256.hexdigest @uuid
+    # @image = Image.find_by({
+    #   :id => @uuid,
+    # })
+    # if @image != nil
+    #   raise StandardError.new "UUIDの重複がありました"
+    # end
+
+    # @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[upload_params[:upload_file].content_type]
+
+    # # アップロードファイルの確定フルパス
+    # uploaded_file_path = save_path.to_s + "/" + @filename
+    # response = FileUtils.cp(upload_params[:upload_file].tempfile.path, uploaded_file_path)
+
+    # # 仮パス -> 確定ディレクトリ へのコピー完了後
+    # uploaded_at = @today.strftime("%Y-%m-%d %H:%M:%S")
+    # random_token = TokenForApi.make_random_token 128
+
+    # @image = Image.new({
+    #   :id => @uuid,
+    #   :member_id => upload_params[:member_id],
+    #   :filename => @filename,
+    #   :use_type => 1,
+    #   :blur_level => 0,
+    #   :extension => upload_params[:upload_file].content_type,
+    #   :is_approved => true,
+    #   :token => random_token,
+    #   :uploaded_at => uploaded_at,
+    # })
+
+    # if @image.validate != true
+    #   raise StandardError.new "ああああああああああ"
+    #   raise ActiveModel::ValidationError.new(@image)
+    # end
+
+    # # If validation is successfully so execute inserting new image data to table.
+    # if (@image.save != true)
+    #   raise StandardError.new "画像のアップロードに失敗しました"
+    # end
+    # return render :json => @image.to_json(:include => [:member])
+  rescue ActiveModel::ValidationError => error
+    # logger.debug "111[例外]---#{error.message.to_s}"
+    pp error.message
+    return render :json => @image.errors.messages.to_s
+  rescue => error
+    # logger.debug "222[例外]---#{error.message}"
+    pp error.message
+    return render :json => error.message
   end
 
   def login_check
@@ -235,6 +361,19 @@ class Api::ImagesController < ApplicationController
       :token_for_api
     )
     return upload_params
+  end
+
+  def update_params
+    update_params = params.fetch(:image, {
+      :id => nil,
+      :blur_level => nil,
+      :is_displayed => nil,
+    }).permit(
+      :id,
+      :blur_level,
+      :is_displayed,
+    )
+    return update_params
   end
 
   def owner_images_params
