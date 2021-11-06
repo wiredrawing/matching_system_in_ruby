@@ -16,12 +16,21 @@ class Api::TimelinesController < ApplicationController
       raise ActiveModel::ValidationError.new @token_check
     end
 
-    @timelines = Timeline.where({
+    @timeline_id_list = Timeline.where({
       :from_member_id => params[:from_member_id].to_i,
       :to_member_id => params[:to_member_id].to_i,
-    })
-      .order(:created_at => :desc)
-      .limit(5)
+    }).or(Timeline.where({
+      :from_member_id => params[:to_member_id].to_i,
+      :to_member_id => params[:from_member_id].to_i,
+    })).map do |timeline|
+      next timeline.id
+    end
+
+    @timelines = Timeline.where({
+      :id => @timeline_id_list,
+    }).order(
+      :created_at => :desc,
+    ).limit(5)
 
     if @timelines.first == nil
       raise StandardError.new "メッセージのやりとりは有りません"
@@ -38,16 +47,15 @@ class Api::TimelinesController < ApplicationController
       end
     end
 
-    render({
-      :json => @timelines.to_json({
-        :include => [
-          :message,
-          :image,
-          :url,
-        ],
-      }),
-    })
-    return true
+    return render({
+             :json => @timelines.to_json({
+               :include => [
+                 :message,
+                 :image,
+                 :url,
+               ],
+             }),
+           })
   rescue ActiveModel::ValidationError => error
     p error.model
     p error.class
@@ -128,6 +136,17 @@ class Api::TimelinesController < ApplicationController
     # return render :json => @message_to_timeline.errors.messages
   end
 
+  # 画像の投稿
+  def create_image
+    upload_params = {
+      :member_id => create_image_params[:from_member_id],
+      :upload_file => create_image_params[:upload_file],
+      :token_for_api => create_image_params[:token_for_api],
+    }
+    # アップロード処理を実行
+    self.upload_process(upload_params)
+  end
+
   # 要ログインを一旦外す場合
   def login_check
     return true
@@ -142,5 +161,15 @@ class Api::TimelinesController < ApplicationController
       :message,
       :token_for_api
     )
+  end
+
+  def create_image_params
+    create_image_params = params.fetch(:image, {}).permit(
+      :from_member_id,
+      :to_member_id,
+      :upload_file,
+      :token_for_api,
+    )
+    return create_image_params
   end
 end

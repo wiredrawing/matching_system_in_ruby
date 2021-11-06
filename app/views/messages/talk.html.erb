@@ -3,6 +3,7 @@
 <% end %>
 <a href="" class="backk">戻る</a>
 <div id="chat_area">
+  {{timelines}}
   <section>
     <div class="message_face">
       <% if @opponent.showable_images.length > 0 then %>
@@ -19,72 +20,65 @@
     <div class="talk">
       <p v-on:click="getOldMessage" class="past_message_btn">過去のメッセージを取得</p>
       <!-- メッセージのループ -->
-      <% @timelines.each do |timeline| %>
-        <% if timeline.message.member_id == @current_user.id %>
-          <div>
-            <div class="talkin_r">
-              <p class="kidokuornot"><%= timeline.is_browsed %></p>
-              <div class="balloon1-right">
-                <p><%= timeline.message.message %></p>
-              </div>
-              <div class="balloon1-right">
-                <p>
-                  <a target="_blank" >
-                    <img width="100" >
-                  </a>
-                </p>
-              </div>
-            </div>
+      <div v-for="timeline in timelines">
+        <div class="talkin_r" v-if="timeline.from_member_id == fromMemberId.value">
+          <p class="kidokuornot">既読or未読</p>
+          <div class="balloon1-right">
+            <p>{{timeline.message.message}}</p>
           </div>
-        <% else %>
-          <div v-else>
-            <div class="talkin_l">
-              <div class="balloon1-left">
-                <p><%= timeline.message.message %></p>
-              </div>
-              <div class="balloon1-left">
-                <p>
-                  <a target="_blank" >
-                    <img width="100" >
-                  </a>
-                </p>
-              </div>
-            </div>
+          <!--
+          <div class="balloon1-right">
+            <p>
+              <a target="_blank" >
+                <img width="100" >
+              </a>
+            </p>
           </div>
-        <% end %>
-      <% end %>
+          -->
+        </div>
+        <div v-else class="talkin_l">
+          <div class="balloon1-left">
+            <p>{{timeline.from_member_id}}{{timeline.message.message}}</p>
+          </div>
+          <div class="balloon1-left">
+            <p>
+              <a target="_blank" >
+                <img width="100" >
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
       <div class="prepare_uploading_image">
         <img src="" width="30%" id="selected_image">
         <button v-on:click="uploadProfileImage">この画像をアップロードする</button>
       </div>
     </div>
-    <%= api_timeline_create_message_path() %>
     <%= form_for :message, :url => api_timeline_create_message_path, :method => "post", :html => {:id => "send-message-form"} do |form| %>
       <%= form.hidden_field :request_url, :value => api_timeline_create_message_path(), :ref => "requestUrl" %>
       <%= form.hidden_field :from_member_id, :value => @current_user.id, :ref => "fromMemberId" %>
       <%= form.hidden_field :to_member_id, :value => @to_member_id, :ref => "toMemberId" %>
       <%= form.hidden_field :token_for_api, :value => @current_user.token_for_api, :ref => "tokenForApi" %>
+      <%= form.hidden_field :api_timeline_messages, :value => api_timeline_messages_path(:from_member_id => @current_user.id, :to_member_id => @to_member_id), :ref => "apiTimelineMessagesUrl" %>
       <p><%= form.submit "submit-to-create-message", :id => "send-message", :"v-on:click" => "sendMessage($event)", :value => "メッセージ送信" %></p>
       <p><%= form.text_field :message, :placeholder => "※メッセージを入力して下さい", :ref => "message" %></p>
     <% end %>
   </section>
+  <!--
   <div class="talk_form">
     <div class="talk_form2">
-      <%= form_for :message, :url => message_create_path, :method => "post" do |form| %>
-        <%= form.hidden_field :from_member_id, :value => @current_user.id %>
-        <%= form.hidden_field :to_member_id, :value => @to_member_id  %>
-        <p><%= form.submit "submit-to-create-message", :value => "メッセージ送信" %></p>
-        <p><%= form.text_field :message, :placeholder => "※メッセージを入力して下さい" %></p>
-      <% end %>
     </div>
   </div>
+  -->
 </div>
 <script src="https://unpkg.com/vue@next"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
   let app = Vue.createApp({
     data: function () {
-  
+      return {
+        timelines: [],
+      }
     },
     setup: function () {
       return {
@@ -93,14 +87,24 @@
         tokenForApi: Vue.ref(""),
         requestUrl: Vue.ref(""),
         message: Vue.ref(""),
+        apiTimelineMessagesUrl: Vue.ref(""),
       }
     },
     mounted: function () {
-      this.fetchMessageList();
+      this.fetchTimelines();
     },
     methods: {
-      fetchMessageList: function () {
-  
+      fetchTimelines: function () {
+        let options = {
+          headers: {
+            member_id: this.fromMemberId.value,
+            token_for_api: this.tokenForApi.value,
+          }
+        }
+        axios.get(this.apiTimelineMessagesUrl.value, options).then((response) => {
+          console.log(response);
+          this.timelines = response.data
+        });
       },
       sendMessage: function(event) {
         event.preventDefault();
@@ -122,6 +126,7 @@
         console.log(options);
         axios.post(this.requestUrl.value, postData, options).then((response) => {
           console.log(response);
+          this.fetchTimelines();
         });
       }
     }

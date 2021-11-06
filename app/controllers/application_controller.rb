@@ -4,6 +4,7 @@ class ApplicationController < ActionController::Base
   include RegisterHelper
   include MembersHelper
   include Api::ImagesHelper
+  include Api::TimelineHelper
   before_action :set_gender_list
   before_action :login_check
 
