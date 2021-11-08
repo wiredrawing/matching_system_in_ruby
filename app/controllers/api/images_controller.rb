@@ -316,25 +316,4 @@ class Api::ImagesController < ApplicationController
     )
     return owner_images_params
   end
-
-  # Return absolute path to save image file uploaded by logged in user.
-  def save_path
-    # 画像がアップロードされた日付
-    Time.zone = "Asia/Tokyo"
-    @today = Time.zone.now
-    # 画像のアップロード先ディレクトリ
-    year = @today.strftime "%Y"
-    month = @today.strftime "%m"
-    day = @today.strftime "%d"
-    hour = @today.strftime "%H"
-    minute = @today.strftime "%M"
-    # ファイルコピー先のディレクトリを確定
-    decided_file_path = "storage/uploads/" + year + "/" + month + "/" + day + "/" + hour
-    decided_file_path = Rails.root.join decided_file_path
-
-    # Setting umask value.
-    File.umask(0)
-    FileUtils.mkdir_p decided_file_path
-    return decided_file_path
-  end
 end

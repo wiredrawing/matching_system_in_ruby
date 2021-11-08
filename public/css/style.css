@@ -568,7 +568,7 @@ footer {
 	    text-align: center !important;
 	    overflow: hidden !important;
 	    margin: 0 auto;
-	    
+
 }
     .trimm img {
 	    min-width: 100%;
@@ -673,7 +673,7 @@ footer {
 	overflow: hidden;
 	background: #999;
 
-	
+
 }
 
 .face img {
@@ -1204,7 +1204,7 @@ td,th{
   content: "";
   position: absolute;
   top: 50%;
-  left: -14px;
+  left: -16px;
   margin-top: -8px;
   border: 8px solid transparent;
   border-right: 8px solid #fff;
@@ -1214,6 +1214,23 @@ td,th{
   margin: 0;
   padding: 0;
   text-align: left;
+}
+
+.balloon1-left-img {
+  position: relative;
+  display: block;
+  margin: 16px 0 0;
+  padding: 8px 16px;
+  min-width: 32px;
+  max-width: 50%;
+  color: #555;
+  font-size: 19px;
+  /* background: #fff; */
+  border-radius: 16px;
+}
+
+.balloon1-left-img img{
+  border-radius: 10px;
 }
 
 .balloon1-right {
@@ -1233,7 +1250,8 @@ td,th{
   content: "";
   position: absolute;
   top: 50%;
-  left: 97%;
+	left: 100%;
+  /* left: 97%; */
   margin-top: -8px;
   border: 8px solid transparent;
   border-left: 8px solid #20a81d;
@@ -1246,6 +1264,22 @@ td,th{
   text-align: left;
 }
 
+.balloon1-right-img {
+  position: relative;
+  display: block;
+  margin: 16px 0 0;
+  padding: 8px 16px;
+  min-width: 32px;
+  max-width: 50%;
+  color: #555;
+  font-size: 19px;
+  /* background: #20a81d; */
+  border-radius: 16px;
+}
+
+.balloon1-right-img img {
+  border-radius: 10px;
+}
 
 .talkin_l {
 	width: 100%;
@@ -1357,7 +1391,7 @@ td,th{
 	position: relative;
 	top: 16px;
 
-	
+
 
 }
 
@@ -1437,7 +1471,7 @@ td,th{
 	text-align: center;
 	margin: 16px auto 0;
 	display: inline-block;
-	
+
 }
 
 .VueCarousel {
@@ -1454,7 +1488,7 @@ td,th{
     box-sizing: border-box;
     width: 100% !important;
     margin: 0 auto;
-   
+
 }
 
 

@@ -31,22 +31,10 @@ class UtilitiesController < ApplicationController
   ]
 
   BLUR_LEVEL_LIST = [
-    {
-      :id => 0,
-      :value => "ぼかさない",
-    },
-    {
-      :id => 5,
-      :value => "小",
-    },
-    {
-      :id => 15,
-      :value => "中",
-    },
-    {
-      :id => 30,
-      :value => "大",
-    },
+    { :id => 0, :value => "ぼかさない" },
+    { :id => 10, :value => "小" },
+    { :id => 15, :value => "中" },
+    { :id => 30, :value => "大" },
   ]
 
   # ユーザーのアクションリスト
@@ -56,6 +44,7 @@ class UtilitiesController < ApplicationController
     :message => 30, # マッチングしたメンバーからのメッセージ受信
     :notice => 40, # システム側からのメッセージ通知があった場合
   }
+
   ACTION_STRING_LIST = [
     10 => "いいねがきました",
     20 => "マッチングしました",
@@ -65,14 +54,8 @@ class UtilitiesController < ApplicationController
 
   # 画像の表示ステータス
   DISPLAY_STATUS_LIST = [
-    {
-      :id => 1,
-      :value => "表示中",
-    },
-    {
-      :id => 0,
-      :value => "非表示",
-    },
+    { :id => 1, :value => "表示中" },
+    { :id => 0, :value => "非表示" },
   ]
 
   #

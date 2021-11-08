@@ -1,9 +1,5 @@
-<% @timelines.each do |timeline|%>
-  <p><%= timeline.message.message %></p>
-<% end %>
 <a href="" class="backk">戻る</a>
 <div id="chat_area">
-  {{timelines}}
   <section>
     <div class="message_face">
       <% if @opponent.showable_images.length > 0 then %>
@@ -18,40 +14,42 @@
     </div>
     <p><%= @opponent.display_name %></p>
     <div class="talk">
-      <p v-on:click="getOldMessage" class="past_message_btn">過去のメッセージを取得</p>
+      <p v-on:click="fetchPastTimelines" class="past_message_btn">過去のメッセージを取得</p>
       <!-- メッセージのループ -->
       <div v-for="timeline in timelines">
         <div class="talkin_r" v-if="timeline.from_member_id == fromMemberId.value">
           <p class="kidokuornot">既読or未読</p>
-          <div class="balloon1-right">
+          <div v-if="timeline.message != null" class="balloon1-right">
             <p>{{timeline.message.message}}</p>
           </div>
-          <!--
-          <div class="balloon1-right">
+          <div v-if="timeline.image != null" class="balloon1-right-img">
             <p>
               <a target="_blank" >
-                <img width="100" >
+                <img v-bind:src="timeline.image.image_url" width="100" >
               </a>
             </p>
           </div>
-          -->
         </div>
         <div v-else class="talkin_l">
-          <div class="balloon1-left">
-            <p>{{timeline.from_member_id}}{{timeline.message.message}}</p>
+          <div v-if="timeline.message != null" class="balloon1-left">
+            <p>{{timeline.message.message}}</p>
           </div>
-          <div class="balloon1-left">
+          <div v-if="timeline.image != null" class="balloon1-left-img">
             <p>
               <a target="_blank" >
-                <img width="100" >
+                <img v-bind:src="timeline.image.image_url" width="100" >
               </a>
             </p>
           </div>
         </div>
       </div>
       <div class="prepare_uploading_image">
-        <img src="" width="30%" id="selected_image">
-        <button v-on:click="uploadProfileImage">この画像をアップロードする</button>
+        <img v-bind:src="file_resorce" id="selected_image">
+        <input type="hidden" id="url-to-upload-image" name="urlToUploadImage" value="<%= api_image_upload_path() %>">
+        <input type="hidden" name="member_id" value="<%= @current_user.id %>">
+        <input type="hidden" name="member_id" value="<%= @current_user.token_for_api %>">
+        <input type="file"   name="upload_file" v-on:change="selectFile($event)">
+        <input type="submit" name="submit" v-on:click="uploadSelectedFile" id="button-to-upload-image" value="ファイルをアップロード">
       </div>
     </div>
     <%= form_for :message, :url => api_timeline_create_message_path, :method => "post", :html => {:id => "send-message-form"} do |form| %>
@@ -78,6 +76,11 @@
     data: function () {
       return {
         timelines: [],
+        limit: 10,
+        offset: 0,
+        selected_file: null,
+        file_binary: null,
+        file_resorce: null,
       }
     },
     setup: function () {
@@ -101,9 +104,28 @@
             token_for_api: this.tokenForApi.value,
           }
         }
-        axios.get(this.apiTimelineMessagesUrl.value, options).then((response) => {
+        let url = this.apiTimelineMessagesUrl.value
+        url += "?offset=" + this.offset + "&limit=10";
+        axios.get(url, options).then((response) => {
           console.log(response);
           this.timelines = response.data
+        });
+      },
+      // 過去のメッセージリストを取得
+      fetchPastTimelines: function () {
+        this.offset += 10
+        let options = {
+          headers: {
+            member_id: this.fromMemberId.value,
+            token_for_api: this.tokenForApi.value,
+          }
+        }
+        let url = this.apiTimelineMessagesUrl.value;
+        url += "?offset=" + this.offset + "&limit=10";
+        alert(url)
+        axios.get(url, options).then((response) => {
+          console.log(response);
+          this.timelines = response.data.concat(this.timelines)
         });
       },
       sendMessage: function(event) {
@@ -125,9 +147,42 @@
         console.log(postData);
         console.log(options);
         axios.post(this.requestUrl.value, postData, options).then((response) => {
+          this.timelines.push(response.data);
           console.log(response);
-          this.fetchTimelines();
+          // this.fetchTimelines();
         });
+      },
+      selectFile: function (event) {
+        let files = event.target.files
+        let reader = new FileReader();
+        let file_binary = null;
+        this.file_binary = files[0];
+        reader.onload = (e) => {
+          // console.log(e);
+          console.log(e)
+          alert(e.target.result)
+          // console.log(reader.result);
+          this.file_resorce = URL.createObjectURL(files[0]);
+        }
+        reader.readAsBinaryString(files[0])
+  
+        console.log(files);
+      },
+      uploadSelectedFile: function() {
+        let options = {
+          headers: {
+            member_id: this.fromMemberId.value,
+            token_for_api: this.tokenForApi.value,
+          }
+        }
+        let postData = new FormData();
+        postData.append("image[upload_file]", this.file_binary)
+        postData.append("image[from_member_id]", this.fromMemberId.value)
+        postData.append("image[to_member_id]", this.toMemberId.value)
+        // Request with post.
+        axios.post("/api/timeline/upload", postData, options).then((response) => {
+          console.log(response)
+        })
       }
     }
   })

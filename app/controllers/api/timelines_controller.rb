@@ -1,11 +1,13 @@
 class Api::TimelinesController < ApplicationController
 
   # csrfを除外するmethod
-  protect_from_forgery :except => :create_message
+  protect_from_forgery :except => [
+    :create_message,
+    :create_image,
+  ]
 
   # 過去のメッセージのやりとり一覧を取得
-  def message_list
-
+  def messages
     # メッセージリストのリクエストユーザーの認証
     @token_check = TokenCheck.new({
       :id => request.headers["member-id"].to_i,
@@ -26,11 +28,18 @@ class Api::TimelinesController < ApplicationController
       next timeline.id
     end
 
-    @timelines = Timeline.where({
+    @timelines = Timeline.includes(
+      :image,
+      :message,
+      :url,
+      :from_member,
+      :to_member,
+    ).where({
       :id => @timeline_id_list,
     }).order(
       :created_at => :desc,
-    ).limit(5)
+    ).limit(params[:limit].to_i)
+      .offset(params[:offset].to_i)
 
     if @timelines.first == nil
       raise StandardError.new "メッセージのやりとりは有りません"
@@ -47,21 +56,18 @@ class Api::TimelinesController < ApplicationController
       end
     end
 
-    return render({
-             :json => @timelines.to_json({
-               :include => [
-                 :message,
-                 :image,
-                 :url,
-               ],
-             }),
-           })
+    return render(:json => @timelines.to_json({
+                    :include => [
+                      :message,
+                      :image,
+                      :url,
+                    ],
+                  }))
   rescue ActiveModel::ValidationError => error
-    p error.model
-    p error.class
+    logger.debug "#{error.model.errors.messages.join(",")}"
     return render(:json => error.model.errors.messages)
   rescue => error
-    p error.message
+    logger.debug "#{error.message}"
     return render(:json => error.message)
   end
 
@@ -93,13 +99,9 @@ class Api::TimelinesController < ApplicationController
             p "==========================>"
           end
         end
-        p "---"
-        p @message.errors.messages
-        p "==="
+
         errors = @message.errors.messages
-        p errors
         raise ActiveModel::ValidationError.new @message
-        p "ああああああ"
         # raise StandardError.new "メッセージのバリデーションに失敗しました"
       end
       response = @message.save()
@@ -139,12 +141,39 @@ class Api::TimelinesController < ApplicationController
   # 画像の投稿
   def create_image
     upload_params = {
-      :member_id => create_image_params[:from_member_id],
+      :member_id => create_image_params[:from_member_id].to_i,
       :upload_file => create_image_params[:upload_file],
-      :token_for_api => create_image_params[:token_for_api],
+      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+      :token_for_api => request.headers["token-for-api"],
     }
     # アップロード処理を実行
-    self.upload_process(upload_params)
+    # アップロードによる最新のimage_idを取得
+    @image_id = self.upload_process(upload_params)
+    p "@image_id ===============================>", @image_id
+    @timeline = Timeline.new({
+      :from_member_id => create_image_params[:from_member_id].to_i,
+      :to_member_id => create_image_params[:to_member_id].to_i,
+      :message_id => nil,
+      :url_id => nil,
+      :image_id => @image_id,
+    })
+
+    if @timeline.validate() != true
+      raise ActiveModel::ValidationError.new @timeline
+    end
+    response = @timeline.save()
+    p response
+    return render :json => @timeline.to_json(:include => [
+                                               :message,
+                                               :image,
+                                               :url,
+                                             ])
+  rescue ActiveModel::ValidationError => error
+    p error.backtrace
+    return render :json => error.model.errors.messages
+  rescue => error
+    p error.backtrace
+    return render :json => error.message
   end
 
   # 要ログインを一旦外す場合

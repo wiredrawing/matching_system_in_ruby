@@ -41,13 +41,13 @@ module Api::ImagesHelper
       :use_type => 1,
       :blur_level => 0,
       :extension => parameters[:upload_file].content_type,
-      :is_approved => true,
+      :is_approved => UtilitiesController::BINARY_TYPE[:on],
+      :is_displayed => parameters[:is_displayed],
       :token => random_token,
       :uploaded_at => uploaded_at,
     })
 
     if @image.validate != true
-      raise StandardError.new "ああああああああああ"
       raise ActiveModel::ValidationError.new(@image)
     end
 
@@ -57,8 +57,35 @@ module Api::ImagesHelper
     end
     # Return the new uuid on images table.
     return @image.id
+  rescue ActiveModel::ValidationError => error
+    p error.backtrace
+    logger.debug error.model.errors.messages
+    # return render :json => error.model.errors.messages
+    return nil
   rescue => error
-    logger.debug "#{error.message}"
-    return 0
+    p error.backtrace
+    logger.debug error.message
+    return nil
+  end
+
+  # Return absolute path to save image file uploaded by logged in user.
+  def save_path
+    # 画像がアップロードされた日付
+    Time.zone = "Asia/Tokyo"
+    @today = Time.zone.now
+    # 画像のアップロード先ディレクトリ
+    year = @today.strftime "%Y"
+    month = @today.strftime "%m"
+    day = @today.strftime "%d"
+    hour = @today.strftime "%H"
+    minute = @today.strftime "%M"
+    # ファイルコピー先のディレクトリを確定
+    decided_file_path = "storage/uploads/" + year + "/" + month + "/" + day + "/" + hour
+    decided_file_path = Rails.root.join decided_file_path
+
+    # Setting umask value.
+    File.umask(0)
+    FileUtils.mkdir_p decided_file_path
+    return decided_file_path
   end
 end

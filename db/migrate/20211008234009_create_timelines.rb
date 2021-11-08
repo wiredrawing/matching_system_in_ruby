@@ -6,7 +6,7 @@ class CreateTimelines < ActiveRecord::Migration[6.1]
       t.integer :timeline_type
       t.integer :message_id
       t.integer :url_id
-      t.integer :image_id
+      t.uuid :image_id
       t.integer :is_browsed
       t.timestamps
     end

@@ -50,12 +50,16 @@ Rails.application.routes.draw do
     # メッセージ送信用
     scope "timeline" do
       get "/messages/:from_member_id/:to_member_id", {
-        :to => "timelines#message_list",
+        :to => "timelines#messages",
         :as => "timeline_messages",
       }
       post "/", {
         :to => "timelines#create_message",
         :as => "timeline_create_message",
+      }
+      post "/upload", {
+        :to => "timelines#create_image",
+        :as => "timeline_create_image",
       }
     end
 
