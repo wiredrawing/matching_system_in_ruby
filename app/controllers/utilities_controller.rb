@@ -58,6 +58,10 @@ class UtilitiesController < ApplicationController
     { :id => 0, :value => "非表示" },
   ]
 
+  # アップロード可能なファイルサイズ
+  # 5MBに制御
+  UPLOADABLE_SIZE = 3000000
+
   #
   def self.gender_id_list
     gender_id_list = self::GENDER_LIST.map do |gender|

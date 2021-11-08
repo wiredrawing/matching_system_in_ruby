@@ -1,3 +1,4 @@
+# 仮登録処理用のモデルクラス
 class Register < ApplicationRecord
   self.table_name = "members"
 

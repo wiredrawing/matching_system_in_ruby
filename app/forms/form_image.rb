@@ -31,6 +31,15 @@ class FormImage
       object.errors.add(attribute, "ファイルアップロードは必須項目です")
       next false
     end
+
+    # ファイルサイズを検証
+    max_filesize = data.size
+    if max_filesize > UtilitiesController::UPLOADABLE_SIZE
+      object.errors.add(attribute, "ファイルサイズは3MB以下にして下さい")
+      next false
+    end
+
+    # ファイルの拡張子を検証
     content_type = data.content_type.to_s
     if UtilitiesController::EXTENSION_LIST.keys.include?(content_type) != true
       object.errors.add(attribute, "無効なファイル拡張子です")

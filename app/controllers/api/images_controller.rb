@@ -209,9 +209,16 @@ class Api::ImagesController < ApplicationController
 
   # 自身の画像をアップロードする(※非Timeline)
   def upload
-    response = self.upload_process(upload_params)
     p("===============================================================")
-    p(response)
+    pp upload_params
+    p("===============================================================")
+    @image_id = self.upload_process(upload_params)
+
+    @image = Image.find(@image_id)
+    if @image == nil
+      raise StandardError.new "ファイルアップロードに失敗しました"
+    end
+    return render :json => @image.to_json(:includes => [:member])
     # # トークンとIDの組み合わせのチェック
     # @image = FormImage.new({
     #   :member_id => upload_params[:member_id].to_i,
@@ -270,7 +277,7 @@ class Api::ImagesController < ApplicationController
   rescue ActiveModel::ValidationError => error
     # logger.debug "111[例外]---#{error.message.to_s}"
     pp error.message
-    return render :json => @image.errors.messages.to_s
+    return render :json => @image.errors.messages
   rescue => error
     # logger.debug "222[例外]---#{error.message}"
     pp error.message
