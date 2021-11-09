@@ -15,6 +15,12 @@ class Timeline < ApplicationRecord
   # URLアクション
   has_one :url, :class_name => "Url", :foreign_key => :id, :primary_key => :url_id
 
+  attribute :message
+  attribute :from_member
+  attribute :to_member
+  attribute :image
+  attribute :url
+
   public
 
   # 指定したメンバー間のタイムライン

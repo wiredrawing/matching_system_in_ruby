@@ -73,6 +73,7 @@ class Api::TimelinesController < ApplicationController
 
   # メッセージの投稿
   def create_message
+    # Start transaction.
     ActiveRecord::Base.transaction do
       @message_to_timeline = MessageToTimeline.new ({
         :from_member_id => create_message_params[:from_member_id].to_i,
@@ -85,22 +86,20 @@ class Api::TimelinesController < ApplicationController
         raise ActiveModel::ValidationError.new(@message_to_timeline)
       end
 
-      # raise StandardError.new "意図的な例外"
-      # 新規メッセージを作成
       new_message = {
         :member_id => create_message_params[:from_member_id],
         :message => create_message_params[:message],
       }
       @message = Message.new(new_message)
       if @message.validate() != true
-        p @message.errors.messages
-        @message.methods.each do |method|
-          if (method == :errors)
-            p "==========================>"
-          end
-        end
+        # p @message.errors.messages
+        # @message.methods.each do |method|
+        #   if (method == :errors)
+        #     p "==========================>"
+        #   end
+        # end
 
-        errors = @message.errors.messages
+        # errors = @message.errors.messages
         raise ActiveModel::ValidationError.new @message
         # raise StandardError.new "メッセージのバリデーションに失敗しました"
       end
@@ -118,20 +117,30 @@ class Api::TimelinesController < ApplicationController
       if @timeline.validate() != true
         raise StandardError.new "タイムラインのバリデーションに失敗しました"
       end
-
       response = @timeline.save()
       if response != true
         raise StandardError.new "タイムラインの作成に失敗しました"
       end
-      render(:json => @timeline.to_json(:include => [
-                                          :message,
-                                        ]))
+
+      # pp @timeline.methods
+      json_response = {
+        :status => true,
+        :response => {
+          :timeline => @timeline,
+        },
+      }
+      render :json => json_response
     end
   rescue ActiveModel::ValidationError => error
     logger.debug error.model.errors.messages
-    return render({ :json => error.model.errors.messages })
+    json_response = {
+      :status => false,
+      :response => error.model.errors.messages,
+    }
+    return render({ :json => json_response })
   rescue => exception
     puts("[例外発生-----------------------------------]")
+    pp exception.backtrace.methods
     p(exception)
     p(exception.message)
     # pp @message_to_timeline.errors.messages
@@ -163,11 +172,19 @@ class Api::TimelinesController < ApplicationController
     end
     response = @timeline.save()
     p response
-    return render :json => @timeline.to_json(:include => [
-                                               :message,
-                                               :image,
-                                               :url,
-                                             ])
+
+    json_response = {
+      :status => true,
+      :response => {
+        :timeline => @timeline
+      }
+    }
+    return render :json => json_response
+    # return render :json => @timeline.to_json(:include => [
+    #                                            :message,
+    #                                            :image,
+    #                                            :url,
+    #                                          ])
   rescue ActiveModel::ValidationError => error
     p error.backtrace
     return render :json => error.model.errors.messages

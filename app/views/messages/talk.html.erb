@@ -147,9 +147,20 @@
         console.log(postData);
         console.log(options);
         axios.post(this.requestUrl.value, postData, options).then((response) => {
-          this.timelines.push(response.data);
-          console.log(response);
-          // this.fetchTimelines();
+  
+          if (response.data.status === true) {
+            let timeline = response.data.response.timeline;
+            this.timelines.push(timeline);
+            console.log(response);
+            this.message.value = "";
+            // this.fetchTimelines();
+          } else {
+            console.log(response.data.response);
+            throw new Error(response.data.response)
+          }
+        }).catch((error) => {
+          console.log(error);
+          alert(error);
         });
       },
       selectFile: function (event) {
@@ -181,7 +192,12 @@
         postData.append("image[to_member_id]", this.toMemberId.value)
         // Request with post.
         axios.post("/api/timeline/upload", postData, options).then((response) => {
+          console.log("ファイルアップロード成功");
           console.log(response)
+          if (response.data.status === true) {
+            this.timelines.push(response.data.response.timeline);
+            this.file_resorce = null;
+          }
         })
       }
     }
