@@ -92,13 +92,6 @@ class Api::TimelinesController < ApplicationController
       }
       @message = Message.new(new_message)
       if @message.validate() != true
-        # p @message.errors.messages
-        # @message.methods.each do |method|
-        #   if (method == :errors)
-        #     p "==========================>"
-        #   end
-        # end
-
         # errors = @message.errors.messages
         raise ActiveModel::ValidationError.new @message
         # raise StandardError.new "メッセージのバリデーションに失敗しました"
@@ -132,8 +125,7 @@ class Api::TimelinesController < ApplicationController
         raise ActiveModel::ValidationError.new @log
       end
 
-      response = @log.save()
-      if response != true
+      if @log.save() != true
         raise StandardError.new "ログの保存に失敗しました"
       end
     end
