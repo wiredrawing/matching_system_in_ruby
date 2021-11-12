@@ -6,9 +6,7 @@ class CreateLogs < ActiveRecord::Migration[6.1]
       t.bigint :from_member_id
       t.bigint :to_member_id
       t.integer :action_id
-      t.integer :is_browsed, **{
-                               :default => 0,
-                             }
+      t.integer :is_browsed, **{ :default => 0 }
       t.timestamps
     end
 

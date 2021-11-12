@@ -85,6 +85,12 @@ Rails.application.routes.draw do
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
+  # List notices to logged in user.
+  get "/notices/", {
+    :to => "notices#index",
+    :as => "notices",
+  }
+
   post "/images/active/:id", {
     :to => "images#active",
     :as => "active_image",

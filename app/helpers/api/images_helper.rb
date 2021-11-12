@@ -1,6 +1,5 @@
 module Api::ImagesHelper
-  def upload_process(parameters)
-
+  def upload_process(parameters = { :member_id => nil, :upload_file => nil, :token_for_api => nil })
     # 表示スタータスが設定されていない場合は1を代入
     parameters[:is_displayed] ||= UtilitiesController::BINARY_TYPE[:on]
 

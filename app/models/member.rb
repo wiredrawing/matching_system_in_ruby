@@ -27,6 +27,9 @@ class Member < ApplicationRecord
          :foreign_key => :member_id,
        })
 
+  # 自身に送信されたアクション一覧を取得
+  has_many(:logs, :class_name => "Log", :foreign_key => :to_member_id, :primary_key => :id)
+
   # メンバーがアップロードした全画像
   # 並び順sqlをlambda関数で渡す
   _anonymous = lambda do

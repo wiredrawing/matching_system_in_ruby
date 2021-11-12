@@ -122,15 +122,30 @@ class Api::TimelinesController < ApplicationController
         raise StandardError.new "タイムラインの作成に失敗しました"
       end
 
-      # pp @timeline.methods
-      json_response = {
-        :status => true,
-        :response => {
-          :timeline => @timeline,
-        },
-      }
-      render :json => json_response
+      # Saved executed process on above as log.
+      @log = Log.new({
+        :from_member_id => create_message_params[:from_member_id].to_i,
+        :to_member_id => create_message_params[:to_member_id].to_i,
+        :action_id => UtilitiesController::ACTION_ID_LIST[:message],
+      })
+      if @log.validate() != true
+        raise ActiveModel::ValidationError.new @log
+      end
+
+      response = @log.save()
+      if response != true
+        raise StandardError.new "ログの保存に失敗しました"
+      end
     end
+
+    # pp @timeline.methods
+    json_response = {
+      :status => true,
+      :response => {
+        :timeline => @timeline,
+      },
+    }
+    return render :json => json_response
   rescue ActiveModel::ValidationError => error
     logger.debug error.model.errors.messages
     json_response = {
@@ -149,48 +164,88 @@ class Api::TimelinesController < ApplicationController
 
   # 画像の投稿
   def create_image
-    upload_params = {
-      :member_id => create_image_params[:from_member_id].to_i,
-      :upload_file => create_image_params[:upload_file],
-      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      :token_for_api => request.headers["token-for-api"],
-    }
-    # アップロード処理を実行
-    # アップロードによる最新のimage_idを取得
-    @image_id = self.upload_process(upload_params)
-    p "@image_id ===============================>", @image_id
-    @timeline = Timeline.new({
-      :from_member_id => create_image_params[:from_member_id].to_i,
-      :to_member_id => create_image_params[:to_member_id].to_i,
-      :message_id => nil,
-      :url_id => nil,
-      :image_id => @image_id,
-    })
+    @errors = Array.new()
+    ActiveRecord::Base.transaction do
 
-    if @timeline.validate() != true
-      raise ActiveModel::ValidationError.new @timeline
+      # post parameters.
+      upload_params = {
+        :member_id => create_image_params[:from_member_id].to_i,
+        :upload_file => create_image_params[:upload_file],
+        :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+        :token_for_api => request.headers["token-for-api"],
+      }
+
+      # ----------------------------------------------------------
+      # アップロード処理を実行
+      # アップロードによる最新のimage_idを取得
+      # ----------------------------------------------------------
+      @image_id = self.upload_process(upload_params)
+      if Image.find(@image_id) == nil
+        raise StandardError.new "Failed uploading image file."
+      end
+
+      # p "@new_image ===============================>", @new_image
+
+      # p "@image_id ===============================>", @image_id
+
+      @timeline = Timeline.new({
+        :from_member_id => create_image_params[:from_member_id].to_i,
+        :to_member_id => create_image_params[:to_member_id].to_i,
+        :message_id => nil,
+        :url_id => nil,
+        :image_id => @image_id,
+      })
+
+      if @timeline.validate() != true
+        raise ActiveModel::ValidationError.new @timeline
+      end
+      response = @timeline.save()
+      # p response
+
+      # Saved executed process on above as log.
+      @log = Log.new({
+        :from_member_id => create_image_params[:from_member_id].to_i,
+        :to_member_id => create_image_params[:to_member_id].to_i,
+        :action_id => UtilitiesController::ACTION_ID_LIST[:message],
+      })
+      if @log.validate() != true
+        raise ActiveModel::ValidationError.new @log
+      end
+
+      response = @log.save()
+      if response != true
+        raise StandardError.new "ログの保存に失敗しました"
+      end
     end
-    response = @timeline.save()
-    p response
 
+    # Defined api response.
     json_response = {
       :status => true,
       :response => {
-        :timeline => @timeline
-      }
+        :timeline => @timeline,
+      },
+      :errors => nil,
     }
     return render :json => json_response
-    # return render :json => @timeline.to_json(:include => [
-    #                                            :message,
-    #                                            :image,
-    #                                            :url,
-    #                                          ])
   rescue ActiveModel::ValidationError => error
-    p error.backtrace
-    return render :json => error.model.errors.messages
+    logger.debug error
+    # p error.backtrace
+    json_response = {
+      :status => false,
+      :response => nil,
+      :errors => error.model.errors.messages,
+    }
+    return render :json => json_response
   rescue => error
-    p error.backtrace
-    return render :json => error.message
+    logger.debug error
+    # p error.backtrace
+    @errors.push(error.message)
+    json_response = {
+      :status => false,
+      :response => nil,
+      :errors => @errors,
+    }
+    return render :json => json_response
   end
 
   # 要ログインを一旦外す場合

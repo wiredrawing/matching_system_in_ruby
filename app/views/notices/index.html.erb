@@ -1,0 +1,38 @@
+<a href="" class="backk">戻る</a>
+<section>
+  <% if @logs.length > 0 then %>
+    <div class="box">
+      <% @logs.each do |log| %>
+        <a href="{{$value->url}}" class="topics_list">
+          <p><%= log.created_at.strftime("%Y年%m月%d日 %H時%M分") %></p>
+          <p><%= log.from_member.display_name %>さん <%= log.action_name %></p>
+        </a>
+      <% end %>
+    </div>
+    <!--box-->
+  <% end %>
+</section>
+<!-- ページング機能 -->
+@if ($logs->hasPages())
+<div class="paging">
+  {{-- Previous Page Link --}}
+  @if ($logs->onFirstPage())
+  {{-- <span class="disabled" aria-disabled="true">
+    <img src="/images/back.png" width="24">
+  </span> --}}
+  @else
+  <a href="{{ $logs->previousPageUrl() }}" rel="prev">
+    <img src="/images/back.png" width="24">
+  </a>
+  @endif
+  {{-- Next Page Link --}}
+  @if ($logs->hasMorePages())
+  <a href="{{ $logs->nextPageUrl() }}" rel="next">
+    <img src="/images/forward.png" width="24">
+  </a>
+  @else
+  {{-- <span class="disabled" aria-disabled="true">
+    <img src="/images/forward.png" width="24">
+  </span> --}}
+  @endif
+</div>

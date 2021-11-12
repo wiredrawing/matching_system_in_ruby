@@ -45,12 +45,12 @@ class UtilitiesController < ApplicationController
     :notice => 40, # システム側からのメッセージ通知があった場合
   }
 
-  ACTION_STRING_LIST = [
-    10 => "いいねがきました",
-    20 => "マッチングしました",
-    30 => "メッセージがきました",
+  ACTION_STRING_LIST = {
+    10 => "からいいねがきました",
+    20 => "とマッチングしました",
+    30 => "からメッセージがきました",
     40 => "システムメッセージがきました",
-  ]
+  }
 
   # 画像の表示ステータス
   DISPLAY_STATUS_LIST = [
