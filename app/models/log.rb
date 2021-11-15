@@ -3,6 +3,8 @@ class Log < ApplicationRecord
   # Define the column named action_name on log table.
   attribute :from_member
   attribute :action_name
+  attribute :url
+
   # Memberテーブルとのリレーション
   has_one :from_member, :class_name => "Member", :foreign_key => :id, :primary_key => :from_member_id
   has_one :to_member, :class_name => "Member", :foreign_key => :id, :primary_key => :to_member_id
@@ -43,5 +45,23 @@ class Log < ApplicationRecord
       return ""
     end
     return UtilitiesController::ACTION_STRING_LIST[self.action_id]
+  end
+
+  def url
+    if self.action_id == UtilitiesController::ACTION_ID_LIST[:like]
+      # いいねをもらった場合は､いいね送信元メンバーのURLへ
+      return member_url(:id => self.from_member.id)
+    elsif self.action_id == UtilitiesController::ACTION_ID_LIST[:match]
+      # マッチングした場合は､マッチング先メンバーのURLへ
+      return member_url(:id => self.from_member.id)
+    elsif self.action_id == UtilitiesController::ACTION_ID_LIST[:message]
+      # メッセージ受信時は､送信元メンバーとのチャットルームへ
+      return message_talk_url(:id => self.from_member.id)
+    else
+      # 上記以外はURLなし
+      return nil
+    end
+  rescue => error
+    p error.message
   end
 end

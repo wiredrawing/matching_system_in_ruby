@@ -2,6 +2,7 @@ require_relative "boot"
 
 require "rails/all"
 
+# 自作ミドルウェアの読み込み
 load_eager_model_filename = File.expand_path("../lib/middlewares/load_eager_model", File.dirname(__FILE__))
 require load_eager_model_filename
 

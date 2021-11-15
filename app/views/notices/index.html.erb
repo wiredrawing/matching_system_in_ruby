@@ -3,7 +3,7 @@
   <% if @logs.length > 0 then %>
     <div class="box">
       <% @logs.each do |log| %>
-        <a href="" class="message_list">
+        <a href="<%= log.url %>" class="message_list">
           <div class="message_list1">
             <% if log.from_member.showable_images.length > 0 %>
               <img src="<%= log.from_member.showable_images.first.image_url() %>">

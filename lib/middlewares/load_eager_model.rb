@@ -1,9 +1,9 @@
 class LoadEagerModel
   def initialize(app)
-    p("initialize")
+    # p("initialize")
     @app = app
-    p(app)
-    p("end")
+    # p(app)
+    # p("end")
   end
 
   def call(env)
@@ -50,13 +50,13 @@ class LoadEagerModel
     # pp(@app.methods)
     # pp(@app.routes)
     # pp(request.class)
-    env.keys.each do |key|
-      pp "---------" + key
-      pp env[key].class
-    end
+    # env.keys.each do |key|
+    #   pp "---------" + key
+    #   pp env[key].class
+    # end
     res = @app.call(env)
-    # pp(res)
-    p("0000000000000000000000000000000000000000000000")
+    # # pp(res)
+    # p("0000000000000000000000000000000000000000000000")
     return res
   end
 end
