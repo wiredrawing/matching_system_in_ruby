@@ -228,6 +228,10 @@ class MypageController < ApplicationController
       :to_member_id => @current_user.id,
     }).order(:updated_at => :desc)
 
+    response = @footprints.update({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    })
+
     print("ここはログインユーザーへの足跡一覧ページです")
     @footprints.each do |footprint|
       pp(footprint.from_member)

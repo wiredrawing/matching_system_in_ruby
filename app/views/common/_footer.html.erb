@@ -9,17 +9,23 @@
         <span>マイページ</span>
       </div>
       <div class="footer_menu_icon">
-        <span class="pochi"><span class="pochi_in"></span></span>
-        <a href="{{action("Member\\MessageController@index")}}"><img src="/images/footer_menu2.png"></a>
+        <% if @uncheck_messages != nil && @uncheck_messages.length > 0 %>
+          <span class="pochi"><span class="pochi_in"></span></span>
+        <% end %>
+        <a href="<%= messages_url() %>"><img src="/images/footer_menu2.png"></a>
         <span>メッセージ</span>
       </div>
       <div class="footer_menu_icon">
-        <span class="pochi"><span class="pochi_in"></span></span>
-        <a href="{{action("Member\\NoticeController@index")}}"><img src="/images/footer_menu3.png"></a>
+        <% if @uncheck_notices != nil && @uncheck_notices.length > 0 then%>
+          <span class="pochi"><span class="pochi_in"></span></span>
+        <% end %>
+        <a href="<%= notices_url %>"><img src="/images/footer_menu3.png"></a>
         <span>お知らせ</span>
       </div>
       <div class="footer_menu_icon">
-        <span class="pochi"><span class="pochi_in"></span></span>
+        <% if @uncheck_footprints != nil && @uncheck_footprints.length > 0 %>
+          <span class="pochi"><span class="pochi_in"></span></span>
+        <% end %>
         <a href="<%= mypage_footprints_url() %>"><img src="/images/footer_menu4.png"></a>
         <span>足跡</span>
       </div>

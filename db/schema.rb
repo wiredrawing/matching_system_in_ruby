@@ -55,7 +55,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "logs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "logs", force: :cascade do |t|
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "action_id"
@@ -108,7 +108,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.integer "timeline_type"
     t.integer "message_id"
     t.integer "url_id"
-    t.integer "image_id"
+    t.uuid "image_id"
     t.integer "is_browsed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

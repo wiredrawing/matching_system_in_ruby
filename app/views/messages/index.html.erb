@@ -1,19 +1,23 @@
 <a href="" class="backk">戻る</a>
 <section>
-  <% if @timelines.length > 0 %>
+  <% if @members.length > 0 %>
     <div class="box">
-      <% @timelines.each do |timeline| %>
-        <a href="<%= message_talk_url :id => timeline.from_member.id %>" class="message_list">
+      <% @members.each do |member| %>
+        <a href="<%= message_talk_url :id => member.id %>" class="message_list">
           <div class="message_list1">
-            <% if timeline.from_member.showable_images.length > 0 %>
-              <img src="<%= timeline.from_member.showable_images.first.image_url() %>">
+            <% if member.showable_images.length > 0 %>
+              <img src="<%= member.showable_images.first.image_url() %>">
             <% else %>
               <img src="/images/sample_user.jpg">
             <% end %>
           </div>
           <div class="message_list2">
-            <p><%= timeline.created_at.strftime("%Y年%m月%d日 %H時%I分") %></p>
-            <p><%= timeline.from_member.display_name %>さんとのメッセージ</p>
+            <% if member.timeline_created_at != nil then %>
+              <p><%= member.timeline_created_at.strftime("%Y年%m月%d日 %H時%M分%S秒") %></p>
+              <p><%= member.display_name %>さんからメッセージを受信しました</p>
+            <% else %>
+              <p>まだメッセージのやり取りがありません</p>
+            <% end %>
           </div>
         </a>
       <% end %>

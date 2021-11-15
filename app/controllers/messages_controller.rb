@@ -1,25 +1,47 @@
 class MessagesController < ApplicationController
   before_action :set_message, only: %i[ show edit update destroy ]
 
+  # 現時点で､メッセージ可能なメンバーリストを表示
   def index
-    puts("[メッセージ一覧-------------------------------------]")
-    # ログインユーザーが受け取った異性ごとのメッセージ
-    @timelines_to = Timeline.select(
-      "max(id) as id ",
-      "max(created_at) as created_at"
-    ).where({
-      :to_member_id => @current_user.id,
-    }).limit(
-      10
-    ).group(
-      :from_member_id,
-    ).to_a.map do |timeline|
-      next timeline.id
+    # p "メッセージ可能なメンバーを取得し､且つまだメッセージのやりとりが完了していない場合はメッセージなしと表示する"
+    # メッセージ可能なメンバーリスト
+    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members).to_a.map do |member|
+      next member.id
     end
 
-    @timelines = Timeline.where({
-      :id => @timelines_to,
-    })
+    # p "マッチング済みメンバー"
+    # pp @matching_members
+
+    @members = Member.select([
+      :id,
+      :display_name,
+      "max(timelines.created_at) as timeline_created_at",
+    ]).where({
+      :id => @matching_members,
+    }).joins(%{LEFT JOIN timelines on timelines.from_member_id = members.id and timelines.to_member_id = #{@current_user.id}})
+      .group([
+        :id,
+        :display_name,
+      ]).order("timeline_created_at desc nulls last")
+
+    # p "=========================================="
+    # # ログインユーザーが受け取った異性ごとのメッセージ
+    # @timelines_to = Timeline.select(
+    #   "max(id) as id ",
+    #   "max(created_at) as created_at"
+    # ).where({
+    #   :to_member_id => @current_user.id,
+    # }).limit(
+    #   10
+    # ).group(
+    #   :from_member_id,
+    # ).to_a.map do |timeline|
+    #   next timeline.id
+    # end
+
+    # @timelines = Timeline.where({
+    #   :id => @timelines_to,
+    # })
     return render :template => "messages/index"
   end
 

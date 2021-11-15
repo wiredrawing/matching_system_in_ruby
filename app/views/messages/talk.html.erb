@@ -28,6 +28,7 @@
                 <img v-bind:src="timeline.image.image_url" width="100" >
               </a>
             </p>
+            <p class="kidokuornot">{{timeline.created_at_string}}</p>
           </div>
         </div>
         <div v-else class="talkin_l">
@@ -107,8 +108,14 @@
         let url = this.apiTimelineMessagesUrl.value
         url += "?offset=" + this.offset + "&limit=10";
         axios.get(url, options).then((response) => {
+          console.log("fetchTimelines");
           console.log(response);
-          this.timelines = response.data
+          if (response.data.status === true) {
+            this.timelines = response.data.response
+          }
+  
+  
+          // this.timelines = response.data
         });
       },
       // 過去のメッセージリストを取得
@@ -124,6 +131,7 @@
         url += "?offset=" + this.offset + "&limit=10";
         alert(url)
         axios.get(url, options).then((response) => {
+          console.log("=====================================>>")
           console.log(response);
           this.timelines = response.data.concat(this.timelines)
         });
@@ -144,8 +152,6 @@
             "member_id": this.fromMemberId,
           }
         }
-        console.log(postData);
-        console.log(options);
         axios.post(this.requestUrl.value, postData, options).then((response) => {
   
           if (response.data.status === true) {

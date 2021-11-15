@@ -7,8 +7,62 @@ class ApplicationController < ActionController::Base
   include Api::TimelineHelper
   before_action :set_gender_list
   before_action :login_check
+  before_action :uncheck_notices
+  before_action :uncheck_messages
+  before_action :uncheck_footprints
 
   private
+
+  # ログインユーザーへの通知一覧を取得する
+  def uncheck_notices
+    @uncheck_notices = nil
+    if defined?(request.session[:member_id]) == nil
+      return false
+    end
+
+    # 未確認の通知情報を取得する
+    @uncheck_notices = Log.where({
+      :to_member_id => request.session[:member_id],
+    }).where.not({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    })
+    return true
+  end
+
+  def uncheck_messages
+    @uncheck_messages = nil
+    if defined?(request.session[:member_id]) == nil
+      p defined? request.session[:member_id]
+      return false
+    end
+
+    @uncheck_messages = Timeline.where({
+      :to_member_id => request.session[:member_id],
+    }).where.not({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    }).or(Timeline.where({
+      :is_browsed => nil,
+    }))
+    return true
+  end
+
+  def uncheck_footprints
+    @uncheck_footprints = nil
+
+    if defined?(request.session[:member_id]) == nil
+      return false
+    end
+
+    @uncheck_footprints = Footprint.where({
+      :to_member_id => request.session[:member_id],
+    }).where.not({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    }).or(Footprint.where({
+      :is_browsed => nil,
+    }))
+
+    return true
+  end
 
   ###########################################
   # 未ログインの場合は､ログインページへリダイレクト

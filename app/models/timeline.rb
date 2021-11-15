@@ -20,6 +20,7 @@ class Timeline < ApplicationRecord
   attribute :to_member
   attribute :image
   attribute :url
+  attribute :created_at_string
 
   public
 
@@ -50,5 +51,13 @@ class Timeline < ApplicationRecord
   rescue => error
     logger.debug error.message
     return nil
+  end
+
+  def created_at_string()
+    if self.created_at != nil
+      return self.created_at.strftime("%Y年%m月%d日 %H時%M時%S秒")
+    else
+      return nil
+    end
   end
 end

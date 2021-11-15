@@ -2,6 +2,7 @@ class Member < ApplicationRecord
   attribute :forbidden_members
   attribute :informing_valid_likes
   attribute :getting_valid_likes
+  attribute :timeline_created_at, :datetime
   # パスワード処理
   has_secure_password
   # ページング処理
@@ -30,6 +31,10 @@ class Member < ApplicationRecord
   # 自身に送信されたアクション一覧を取得
   has_many(:logs, :class_name => "Log", :foreign_key => :to_member_id, :primary_key => :id)
 
+  # 自身が受け取ったtimelineのアクション
+  has_many(:get_timelines, :class_name => "Timeline", :foreign_key => :to_member_id, :primary_key => :id)
+  # 自身が送信したtimeline
+  has_many(:send_timelines, :class_name => "Timeline", :foreign_key => :from_member_id, :primary_key => :id)
   # メンバーがアップロードした全画像
   # 並び順sqlをlambda関数で渡す
   _anonymous = lambda do
@@ -128,7 +133,7 @@ class Member < ApplicationRecord
       }).first
 
       if (_member == nil)
-        object.errors.add(attribute, "仮登録トークンが不正です")
+        object.errors.add(attribute, "仮登録がおこなわれていないようです")
       end
       next true
     end
@@ -137,15 +142,19 @@ class Member < ApplicationRecord
   # 性別は初期登録時から変更させない
   validates_each :gender do |object, attribute, data|
     # Get the member info while operating.
+    # Except when executing seeder file.
+    if (object.token == "from_seed")
+      next true
+    end
     member = Member.where({
       :token => object.token,
       :id => object.id,
     }).first()
-
     if member == nil
-      object.errors.add(attribute, "仮登録トークンが不正です")
+      object.errors.add(attribute, "仮登録アカウントが見つかりません")
       next false
     end
+
     if data.to_i != member.gender
       object.errors.add(attribute, "性別は変更できません")
       next false
@@ -370,6 +379,7 @@ class Member < ApplicationRecord
     declined = self.declined.map do |d|
       next d.from_member_id
     end
+    # アクセス不可メンバー
     forbidden_members = declined + declining
   end
 end

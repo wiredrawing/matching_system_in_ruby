@@ -2,7 +2,9 @@ require_relative "boot"
 
 require "rails/all"
 
-require "./lib/middlewares/load_eager_model"
+load_eager_model_filename = File.expand_path("../lib/middlewares/load_eager_model", File.dirname(__FILE__))
+require load_eager_model_filename
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -21,6 +23,7 @@ module MatchingSystem
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+    config.time_zone = "UTC"
 
     # エラー時の無用なタグを制御する
     config.action_view.field_error_proc = Proc.new do |html_tag, instance|
@@ -30,6 +33,7 @@ module MatchingSystem
     config.autoload_paths += %W(#{config.root}/lib)
     config.autoload_paths += %W(#{config.root}/app/forms)
 
-    # config.middleware.use(LoadEagerModel)
+    # 自作ミドルウェアの読み込み
+    config.middleware.use(LoadEagerModel)
   end
 end

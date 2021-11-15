@@ -1,4 +1,8 @@
-class AddSessionsTable < ActiveRecord::Migration[6.1]
+# マイグレーションファイルのロールバック
+# rails db:rollback STEP=00
+# マイグレーションの実行
+# raild db:migrate
+class CreateSessionsTable < ActiveRecord::Migration[6.1]
   def change
     create_table :sessions do |t|
       t.string :session_id, :null => false

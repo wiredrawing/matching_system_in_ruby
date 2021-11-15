@@ -7,20 +7,26 @@ class LoadEagerModel
   end
 
   def call(env)
-    if env["REQUEST_METHOD"] == "POST"
-      puts("POSTメソッドでアクセス中です")
-    else
-      puts("POSTメソッド以外でアクセス中")
-    end
+    # p "SESSION"
+    # pp env.keys
+    # pp env["rack.input"]
+    # pp env["rack.session"]
+    # p "SESSION"
+    # pp request.session
+    # if env["REQUEST_METHOD"] == "POST"
+    #   puts("POSTメソッドでアクセス中です")
+    # else
+    #   puts("POSTメソッド以外でアクセス中")
+    # end
 
-    if env["HTTP_TOKEN_FOR_API"] != nil
-      puts("APIリクエスト用トークン -->")
-      puts(env["HTTP_TOKEN_FOR_API"])
-    end
+    # if env["HTTP_TOKEN_FOR_API"] != nil
+    #   puts("APIリクエスト用トークン -->")
+    #   puts(env["HTTP_TOKEN_FOR_API"])
+    # end
 
-    pp env.keys
-    p env["action_dispatch.routes"].class
-    pp env["action_dispatch.routes"].url_helpers
+    # pp env.keys
+    # p env["action_dispatch.routes"].class
+    # pp env["action_dispatch.routes"].url_helpers
     # p("===========================================")
     # p env.class
     # env.each do |key, value|
@@ -44,6 +50,10 @@ class LoadEagerModel
     # pp(@app.methods)
     # pp(@app.routes)
     # pp(request.class)
+    env.keys.each do |key|
+      pp "---------" + key
+      pp env[key].class
+    end
     res = @app.call(env)
     # pp(res)
     p("0000000000000000000000000000000000000000000000")

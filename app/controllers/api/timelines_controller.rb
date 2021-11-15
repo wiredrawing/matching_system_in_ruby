@@ -6,8 +6,9 @@ class Api::TimelinesController < ApplicationController
     :create_image,
   ]
 
-  # 過去のメッセージのやりとり一覧を取得
   def messages
+    # エラーボックス
+    @errors = Array.new()
     # メッセージリストのリクエストユーザーの認証
     @token_check = TokenCheck.new({
       :id => request.headers["member-id"].to_i,
@@ -42,8 +43,13 @@ class Api::TimelinesController < ApplicationController
       .offset(params[:offset].to_i)
 
     if @timelines.first == nil
-      raise StandardError.new "メッセージのやりとりは有りません"
+      @errors.push("メッセージのやりとりは有りません")
+      raise StandardError.new @errors
     end
+
+    response = @timelines.update({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    })
 
     # メッセージをIDのasc順に再度並び替え
     @timelines = @timelines.sort do |a, b|
@@ -56,19 +62,30 @@ class Api::TimelinesController < ApplicationController
       end
     end
 
-    return render(:json => @timelines.to_json({
-                    :include => [
-                      :message,
-                      :image,
-                      :url,
-                    ],
-                  }))
+    json_response = {
+      :status => true,
+      :response => @timelines,
+      :errors => @errors,
+    }
+    return render(:json => json_response)
   rescue ActiveModel::ValidationError => error
-    logger.debug "#{error.model.errors.messages.join(",")}"
-    return render(:json => error.model.errors.messages)
+    json_response = {
+      :status => false,
+      :response => [],
+      :errors => error.model.errors.messages,
+    }
+    logger.debug json_response
+    return render(:json => json_response)
   rescue => error
+    # APIのレスポンスデータ
+    json_response = {
+      :status => false,
+      :response => [],
+      :errors => @errors,
+    }
     logger.debug "#{error.message}"
-    return render(:json => error.message)
+    logger.debug json_response
+    return render(:json => json_response)
   end
 
   # メッセージの投稿
