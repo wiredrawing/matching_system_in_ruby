@@ -18,7 +18,7 @@
       <!-- メッセージのループ -->
       <div v-for="timeline in timelines">
         <div class="talkin_r" v-if="timeline.from_member_id == fromMemberId.value">
-          <p class="kidokuornot">既読or未読</p>
+          <p class="kidokuornot">{{timeline.browsed}}</p>
           <div v-if="timeline.message != null" class="balloon1-right">
             <p>{{timeline.message.message}}</p>
           </div>

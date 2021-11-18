@@ -70,6 +70,14 @@ Rails.application.routes.draw do
         :as => "utilities_list",
       }
     end
+
+    # メンバー情報を取得するためのAPI
+    scope "member" do
+      get "/:id", {
+        :to => "member#show",
+        :as => "member_show",
+      }
+    end
   end
 
   get "sessions/new"

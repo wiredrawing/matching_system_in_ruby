@@ -21,6 +21,7 @@ class Timeline < ApplicationRecord
   attribute :image
   attribute :url
   attribute :created_at_string
+  attribute :browsed
 
   public
 
@@ -58,6 +59,14 @@ class Timeline < ApplicationRecord
       return self.created_at.strftime("%Y年%m月%d日 %H時%M時%S秒")
     else
       return nil
+    end
+  end
+
+  def browsed
+    if self.is_browsed == UtilitiesController::BINARY_TYPE[:on]
+      return "既読"
+    else
+      return "未読"
     end
   end
 end
