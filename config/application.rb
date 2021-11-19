@@ -11,6 +11,7 @@ require load_eager_model_filename
 Bundler.require(*Rails.groups)
 Bundler.require("rmagick")
 Bundler.require("kaminari")
+Bundler.require("uri")
 
 module MatchingSystem
   class Application < Rails::Application
@@ -35,6 +36,6 @@ module MatchingSystem
     config.autoload_paths += %W(#{config.root}/app/forms)
 
     # 自作ミドルウェアの読み込み
-    config.middleware.use(LoadEagerModel)
+    # config.middleware.use(LoadEagerModel)
   end
 end

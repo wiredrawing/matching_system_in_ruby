@@ -16,8 +16,6 @@ class TokenCheck
         }).to_a.map do |member|
           next member.id
         end
-        p("members----------->")
-        p(members)
         return members
       end).call,
       :message => "不正なメンバーIDです",

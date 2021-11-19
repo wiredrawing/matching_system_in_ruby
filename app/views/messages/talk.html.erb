@@ -16,6 +16,7 @@
     <div class="talk">
       <p v-on:click="fetchPastTimelines" class="past_message_btn">過去のメッセージを取得</p>
       <!-- メッセージのループ -->
+      {{timelines.length}}
       <div v-for="timeline in timelines">
         <div class="talkin_r" v-if="timeline.from_member_id == fromMemberId.value">
           <p class="kidokuornot">{{timeline.browsed}}</p>
@@ -29,6 +30,10 @@
               </a>
             </p>
             <p class="kidokuornot">{{timeline.created_at_string}}</p>
+          </div>
+          <!-- URLリンクが送信された場合 -->
+          <div v-if="timeline.url != null" class="balloon1-right">
+            <p><a v-bind:href="timeline.url.url" target="_blank">{{timeline.url.url}}</a></p>
           </div>
         </div>
         <div v-else class="talkin_l">
@@ -95,6 +100,7 @@
       }
     },
     mounted: function () {
+      console.log(Vue.toRaw(this.timelines));
       this.fetchTimelines();
     },
     methods: {
@@ -129,11 +135,23 @@
         }
         let url = this.apiTimelineMessagesUrl.value;
         url += "?offset=" + this.offset + "&limit=10";
-        alert(url)
         axios.get(url, options).then((response) => {
-          console.log("=====================================>>")
-          console.log(response);
-          this.timelines = response.data.concat(this.timelines)
+          if (response.data.status) {
+            let timelines = response.data.response.concat(Vue.toRaw(this.timelines));
+            this.timelines = timelines;
+            return true;
+          } else {
+            return false
+          }
+  
+          // console.log("=====================================>>")
+          // console.log(response);
+          // console.log(this.timelines);
+          // this.timelines = this.timelines.splice(0, 0, response.data.response)
+          // console.log(this.timelines);
+  
+          // this.timelines.concat(response.data.response);
+          // this.timelines = response.data.concat(this.timelines)
         });
       },
       sendMessage: function(event) {

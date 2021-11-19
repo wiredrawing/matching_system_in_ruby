@@ -1,5 +1,10 @@
 class Timeline < ApplicationRecord
 
+  # websocketで送信後
+  after_create_commit do
+    TimelineBroadcastJob.perform_later(self)
+  end
+
   # 送信者
   has_one :from_member, :class_name => "Member", :foreign_key => :id, :primary_key => :from_member_id
 

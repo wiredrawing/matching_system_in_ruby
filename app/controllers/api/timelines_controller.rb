@@ -1,3 +1,5 @@
+require "uri"
+
 class Api::TimelinesController < ApplicationController
 
   # csrfを除外するmethod
@@ -47,10 +49,6 @@ class Api::TimelinesController < ApplicationController
       raise StandardError.new @errors
     end
 
-    response = @timelines.update({
-      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
-    })
-
     # メッセージをIDのasc順に再度並び替え
     @timelines = @timelines.sort do |a, b|
       if a.id > b.id
@@ -61,6 +59,17 @@ class Api::TimelinesController < ApplicationController
         next 0
       end
     end
+
+    # ---------------------------------------------------------
+    # 受信したメッセージを既読にする
+    # ---------------------------------------------------------
+    @uncheck_timelines = Timeline.where({
+      :to_member_id => request.headers["member-id"].to_i,
+      :from_member_id => params[:to_member_id].to_i,
+    }).update({
+      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+    })
+    logger.debug @uncheck_timelines
 
     json_response = {
       :status => true,
@@ -92,6 +101,9 @@ class Api::TimelinesController < ApplicationController
   def create_message
     # Start transaction.
     ActiveRecord::Base.transaction do
+      # メッセージからURLを抜き出す
+      @urls = URI.extract(create_message_params[:message])
+
       @message_to_timeline = MessageToTimeline.new ({
         :from_member_id => create_message_params[:from_member_id].to_i,
         :to_member_id => create_message_params[:to_member_id].to_i,
@@ -132,6 +144,52 @@ class Api::TimelinesController < ApplicationController
         raise StandardError.new "タイムラインの作成に失敗しました"
       end
 
+      # ---------------------------------------------------------
+      # メッセージ中にURLが含まれる場合
+      # ---------------------------------------------------------
+      if @urls != nil && @urls.instance_of?(Array)
+
+        # urlリストをイテレーション
+        @urls.each do |url|
+          @url_to_timeline = UrlToTimeline.new ({
+            :from_member_id => create_message_params[:from_member_id].to_i,
+            :to_member_id => create_message_params[:to_member_id].to_i,
+            :token_for_api => create_message_params[:token_for_api],
+            :url => url,
+          })
+
+          if @url_to_timeline.validate() == true
+            new_url = {
+              :member_id => create_message_params[:from_member_id],
+              :url => url,
+            }
+            @url = Url.new(new_url)
+            if @url.validate() != true
+              raise ActiveModel::ValidationError.new @url
+            end
+
+            response = @url.save()
+            if response != true
+              raise StandardError.new "メッセージの投稿に失敗しました"
+            end
+
+            # タイムラインオブジェクトを作成
+            @timeline = Timeline.includes(:message).new(
+              :from_member_id => create_message_params[:from_member_id],
+              :to_member_id => create_message_params[:to_member_id],
+              :url_id => @url.id,
+            )
+            if @timeline.validate() != true
+              raise StandardError.new "タイムラインのバリデーションに失敗しました"
+            end
+            response = @timeline.save()
+            if response != true
+              raise StandardError.new "タイムラインの作成に失敗しました"
+            end
+          end
+        end
+      end
+
       # Saved executed process on above as log.
       @log = Log.new({
         :from_member_id => create_message_params[:from_member_id].to_i,
@@ -164,7 +222,7 @@ class Api::TimelinesController < ApplicationController
     return render({ :json => json_response })
   rescue => exception
     puts("[例外発生-----------------------------------]")
-    pp exception.backtrace.methods
+    # pp exception.backtrace.methods
     p(exception)
     p(exception.message)
     # pp @message_to_timeline.errors.messages
