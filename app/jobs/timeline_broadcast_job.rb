@@ -2,9 +2,6 @@ class TimelineBroadcastJob < ApplicationJob
   queue_as :default
 
   def perform(timeline)
-    pp "perform ============================================"
-    # Do something later
-    pp timeline
     json_response = {
       :status => true,
       :response => {

@@ -78,153 +78,155 @@
 <script src="https://unpkg.com/vue@next"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-  let app = Vue.createApp({
-    data: function () {
-      return {
-        timelines: [],
-        limit: 10,
-        offset: 0,
-        selected_file: null,
-        file_binary: null,
-        file_resorce: null,
-      }
-    },
-    setup: function () {
-      return {
-        fromMemberId: Vue.ref(0),
-        toMemberId: Vue.ref(0),
-        tokenForApi: Vue.ref(""),
-        requestUrl: Vue.ref(""),
-        message: Vue.ref(""),
-        apiTimelineMessagesUrl: Vue.ref(""),
-      }
-    },
-    mounted: function () {
-      console.log(Vue.toRaw(this.timelines));
-      this.fetchTimelines();
-    },
-    methods: {
-      fetchTimelines: function () {
-        let options = {
-          headers: {
-            member_id: this.fromMemberId.value,
-            token_for_api: this.tokenForApi.value,
-          }
+  {
+    let app = Vue.createApp({
+      data: function () {
+        return {
+          timelines: [],
+          limit: 10,
+          offset: 0,
+          selected_file: null,
+          file_binary: null,
+          file_resorce: null,
         }
-        let url = this.apiTimelineMessagesUrl.value
-        url += "?offset=" + this.offset + "&limit=10";
-        axios.get(url, options).then((response) => {
-          console.log("fetchTimelines");
-          console.log(response);
-          if (response.data.status === true) {
-            this.timelines = response.data.response
-          }
-  
-  
-          // this.timelines = response.data
-        });
       },
-      // 過去のメッセージリストを取得
-      fetchPastTimelines: function () {
-        this.offset += 10
-        let options = {
-          headers: {
-            member_id: this.fromMemberId.value,
-            token_for_api: this.tokenForApi.value,
-          }
+      setup: function () {
+        return {
+          fromMemberId: Vue.ref(0),
+          toMemberId: Vue.ref(0),
+          tokenForApi: Vue.ref(""),
+          requestUrl: Vue.ref(""),
+          message: Vue.ref(""),
+          apiTimelineMessagesUrl: Vue.ref(""),
         }
-        let url = this.apiTimelineMessagesUrl.value;
-        url += "?offset=" + this.offset + "&limit=10";
-        axios.get(url, options).then((response) => {
-          if (response.data.status) {
-            let timelines = response.data.response.concat(Vue.toRaw(this.timelines));
-            this.timelines = timelines;
-            return true;
-          } else {
-            return false
-          }
-  
-          // console.log("=====================================>>")
-          // console.log(response);
-          // console.log(this.timelines);
-          // this.timelines = this.timelines.splice(0, 0, response.data.response)
-          // console.log(this.timelines);
-  
-          // this.timelines.concat(response.data.response);
-          // this.timelines = response.data.concat(this.timelines)
-        });
       },
-      sendMessage: function(event) {
-        event.preventDefault();
-        let postData = {
-          message: {
-            from_member_id: this.fromMemberId.value,
-            to_member_id: this.toMemberId.value,
-            token_for_api: this.tokenForApi.value,
-            message: this.message.value,
+      mounted: function () {
+        console.log(Vue.toRaw(this.timelines));
+        this.fetchTimelines();
+      },
+      methods: {
+        fetchTimelines: function () {
+          let options = {
+            headers: {
+              member_id: this.fromMemberId.value,
+              token_for_api: this.tokenForApi.value,
+            }
           }
-        }
-        let options = {
-          headers: {
-            "token_for_api": this.tokenForApi,
-            "member_id": this.fromMemberId,
-          }
-        }
-        axios.post(this.requestUrl.value, postData, options).then((response) => {
-  
-          if (response.data.status === true) {
-            let timeline = response.data.response.timeline;
-            this.timelines.push(timeline);
+          let url = this.apiTimelineMessagesUrl.value
+          url += "?offset=" + this.offset + "&limit=10";
+          axios.get(url, options).then((response) => {
+            console.log("fetchTimelines");
             console.log(response);
-            this.message.value = "";
-            // this.fetchTimelines();
-          } else {
-            console.log(response.data.response);
-            throw new Error(response.data.response)
-          }
-        }).catch((error) => {
-          console.log(error);
-          alert(error);
-        });
-      },
-      selectFile: function (event) {
-        let files = event.target.files
-        let reader = new FileReader();
-        let file_binary = null;
-        this.file_binary = files[0];
-        reader.onload = (e) => {
-          // console.log(e);
-          console.log(e)
-          alert(e.target.result)
-          // console.log(reader.result);
-          this.file_resorce = URL.createObjectURL(files[0]);
-        }
-        reader.readAsBinaryString(files[0])
+            if (response.data.status === true) {
+              this.timelines = response.data.response
+            }
   
-        console.log(files);
-      },
-      uploadSelectedFile: function() {
-        let options = {
-          headers: {
-            member_id: this.fromMemberId.value,
-            token_for_api: this.tokenForApi.value,
+  
+            // this.timelines = response.data
+          });
+        },
+        // 過去のメッセージリストを取得
+        fetchPastTimelines: function () {
+          this.offset += 10
+          let options = {
+            headers: {
+              member_id: this.fromMemberId.value,
+              token_for_api: this.tokenForApi.value,
+            }
           }
+          let url = this.apiTimelineMessagesUrl.value;
+          url += "?offset=" + this.offset + "&limit=10";
+          axios.get(url, options).then((response) => {
+            if (response.data.status) {
+              let timelines = response.data.response.concat(Vue.toRaw(this.timelines));
+              this.timelines = timelines;
+              return true;
+            } else {
+              return false
+            }
+  
+            // console.log("=====================================>>")
+            // console.log(response);
+            // console.log(this.timelines);
+            // this.timelines = this.timelines.splice(0, 0, response.data.response)
+            // console.log(this.timelines);
+  
+            // this.timelines.concat(response.data.response);
+            // this.timelines = response.data.concat(this.timelines)
+          });
+        },
+        sendMessage: function(event) {
+          event.preventDefault();
+          let postData = {
+            message: {
+              from_member_id: this.fromMemberId.value,
+              to_member_id: this.toMemberId.value,
+              token_for_api: this.tokenForApi.value,
+              message: this.message.value,
+            }
+          }
+          let options = {
+            headers: {
+              "token_for_api": this.tokenForApi,
+              "member_id": this.fromMemberId,
+            }
+          }
+          axios.post(this.requestUrl.value, postData, options).then((response) => {
+  
+            if (response.data.status === true) {
+              let timeline = response.data.response.timeline;
+              this.timelines.push(timeline);
+              console.log(response);
+              this.message.value = "";
+              // this.fetchTimelines();
+            } else {
+              console.log(response.data.response);
+              throw new Error(response.data.response)
+            }
+          }).catch((error) => {
+            console.log(error);
+            // alert(error);
+          });
+        },
+        selectFile: function (event) {
+          let files = event.target.files
+          let reader = new FileReader();
+          let file_binary = null;
+          this.file_binary = files[0];
+          reader.onload = (e) => {
+            // console.log(e);
+            console.log(e)
+            alert(e.target.result)
+            // console.log(reader.result);
+            this.file_resorce = URL.createObjectURL(files[0]);
+          }
+          reader.readAsBinaryString(files[0])
+  
+          console.log(files);
+        },
+        uploadSelectedFile: function() {
+          let options = {
+            headers: {
+              member_id: this.fromMemberId.value,
+              token_for_api: this.tokenForApi.value,
+            }
+          }
+          let postData = new FormData();
+          postData.append("image[upload_file]", this.file_binary)
+          postData.append("image[from_member_id]", this.fromMemberId.value)
+          postData.append("image[to_member_id]", this.toMemberId.value)
+          // Request with post.
+          axios.post("/api/timeline/upload", postData, options).then((response) => {
+            console.log("ファイルアップロード成功");
+            console.log(response)
+            if (response.data.status === true) {
+              this.timelines.push(response.data.response.timeline);
+              this.file_resorce = null;
+            }
+          })
         }
-        let postData = new FormData();
-        postData.append("image[upload_file]", this.file_binary)
-        postData.append("image[from_member_id]", this.fromMemberId.value)
-        postData.append("image[to_member_id]", this.toMemberId.value)
-        // Request with post.
-        axios.post("/api/timeline/upload", postData, options).then((response) => {
-          console.log("ファイルアップロード成功");
-          console.log(response)
-          if (response.data.status === true) {
-            this.timelines.push(response.data.response.timeline);
-            this.file_resorce = null;
-          }
-        })
       }
-    }
-  })
-  const vm = app.mount("#chat_area");
+    })
+    const vm = app.mount("#chat_area");
+  }
 </script>

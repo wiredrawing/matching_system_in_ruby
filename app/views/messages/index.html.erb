@@ -3,7 +3,7 @@
   <% if @members.length > 0 %>
     <div class="box">
       <% @members.each do |member| %>
-        <a href="<%= message_talk_url :id => member.id %>" class="message_list">
+        <a href="<%= message_talk_url :id => member.id  %>" class="message_list">
           <div class="message_list1">
             <% if member.showable_images.length > 0 %>
               <img src="<%= member.showable_images.first.image_url() %>">
@@ -16,6 +16,7 @@
               <p><%= member.timeline_created_at.strftime("%Y年%m月%d日 %H時%M分%S秒") %></p>
               <p><%= member.display_name %>さんからメッセージを受信しました</p>
             <% else %>
+              <p><%= member.display_name %>さん</p>
               <p>まだメッセージのやり取りがありません</p>
             <% end %>
           </div>

@@ -85,6 +85,11 @@ test:
 #
 production:
   <<: *default
-  database: matching_system_production
-  username: matching_system
-  password: <%= ENV['MATCHING_SYSTEM_DATABASE_PASSWORD'] %>
+  database: matching_system_development
+  # database: matching_system_production
+  # username: matching_system
+  username: admin
+  # password: <%= ENV['MATCHING_SYSTEM_DATABASE_PASSWORD'] %>
+  password: admin
+  host: localhost
+  port: 15432

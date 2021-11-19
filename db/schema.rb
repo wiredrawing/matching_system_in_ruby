@@ -51,6 +51,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "favorite", default: 0
+    t.string "matching_token"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -103,6 +104,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
   end
 
   create_table "timelines", force: :cascade do |t|
+    t.uuid "room_id"
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "timeline_type"

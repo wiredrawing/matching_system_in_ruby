@@ -4,6 +4,7 @@ class CreateLikes < ActiveRecord::Migration[6.1]
       t.bigint :from_member_id
       t.bigint :to_member_id
       t.integer :favorite, :default => 0
+      t.string :matching_token
       t.timestamps
     end
   end
