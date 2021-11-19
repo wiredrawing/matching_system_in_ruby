@@ -40,21 +40,23 @@ class Like < ApplicationRecord
 
   # 引数にわたしたメンバー同士がマッチしているかどうか
   def self.is_matching?(from_member_id = 0, to_member_id = 0)
-    puts("[Member#is_match ----------------------------------------]")
-    begin
-      # 送信元
-      from_like = self.where :from_member_id => from_member_id, :to_member_id => to_member_id
-      pp(from_like)
-      # 送信先
-      to_like = self.where :from_member_id => to_member_id, :to_member_id => from_member_id
-      pp(to_like)
-      if from_like.length == 1 && to_like.length == 1
-        return true
-      else
-        return false
-      end
-    rescue => exception
-      pp(exception)
+    # cable用
+    @matching_token = TokenForApi.make_random_token(128)
+    match = self.where({
+      :from_member_id => from_member_id,
+      :to_member_id => to_member_id,
+    }).or(self.where({
+      :from_member_id => to_member_id,
+      :to_member_id => from_member_id,
+    }))
+
+    # マッチしている場合
+    if match.length == 2
+      response = match.update({
+        :matching_token => @matching_token,
+      })
+      return true
+    else
       return false
     end
   end

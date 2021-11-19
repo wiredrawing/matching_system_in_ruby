@@ -68,8 +68,6 @@ class Member < ApplicationRecord
 
   # いいねを贈ることができる異性のメンバー一覧を取得する
   def self.hetero_members(current_user = nil, exculded_members = [])
-    print("ログインユーザーとは性別のことなるメンバー一覧を取得する")
-    pp(current_user)
     # ブロックしているユーザー
     begin
       @members = self.where({
@@ -89,7 +87,6 @@ class Member < ApplicationRecord
       )
       return(@members)
     rescue => error
-      puts("Happen error------------------>")
       puts(error)
       # 例外発生時は[nil]を返却
       return(nil)
@@ -117,8 +114,7 @@ class Member < ApplicationRecord
     end
     return(_member)
   rescue => error
-    puts("[例外発生-------------------------------------------------]")
-    print("error ----------->", error)
+    p error.message
     return nil
   end
 
@@ -322,8 +318,6 @@ class Member < ApplicationRecord
     browsable = self.declined.where({
       :from_member_id => member_id,
     }).first()
-    pp "# Does login user decline selected member?"
-    pp(browsable)
     if browsable != nil
       return false
     end
@@ -333,8 +327,6 @@ class Member < ApplicationRecord
       :to_member_id => member_id,
     }).first()
 
-    pp "# Is login user  declined by selected member?"
-    pp(browsable)
     if browsable != nil
       return false
     end
@@ -344,7 +336,6 @@ class Member < ApplicationRecord
 
   # 自身が贈った現時点で有効なlike
   def informing_valid_likes
-    puts("valid_likes--------------------->")
     valid_likes = Array.new()
     likes = self.informing_likes.map do |like|
       next like.to_member_id
@@ -357,7 +348,6 @@ class Member < ApplicationRecord
 
   # 自身がもらった現時点で有効なlike
   def getting_valid_likes
-    puts("valid_likes--------------------->")
     valid_likes = Array.new()
     likes = self.getting_likes.map do |like|
       next like.from_member_id
