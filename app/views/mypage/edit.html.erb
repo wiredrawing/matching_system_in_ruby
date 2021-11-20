@@ -47,6 +47,18 @@
           <%= form.select :gender, @genders, :readonly => true %>
         </div>
       </div>
+      <!-- 母国語の設定 -->
+      <% if @member.errors.messages.length > 0 then %>
+        <% @member.errors.messages[:native_language].each do |error| %>
+          <p class="input_red"><%= erorr %></p>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>母国語</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :native_language, @languages %>
+        </div>
+      </div>
       <!-- 自己PR -->
       <% if @member.errors.messages.length > 0 then%>
         <% @member.errors.messages[:message].each do |error|%>

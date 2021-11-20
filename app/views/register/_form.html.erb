@@ -64,6 +64,18 @@
           <%= form.select :gender, @genders %>
         </div>
       </div>
+      <!-- 母国語の設定 -->
+      <% if member.errors.messages.length > 0 then %>
+        <% member.errors.messages[:native_language].each do |error|%>
+          <p class="input_red"><%= error %></p>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>母国語</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :native_language, @languages %>
+        </div>
+      </div>
       <!--selectors-->
       <div class="selectors mb32">
         <p>通知の設定</p>

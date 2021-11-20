@@ -164,7 +164,8 @@ class RegisterController < ApplicationController
         :password,
         :password_confirmation,
         :password_digest,
-        :token
+        :token,
+        :native_language,
       )
   end
 
@@ -187,7 +188,8 @@ class RegisterController < ApplicationController
         :password,
         :password_confirmation,
         :password_digest,
-        :token
+        :token,
+        :native_language,
       )
   end
 end

@@ -17,6 +17,7 @@ class CreateMembers < ActiveRecord::Migration[6.1]
       t.string :token
       t.string :token_for_api
       t.string :password_digest
+      t.integer :native_language
       # 本登録完了の場合 => 1
       t.integer :is_registered, **{
                                   :limit => 2,

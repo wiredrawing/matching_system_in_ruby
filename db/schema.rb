@@ -81,6 +81,7 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
     t.string "token"
     t.string "token_for_api"
     t.string "password_digest"
+    t.integer "native_language"
     t.integer "is_registered", limit: 2, default: 0, null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -104,7 +105,6 @@ ActiveRecord::Schema.define(version: 2021_10_27_100739) do
   end
 
   create_table "timelines", force: :cascade do |t|
-    t.uuid "room_id"
     t.bigint "from_member_id"
     t.bigint "to_member_id"
     t.integer "timeline_type"

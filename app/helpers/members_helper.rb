@@ -2,6 +2,7 @@ module MembersHelper
   private
 
   def set_gender_list
+    puts "性別リストを取得する--------------"
     # とりあえず仮
     @genders = [
       ["未設定", 0],

@@ -10,8 +10,39 @@ class ApplicationController < ActionController::Base
   before_action :uncheck_notices
   before_action :uncheck_messages
   before_action :uncheck_footprints
+  before_action :genders
+  before_action :languages
 
   private
+
+  # ---------------------------------------------
+  # 性別リスト一覧を取得する
+  # ---------------------------------------------
+  def genders
+    @genders = UtilitiesController::GENDER_LIST.map do |gender|
+      next [
+             gender[:value],
+             gender[:id],
+           ]
+    end
+    return @genders
+  end
+
+  # ---------------------------------------------
+  # 言語リスト一覧を取得する
+  # ---------------------------------------------
+  def languages
+    @languages = UtilitiesController::LANG_LIST.map do |lang|
+      next [
+             lang[:value],
+             lang[:id],
+           ]
+    end
+    # @languages = @languages.sort do |a, b|
+    #   a[0] <=> b[0]
+    # end
+    return @languages
+  end
 
   # ログインユーザーへの通知一覧を取得する
   def uncheck_notices
@@ -29,21 +60,25 @@ class ApplicationController < ActionController::Base
     return true
   end
 
+  # ---------------------------------------------
+  # 未確認のメッセージを取得する
+  # ---------------------------------------------
   def uncheck_messages
     @uncheck_messages = nil
     if defined?(request.session[:member_id]) == nil
-      p defined? request.session[:member_id]
       return false
+    else
+      @uncheck_messages = Timeline.where({
+        :to_member_id => request.session[:member_id],
+      }).and(
+        Timeline.where.not({
+          :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+        }).or(Timeline.where({
+          :is_browsed => nil,
+        }))
+      )
+      return true
     end
-
-    @uncheck_messages = Timeline.where({
-      :to_member_id => request.session[:member_id],
-    }).where.not({
-      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
-    }).or(Timeline.where({
-      :is_browsed => nil,
-    }))
-    return true
   end
 
   def uncheck_footprints
@@ -51,22 +86,23 @@ class ApplicationController < ActionController::Base
 
     if defined?(request.session[:member_id]) == nil
       return false
+    else
+      @uncheck_footprints = Footprint.where({
+        :to_member_id => request.session[:member_id],
+      }).and(
+        Footprint.where.not({
+          :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+        }).or(Footprint.where({
+          :is_browsed => nil,
+        }))
+      )
+      return true
     end
-
-    @uncheck_footprints = Footprint.where({
-      :to_member_id => request.session[:member_id],
-    }).where.not({
-      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
-    }).or(Footprint.where({
-      :is_browsed => nil,
-    }))
-
-    return true
   end
 
-  ###########################################
+  # ---------------------------------------------
   # 未ログインの場合は､ログインページへリダイレクト
-  ###########################################
+  # ---------------------------------------------
   def login_check
     # sessions_helperのメソッドを読み込む
     if self.logged_in? == true

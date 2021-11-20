@@ -3,6 +3,7 @@ class Member < ApplicationRecord
   attribute :informing_valid_likes
   attribute :getting_valid_likes
   attribute :timeline_created_at, :datetime
+  attribute :native_language_string
   # パスワード処理
   has_secure_password
   # ページング処理
@@ -159,6 +160,15 @@ class Member < ApplicationRecord
     next true
   end
 
+  # 母国語の選択
+  validates_each :native_language do |object, attribute, value|
+    if value.to_i > UtilitiesController::BINARY_TYPE[:off]
+      next true
+    end
+    object.errors.add(attribute, "母国語を選択して下さい")
+    next false
+  end
+
   # emailバリデーション
   validates(:email, {
     :presence => {
@@ -243,6 +253,20 @@ class Member < ApplicationRecord
     },
     :on => :member_update_password,
   })
+
+  # 母国語の設定
+  validates :native_language, {
+    :presence => {
+      :message => "母国語を選択して下さい",
+    },
+    :inclusion => {
+      :in => lambda do
+        return UtilitiesController::LANG_LIST.map do |lang|
+                 next lang[:id]
+               end
+      end[],
+    },
+  }
 
   # 文字列としての性別を取得する
   def gender_string()
@@ -371,5 +395,16 @@ class Member < ApplicationRecord
     end
     # アクセス不可メンバー
     forbidden_members = declined + declining
+  end
+
+  def native_language_string
+    @native_language_string = ""
+    UtilitiesController::LANG_LIST.each do |lang|
+      if self.native_language == lang[:id]
+        @native_language_string = lang[:value]
+        next
+      end
+    end
+    return @native_language_string
   end
 end

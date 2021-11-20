@@ -23,6 +23,7 @@ member = Member.new({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 if (member.validate() == true)
   member.save()
@@ -44,6 +45,7 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 Member.create({
@@ -62,6 +64,7 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 Member.create({
@@ -80,6 +83,7 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 # 男性メンバーのseedデータ
@@ -99,6 +103,7 @@ member = Member.new({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 if (member.validate() == true)
@@ -123,6 +128,7 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 Member.create({
@@ -141,6 +147,7 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })
 
 Member.create({
@@ -159,4 +166,5 @@ Member.create({
   :password_confirmation => "AAAAaaaa1234",
   :is_registered => UtilitiesController::BINARY_TYPE[:on],
   :token => "from_seed",
+  :native_language => 1,
 })

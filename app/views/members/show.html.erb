@@ -67,6 +67,10 @@
         <th>名</th>
         <td><%= @member.given_name %></td>
       </tr>
+      <tr>
+        <th>母国語</th>
+        <td><%= @member.native_language_string %></td>
+      </tr>
     </table>
   </div>
   <!--box-->
@@ -106,14 +110,14 @@
       e.preventDefault();
       $(".send_like_form").eq(0).trigger("submit");
   });
-  
+
   // ブロック送信ボタン
   $(".block_button").on("click", function(e) {
       e.preventDefault();
       $(".decline_form").eq(0).trigger("submit");
   });
-  
-  
+
+
   $('.opp_imgs').slick({
       centerMode: true,
       dots: true,

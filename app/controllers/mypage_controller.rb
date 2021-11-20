@@ -290,6 +290,7 @@ class MypageController < ApplicationController
       :salary,
       :message,
       :memo,
+      :native_language,
     )
   end
 
