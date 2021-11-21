@@ -6,7 +6,7 @@
       <% @footprints.each do |footprint| %>
         <% if footprint.from_member != nil then %>
           <div class="oaitelists">
-            <a class="oaitelists_img" href="<%= member_url(:id => footprint.from_member.id) %>">
+            <a class="oaitelists_img" href="<%= members_show_url(:id => footprint.from_member.id) %>">
               <% if footprint.from_member.showable_images.length > 0 then %>
                 <img src="<%= footprint.from_member.showable_images.first.image_url() %>">
               <% else %>

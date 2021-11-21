@@ -16,7 +16,6 @@ class ImagesController < ApplicationController
   #######################################################
   def show
     file_path = @image.fetch_file_path
-    p("file_path ===>", file_path)
     # 画像出力
     render({
       :file => file_path,
@@ -26,7 +25,6 @@ class ImagesController < ApplicationController
 
   # アップロードした画像をpublicにする
   def active
-    print("画像の表示状態をpublicに切り替える")
     begin
       params.fetch(:image, {}).permit(:id)
       @image = Image.find(params[:image][:id])
@@ -46,7 +44,7 @@ class ImagesController < ApplicationController
       # 表示状態変更後､元のページへリダイレクト
       return redirect_to mypage_upload_url
     rescue => exception
-      p(exception)
+      logger.error exception
       return redirect_to mypage_upload_url
     end
   end

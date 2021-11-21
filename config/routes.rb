@@ -7,7 +7,9 @@ Rails.application.routes.draw do
     :as => "top",
   }
 
+  # ----------------------------------------------
   # api
+  # ----------------------------------------------
   namespace "api" do
 
     # 画像を取り扱うAPI
@@ -90,11 +92,14 @@ Rails.application.routes.draw do
   # resources :timelines
   resources :footprints
   # resources :likes
-  resources :members
+  # resources :members
   resources :users
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
+  # ----------------------------------------------
+  # 通常のHTTPリクエスト
   # List notices to logged in user.
+  # ----------------------------------------------
   get "/notices/", {
     :to => "notices#index",
     :as => "notices",
@@ -110,9 +115,9 @@ Rails.application.routes.draw do
     :as => "deactive_image",
   }
 
-  ##########################################
+  # ----------------------------------------------
   # メッセージ
-  ##########################################
+  # ----------------------------------------------
   get "/messages/", {
     :to => "messages#index",
     :as => "messages",
@@ -126,9 +131,9 @@ Rails.application.routes.draw do
     :as => "message_create",
   }
 
-  ##########################################
+  # ----------------------------------------------
   # いいねを贈る
-  ##########################################
+  # ----------------------------------------------
   # 異性にいいねを贈る
   post "/like/send/:id", {
     :to => "likes#inform",
@@ -140,9 +145,9 @@ Rails.application.routes.draw do
     :as => "cancel_like",
   }
 
-  ##########################################
+  # ----------------------------------------------
   # マイページ関連
-  ##########################################
+  # ----------------------------------------------
   get "/mypage", { :to => "mypage#index" }
   get "/mypage/edit", { :to => "mypage#edit" }
   patch "/mypage/edit", { :to => "mypage#update" }
@@ -184,11 +189,11 @@ Rails.application.routes.draw do
     :to => "mypage#footprints",
     :as => "mypage_footprints",
   }
-  # ログ一覧
-  get "/mypage/logs", {
-    :to => "mypage#logs",
-    :as => "mypage_logs",
-  }
+  # # ログ一覧
+  # get "/mypage/logs", {
+  #   :to => "mypage#logs",
+  #   :as => "mypage_logs",
+  # }
   get "/mypage/logout", {
     :to => "mypage#logout",
     :as => "logout",
@@ -196,9 +201,9 @@ Rails.application.routes.draw do
   # ログイン中ユーザーが自身のプロフィール画面を閲覧する
   get "/mypage/profile", :to => "mypage#prfile", :as => "mypage_profile"
 
-  ##########################################
+  # ----------------------------------------------
   # ログインページ
-  ##########################################
+  # ----------------------------------------------
   scope "login", :as => :login do
     get "/", {
       :to => "sessions#new",
@@ -208,9 +213,9 @@ Rails.application.routes.draw do
     }
   end
 
-  ##########################################
+  # ----------------------------------------------
   # 新規登録時の仮登録
-  ##########################################
+  # ----------------------------------------------
   scope("register", :as => :register) do
     post "/", {
       :to => "register#create",
@@ -235,6 +240,24 @@ Rails.application.routes.draw do
     get "/pre-completed", {
       :to => "register#completed",
       :as => "pre-completed",
+    }
+  end
+
+  # ----------------------------------------------
+  # メンバー情報関連
+  # ----------------------------------------------
+  scope "members", :as => :members do
+    get "/search", {
+      :to => "members#search",
+      :as => "search",
+    }
+    get "/:id", {
+      :to => "members#show",
+      :as => "show",
+    }
+    get "/", {
+      :to => "members#index",
+      :as => "index",
     }
   end
 end

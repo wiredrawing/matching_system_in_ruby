@@ -9,7 +9,10 @@ class MembersController < ApplicationController
 
   # 閲覧可能な全メンバー一覧を表示
   def index
-
+    p "検索条件を指定しつつメンバー一覧を表示させる--------------------"
+    pp params
+    pp search_params
+    p "検索条件を指定しつつメンバー一覧を表示させる--------------------"
     # ログインユーザーがブロックしたメンバー
     @members_you_block = Decline.members_you_block(@current_user.id).map do |member|
       next member.id
@@ -18,11 +21,12 @@ class MembersController < ApplicationController
     @members_blocking_you = Decline.members_blocking_you(@current_user.id).map do |member|
       next member.id
     end
+
     # ログインユーザーがアクセスできない全メンバー
     @disable_access_members = @members_you_block + @members_blocking_you
 
     # 異性のmembers一覧を取得する
-    @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list)
+    @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list, search_params)
   end
 
   # 指定した任意のmember_idの情報を表示する
@@ -63,13 +67,29 @@ class MembersController < ApplicationController
         @images = @member.showable_images
       end
     rescue => error
-      #--------------------------------------------
-      pp(error)
       logger.debug(error)
-      render({
-        :template => "members/error",
-      })
+      return render({
+               :template => "members/error",
+             })
     end
+  end
+
+  # --------------------------------------------
+  # メンバーの検索条件入力フォーム
+  # ここではフォームページのみを表示
+  # --------------------------------------------
+  def search
+    # 設定ファイルデータ
+    @age_list = UtilitiesController::fetch_age_list
+    @gender_list = UtilitiesController::fetch_gender_list
+    @languages = UtilitiesController::fetch_language_list
+    @year_list = UtilitiesController::fetch_year_list
+    @month_list = UtilitiesController::fetch_month_list
+    @day_list = UtilitiesController::fetch_day_list
+
+    @input_params = params
+
+    return render :template => "members/search"
   end
 
   # GET /members/new
@@ -131,6 +151,17 @@ class MembersController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_member
     @member = Member.find(params[:id])
+  end
+
+  # メンバー検索で許可するパラメータ
+  def search_params
+    params.permit(
+      :from_age,
+      :to_age,
+      :native_language,
+      :gender,
+      :display_name,
+    )
   end
 
   # Only allow a list of trusted parameters through.

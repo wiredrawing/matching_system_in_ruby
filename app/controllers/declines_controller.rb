@@ -28,13 +28,13 @@ class DeclinesController < ApplicationController
     if @decline.validate() == true
       response = @decline.save()
       if (response == true)
-        return redirect_to member_url :id => decline_params[:to_member_id]
+        return redirect_to members_show_url :id => decline_params[:to_member_id]
       else
         raise StandardError.new("指定したユーザーのブロックに失敗しました")
       end
     else
       # validate()メソッドがfalseを返却した場合は
-      return redirect_to member_url :id => decline_params[:to_member_id]
+      return redirect_to members_show_url :id => decline_params[:to_member_id]
     end
   end
 
@@ -71,13 +71,6 @@ class DeclinesController < ApplicationController
   end
 
   private
-
-  # # Use callbacks to share common setup or constraints between actions.
-  # def set_decline
-  #   print("ユーザーのブロックを解除する")
-  #   p(params[:id])
-  #   @decline = Decline.find(params[:id])
-  # end
 
   # Only allow a list of trusted parameters through.
   def decline_params

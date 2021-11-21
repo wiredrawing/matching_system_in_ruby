@@ -64,14 +64,14 @@ class LikesController < ApplicationController
           raise StandardError.new("マッチングログの登録に失敗しました")
         end
       end
-      return redirect_to member_url(:id => params[:id])
+      return redirect_to members_show_url(:id => params[:id])
     end
   rescue => error
     p "[例外発生--------------------------------------------------]"
     pp error
     logger.debug "[例外発生] #{error.message}"
     ActiveRecord::Rollback
-    return redirect_to member_url(:id => params[:id])
+    return redirect_to members_show_url(:id => params[:id])
   end
 
   # GET /likes/1 or /likes/1.json

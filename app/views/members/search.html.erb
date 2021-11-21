@@ -1,0 +1,66 @@
+<section>
+  <div class="box">
+    <%= form_tag members_index_url, :method => "get" do %>
+      <div class="selectors">
+        <p>年齢(下限)</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= select_tag :from_age, options_for_select(@age_list, @input_params[:from_age]) %>
+        </div>
+      </div>
+      <!--selectors-->
+      <div class="selectors">
+        <p>年齢(上限)</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= select_tag :to_age, options_for_select(@age_list, @input_params[:to_age]) %>
+        </div>
+      </div>
+      <!--selectors-->      <!--selectors-->
+      <div class="selectors">
+        <p>職業</p>
+        <div class="cp_ipselect cp_sl04">
+          {{Form::select("job_type", $job_type)}}
+        </div>
+      </div>
+      <!--selectors-->
+      <div class="selectors">
+        <p>休日</p>
+        <div class="cp_ipselect cp_sl04">
+          {{Form::select("day_off", $day_off)}}
+        </div>
+      </div>
+      <!--selectors-->
+      <div class="selectors">
+        <p>性別</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= select_tag(:gender, options_for_select(@gender_list, @input_params[:gener])) %>
+        </div>
+      </div>
+      <!--selectors-->
+      <div class="selectors">
+        <p>母国語</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= select_tag :native_language, options_for_select(@languages, @input_params[:native_language]) %>
+        </div>
+      </div>
+      <!--selectors-->
+      <!--- 任意のキーワード -->
+      <div class="selectors">
+        <p>ユーザー名</p>
+      </div>
+      <p class="input_red"></p>
+      <%= text_field_tag  :display_name, @input_params[:display_name], {:placeholder => "任意の名前で指定" } %>
+      <div class="btnbox">
+        <a href="" class="btn search_button">検索</a>
+      </div>
+    <% end %>
+  </div>
+  <!--box-->
+</section>
+<script>
+  $(function () {
+      $(".search_button").on("click", function (e) {
+          e.preventDefault();
+          $("form").eq(0).trigger("submit");
+      });
+  })
+</script>

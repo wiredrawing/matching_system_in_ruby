@@ -37,9 +37,7 @@ class Api::ImagesController < ApplicationController
                                              :member_blongs_to,
                                            ])
   rescue => exception
-    puts("[例外発生--------------------------------------------]")
-    pp(exception)
-    logger.error "#{exception.message}"
+    logger.error exception
     return render :json => @token_check.errors.messages
   end
 
@@ -66,8 +64,7 @@ class Api::ImagesController < ApplicationController
 
     return render :json => @images.to_json
   rescue => exception
-    p(exception)
-    logger.debug "#{exception.message}"
+    logger.error exception
     return render :json => @token_check.errors.messages
   end
 
@@ -131,12 +128,9 @@ class Api::ImagesController < ApplicationController
   end
 
   def update
-    p("==============================================")
     # ログインユーザーの認証チェック
     @member_id = request.headers["member-id"].to_i
     @token_for_api = request.headers["token-for-api"]
-    p @token_for_api
-    p @member_id
     @token_check = TokenCheck.new({
       :id => @member_id,
       :token_for_api => @token_for_api,
@@ -172,25 +166,20 @@ class Api::ImagesController < ApplicationController
     end
     return render :file => original, :content_type => @image.extension, :status => 200
   rescue => exception
-    puts "[例外発生-------------------------------------------------]"
-    p exception.message
+    logger.error exception
     return render :json => exception.message
   end
 
   # 指定した画像を所持しているユーザーであれば削除可能
   def delete
-    p("=============================================")
     @member_id = request.headers["member-id"].to_i
     @token_for_api = request.headers["token-for-api"]
-    p @member_id
-    p @token_for_api
 
     # 削除リクエストの認証処理
     @token_check = TokenCheck.new({
       :id => @member_id,
       :token_for_api => @token_for_api,
     })
-    pp(@token_check)
     # バリデーションチェック
     if @token_check.validate() != true
       raise StandardError.new "認証エラー"
@@ -200,18 +189,13 @@ class Api::ImagesController < ApplicationController
       :id => params[:id],
       :member_id => @member_id,
     }).destroy()
-
-    pp(response)
   rescue => exception
-    p(exception)
+    logger.error exception
     return render(:json => exception)
   end
 
   # 自身の画像をアップロードする(※非Timeline)
   def upload
-    p("===============================================================")
-    pp upload_params
-    p("===============================================================")
     @image_id = self.upload_process(upload_params)
 
     @image = Image.find(@image_id)
@@ -276,11 +260,10 @@ class Api::ImagesController < ApplicationController
     # return render :json => @image.to_json(:include => [:member])
   rescue ActiveModel::ValidationError => error
     # logger.debug "111[例外]---#{error.message.to_s}"
-    pp error.message
+    logger.error error
     return render :json => @image.errors.messages
   rescue => error
-    # logger.debug "222[例外]---#{error.message}"
-    pp error.message
+    logger.error error
     return render :json => error.message
   end
 

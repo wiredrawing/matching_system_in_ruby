@@ -44,7 +44,7 @@ class RegisterController < ApplicationController
       return render ({ :template => "register/index" })
     end
   rescue => exception
-    pp(exception)
+    logger.debug exception
   end
 
   ###########################################
@@ -83,11 +83,9 @@ class RegisterController < ApplicationController
   def main_create
     # 例外ハンドリング
     begin
-      puts("----------------------------------------------------")
       # memberオブジェクトの作成
       @member = Member.new(member_params)
       _valid = @member.validate()
-      pp(@member.errors.messages)
       if _valid != true
         raise StandardError.new("バリデーションエラーが発生しています")
       end
@@ -102,14 +100,10 @@ class RegisterController < ApplicationController
         raise StandardError.new("仮登録中ユーザーが見つかりませんでした")
       end
 
-      print("is_exists ====>", @member)
-
       # postデータをHashオブジェクトに
       member_params_hash = member_params.to_hash()
       member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
       member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
-      print("member_params_hash-------------->")
-      p(member_params_hash)
       _updated = @member.update(member_params_hash)
 
       # updateメソッドが成功した場合
@@ -120,12 +114,8 @@ class RegisterController < ApplicationController
       # ログインページにリダイレクト
       return(redirect_to(login_url))
     rescue => exception
-      # 例外発生時!
-      # puts("@register ------>", @register)
-      # puts("@register.email ------>", @register.email)
-      puts("exception.message ---->", exception.message)
-      # puts("exception.line ------->", exception.line)
-      render({ :template => "register/main_index" })
+      logger.debug exception
+      return render({ :template => "register/main_index" })
     end
   end
 

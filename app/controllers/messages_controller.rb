@@ -66,14 +66,11 @@ class MessagesController < ApplicationController
     # 任意のテンプレート
     return render :template => "messages/talk"
   rescue => error
-    pp(error)
     return render :template => "errors/index"
   end
 
   # 入力内容をレコードに新規追加する
   def create
-    puts("[新規メッセージを登録する]")
-    pp(params)
     params.fetch(:message, {}).permit(
       :from_member_id,
       :to_member_id,
@@ -104,7 +101,7 @@ class MessagesController < ApplicationController
 
     return redirect_to(message_talk_url :id => params[:message][:to_member_id])
   rescue => exception
-    pp(exception)
+    logger.debug exception
   end
 
   # GET /messages/new

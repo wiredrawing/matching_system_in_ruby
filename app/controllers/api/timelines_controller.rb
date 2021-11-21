@@ -221,12 +221,7 @@ class Api::TimelinesController < ApplicationController
     }
     return render({ :json => json_response })
   rescue => exception
-    puts("[例外発生-----------------------------------]")
-    # pp exception.backtrace.methods
-    p(exception)
-    p(exception.message)
-    # pp @message_to_timeline.errors.messages
-    # return render :json => @message_to_timeline.errors.messages
+    logger.error exception
   end
 
   # 画像の投稿

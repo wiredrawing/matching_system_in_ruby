@@ -10,7 +10,7 @@
           <p class="input_red"><%= error %></p>
         <% end %>
       <% end %>
-      <%= form.text_field :dislay_name, :value => @member.display_name, :placeholder => "ニックネーム" %>
+      <%= form.text_field :display_name, :value => @member.display_name, :placeholder => "ニックネーム" %>
       <!-- 名字 -->
       <p>姓</p>
       <% if @member.errors.messages.length > 0 %>
@@ -57,6 +57,55 @@
         <p>母国語</p>
         <div class="cp_ipselect cp_sl04">
           <%= form.select :native_language, @languages %>
+        </div>
+      </div>
+      <div class="selectors">
+        <p>興味のある言語</p>
+        <%= @member.interested_languages.to_a  %>
+        <% @languages.each do |lang|%>
+          <p><label>
+              <% if @member.interested_languages.to_a.map{ |lang| next lang.language}.include?(lang[1]) %>
+                <%= form.check_box :languages, {:multiple => true, :checked => true, :include_hidden => false}, lang[1]  %><%= lang[0] %>
+              <% else %>
+                <%= form.check_box :languages, {:multiple => true, :checked => false, :include_hidden => false}, lang[1]  %><%= lang[0] %>
+              <% end %>
+            </label></p>
+        <% end %>
+      </div>
+      <!-- 生年月日(年) -->
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:year].each do |error| %>
+          <%= error %>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>生年月日(年)</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :year, @year_list %>
+        </div>
+      </div>
+      <!-- 生年月日(月) -->
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:month].each do |error| %>
+          <%= error %>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>生年月日(月)</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :month, @month_list %>
+        </div>
+      </div>
+      <!-- 生年月日(日) -->
+      <% if @member.errors.messages.length > 0 %>
+        <% @member.errors.messages[:day].each do |error| %>
+          <%= error %>
+        <% end %>
+      <% end %>
+      <div class="selectors">
+        <p>生年月日(日)</p>
+        <div class="cp_ipselect cp_sl04">
+          <%= form.select :day, @day_list %>
         </div>
       </div>
       <!-- 自己PR -->

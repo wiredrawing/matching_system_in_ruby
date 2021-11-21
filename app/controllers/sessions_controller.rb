@@ -7,16 +7,18 @@ class SessionsController < ApplicationController
   end
 
   def create
+    p "================"
     params.fetch(:login, {}).permit(
       :email,
       :password,
     )
+    p "================"
     @login = Login.new({
       :email => params[:login][:email],
       :password => params[:login][:password],
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
-
+    p "================"
     if @login.validate() != true
       raise StandardError.new "メンバー情報が見つかりませんでした"
     end
@@ -32,9 +34,11 @@ class SessionsController < ApplicationController
 
     # Reforge the token to request for api, and update record of login user's info.
     new_token = TokenForApi.make_random_token(128)
+    p new_token
     response = @member.update({
       :token_for_api => new_token,
     })
+    p response
     if response != true
       raise StandardError.new "ログインに失敗しました"
     end
@@ -42,17 +46,15 @@ class SessionsController < ApplicationController
     # Execute logging in.
     self.login(@member)
     return redirect_to(mypage_url)
-  rescue => exception
+  rescue => error
+    p error
     # When failed logging in.
     render :template => "sessions/new"
   end
 
   # ログインページはログイン状態が不要なためoverride
   def login_check
-    print("必ず実行される処理 ==========> login_check")
-    p(self.logged_in?)
     if (self.logged_in? == true)
-      print("既にログイン中の場合はリダイレクトさせる")
       return(redirect_to(mypage_url))
     end
   end

@@ -4,10 +4,15 @@ class Member < ApplicationRecord
   attribute :getting_valid_likes
   attribute :timeline_created_at, :datetime
   attribute :native_language_string
+  # attribute :year, :datetime
+  # attribute :month, :datetime
+  # attribute :day, :datetime
   # パスワード処理
   has_secure_password
   # ページング処理
-  paginates_per 2
+  paginates_per 10
+
+  attr_accessor :year, :month, :day, :age, :languages
 
   # リレーションの関連付け
   # もらったいいいね
@@ -67,31 +72,87 @@ class Member < ApplicationRecord
            :foreign_key => :from_member_id,
            :primary_key => :id
 
+  # 興味のある言語一覧
+  has_many :interested_languages, :class_name => "Language", :foreign_key => :member_id, :primary_key => :id
+
+  # -----------------------------------------------------------------
   # いいねを贈ることができる異性のメンバー一覧を取得する
-  def self.hetero_members(current_user = nil, exculded_members = [])
-    # ブロックしているユーザー
-    begin
-      @members = self.where({
-        :is_registered => UtilitiesController::BINARY_TYPE[:on],
+  # 第三引数の検索条件は任意
+  # -----------------------------------------------------------------
+  def self.hetero_members(current_user = nil, exculded_members = [], conditions = {})
+    today = Time.now
+    _year = today.strftime("%Y")
+    _month = today.strftime("%m")
+    _day = today.strftime("%d")
+    _hour = today.strftime("%H")
+    _minute = today.strftime("%M")
+    _second = today.strftime("%S")
+
+    # 検索条件のベース条件
+    @members = self.where({
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+    }).and(
+      self.where.not({
+        :id => exculded_members,
       }).and(
         self.where.not({
           :id => current_user.id,
-        }).and(
-          self.where.not({
-            :gender => current_user.gender,
-          })
-        )
-      ).and(
-        self.where.not({
-          :id => exculded_members,
         })
       )
-      return(@members)
-    rescue => error
-      puts(error)
-      # 例外発生時は[nil]を返却
-      return(nil)
+    )
+
+    # 下限年齢
+    if conditions[:from_age].nil? != true && conditions[:from_age].to_i > 0
+      _year = _year.to_i - conditions[:from_age].to_i
+      from_date = Time.local(
+        _year,
+        _month,
+        _day,
+        _hour,
+        _minute,
+        _second
+      )
+      @members = @members.where("birthday <= ?", from_date)
     end
+
+    # 上限年齢
+    if conditions[:to_age].nil? != true && conditions[:to_age].to_i > 0
+      _year = _year.to_i - conditions[:to_age].to_i
+      to_date = Time.local(
+        _year,
+        _month,
+        _day,
+        _hour,
+        _minute,
+        _second
+      )
+      @members = @members.where("birthday >= ?", to_date)
+    end
+
+    # 性別が設定されている場合
+    if conditions[:gender].nil? != true && conditions[:gender].to_i > 0
+      @members = @members.where({
+        :gender => conditions[:gender],
+      })
+    end
+
+    # 母国語が設定されている場合
+    if conditions[:native_language].nil? != true && conditions[:native_language].to_i > 0
+      @members = @members.where({
+        :native_language => conditions[:native_language],
+      })
+    end
+
+    # 任意の名前が設定されている場合
+    if conditions[:display_name].nil? != true && conditions[:display_name].length > 0
+      @members = @members.where("display_name like ?", conditions[:display_name])
+    end
+
+    return(@members)
+  rescue => error
+    puts(error.message)
+    # 例外発生時は[nil]を返却
+    return(nil)
   end
 
   # 指定したmember_idのユーザーをログイン中ユーザーが閲覧できる場合のみ
@@ -268,6 +329,40 @@ class Member < ApplicationRecord
     },
   }
 
+  # validates :year, {
+  #   :inclusion => {
+  #     :in => lambda do
+  #       p "################################################"
+  #       year_list = UtilitiesController::YEAR_LIST.map do |year|
+  #         next year[:id].to_s
+  #       end
+
+  #       p "################################################"
+  #       pp year_list
+  #     end[],
+  #   },
+  # }
+
+  # validates :month, {
+  #   :inclusion => {
+  #     :in => lambda do
+  #       return UtilitiesController::MONTH_LIST.map do |month|
+  #                next month[:id]
+  #              end
+  #     end.call(),
+  #   },
+  # }
+
+  # validates :day, {
+  #   :inclusion => {
+  #     :in => lambda do
+  #       return UtilitiesController::DAY_LIST.map do |day|
+  #                next day[:id]
+  #              end
+  #     end.call(),
+  #   },
+  # }
+
   # 文字列としての性別を取得する
   def gender_string()
     # 性別定数をループする
@@ -365,8 +460,6 @@ class Member < ApplicationRecord
       next like.to_member_id
     end
     valid_likes = likes - self.forbidden_members
-    # p("贈った有効ないいね")
-    # pp(valid_likes)
     return valid_likes
   end
 
@@ -377,8 +470,6 @@ class Member < ApplicationRecord
       next like.from_member_id
     end
     valid_likes = likes - self.forbidden_members
-    # p("もらった有効ないいね")
-    # pp(valid_likes)
     return valid_likes
   end
 
@@ -406,5 +497,31 @@ class Member < ApplicationRecord
       end
     end
     return @native_language_string
+  end
+
+  def year
+    if self.birthday != nil
+      return self.birthday.strftime("%Y")
+    end
+  end
+
+  def month
+    if (self.birthday != nil)
+      return self.birthday.strftime("%-m")
+    end
+  end
+
+  def day
+    if (self.birthday != nil)
+      return self.birthday.strftime("%-d")
+    end
+  end
+
+  # 現時点の年齢を取得する
+  def age
+    if (self.birthday != nil)
+      return (Time.new.strftime("%Y%m%d").to_i - self.birthday.strftime("%Y%m%d").to_i) / 10000
+    end
+    return "?"
   end
 end

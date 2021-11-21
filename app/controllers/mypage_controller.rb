@@ -22,32 +22,55 @@ class MypageController < ApplicationController
   end
 
   def edit
-    puts("[マイページ内プロフィール編集ページ--------------------------------]")
+    # 設定ファイルデータ
+    @age_list = UtilitiesController::fetch_age_list
+    @gender_list = UtilitiesController::fetch_gender_list
+    @languages = UtilitiesController::fetch_language_list
+    @year_list = UtilitiesController::fetch_year_list
+    @month_list = UtilitiesController::fetch_month_list
+    @day_list = UtilitiesController::fetch_day_list
+
     @member = @current_user
-    pp(@member)
-    pp(@member.errors)
-    pp(@member.errors.messages)
-    pp(@member.errors.messages.length)
-    puts("[マイページ内プロフィール編集ページ--------------------------------]")
-    return true
     return render :template => "mypage/edit"
   end
 
   # ログインユーザーの情報更新処理
   def update
+    # 設定ファイルデータ
+    @age_list = UtilitiesController::fetch_age_list
+    @gender_list = UtilitiesController::fetch_gender_list
+    @languages = UtilitiesController::fetch_language_list
+    @year_list = UtilitiesController::fetch_year_list
+    @month_list = UtilitiesController::fetch_month_list
+    @day_list = UtilitiesController::fetch_day_list
+
     @member = Member.find(self.current_user.id)
-    # 更新対象のカラムをオブジェクトにアサイン
-    @member.attributes = member_params_to_update
+    @member.update(member_params_to_update)
 
     # バリデーション成功の場合はMyPageトップへリダイレクト
     _valid = @member.validate()
     if _valid == true
+
       # レコードの更新処理
       @member.save()
+
+      @member.interested_languages.destroy_all()
+
+      if (member_params_to_update[:languages].length > 0)
+        member_params_to_update[:languages].each do |lang|
+          response = @member.interested_languages.new({
+            :member_id => @member.id,
+            :language => lang,
+          }).save()
+        end
+      end
+
       redirect_to mypage_url
     else
       render({ :template => "mypage/edit" })
     end
+  rescue => error
+    logger.debug error
   end
 
   # ログイン中ユーザーが受けとったいいね一覧
@@ -80,7 +103,6 @@ class MypageController < ApplicationController
     begin
       # 既存レコードにuuidが存在していないかどうかを検証
       uuid = SecureRandom.uuid
-      p("アプリケーション側で生成したUUID =====>", uuid)
       @image = Image.find_by({
         :id => uuid,
       })
@@ -89,10 +111,6 @@ class MypageController < ApplicationController
       if @image != nil
         raise StandardError.new "UUIDの重複がありました"
       end
-
-      p "@image ---> ", @image
-
-      p "params[:member] -------------------> ", params[:member]
 
       # アップロードされたファイルをハッシュ化
       upload_file = params[:member][:upload_file]
@@ -143,26 +161,19 @@ class MypageController < ApplicationController
                         :template => "mypage/upload",
                       })
       else
-        # バリデーション失敗時はエラー内容の表示処理
-        p "@image ----------------------->", @image
-        p "response ---->", response
-        p "@image.errors.messages ---> ", @image.errors.messages
         render ({
           :template => "mypage/upload",
         })
       end
     rescue => error
+      logger.error error
       # 例外発生時は､アップロードフォームへ再度リダイレクト
-      p "rescue ======>  ", error
       return redirect_to mypage_upload_url
     end
   end
 
   def update_image
-    puts("[Mypage#update_image----------------------------------]")
     begin
-      p("---------------------------update_imge")
-      p(params)
       # 更新対象の画像を取得
       params.fetch(:image, {}).permit(
         :id,
@@ -181,30 +192,23 @@ class MypageController < ApplicationController
       })
       return redirect_to(mypage_upload_url)
     rescue => exception
-      pp(exception)
+      logger.debug exception
       return render :tempate => "errors/index"
     end
   end
 
   def delete_image
     begin
-      print("delete_image ==========================>")
       params.fetch(:image, {}).permit(:id)
       @image = Image.find(params[:image][:id])
       @file_real_path = @image.fetch_file_path.to_s
       # まずDBレコードを削除
       response = @image.destroy()
-      p("削除したレコード ====>", response)
-      p(@image.fetch_file_path)
-      p("ファイルの物理削除 ====>", File.delete(@file_real_path))
-      p(params)
-      p(@image)
+      File.delete(@file_real_path)
       # ファイルアップロードページにリダイレクト
       return (redirect_to(mypage_upload_url))
     rescue => exception
-      p("!!!!!!!!!!!!!!!! ------>例外発生")
-      p(exception)
-      p(exception.message)
+      logger.error exception
       return (redirect_to(mypage_upload_url))
     end
   end
@@ -216,14 +220,11 @@ class MypageController < ApplicationController
 
   # ブロック中一覧ページ
   def blocking
-    puts("[blocking--------------------------------------]")
     @members_you_block = Decline.members_you_block @current_user.id
-    pp @members_you_block
   end
 
   # 足跡一覧ページ
   def footprints
-    puts("[マイページ内足跡一覧ページ----------------------------------------]")
     @footprints = Footprint.includes(:from_member).where({
       :to_member_id => @current_user.id,
     }).order(:updated_at => :desc)
@@ -231,18 +232,11 @@ class MypageController < ApplicationController
     response = @footprints.update({
       :is_browsed => UtilitiesController::BINARY_TYPE[:on],
     })
-
-    print("ここはログインユーザーへの足跡一覧ページです")
-    @footprints.each do |footprint|
-      pp(footprint.from_member)
-    end
   end
 
   # ログアウト
   def logout
-    puts("@@@@@@@@@@@@@@@@@@@@@@SessionController#logout")
     # セッションの破棄
-    p(params[:session])
     session[:member_id] = nil
     # セッション破棄後､TOPページへ
     return redirect_to(top_url)
@@ -255,9 +249,7 @@ class MypageController < ApplicationController
       :to_member_id => @current_user.id,
       :is_browsed => UtilitiesController::BINARY_TYPE[:off],
     }).order(:created_at => :desc)
-    @action_string_list = UtilitiesController::ACTION_STRING_LIST,
-    pp(@logs)
-    pp(@action_string_list)
+    @action_string_list = UtilitiesController::ACTION_STRING_LIST
   end
 
   private
@@ -266,16 +258,10 @@ class MypageController < ApplicationController
   # マイページへはログイン済みユーザーのみ許可
   ##########################################
   def login_check
-    p "======================================================"
-    p "MypageController#login_check"
-    p "self.logged_in?=======>", self.logged_in?
-    p "self.current_user ====>", self.current_user
-    p "======================================================"
     if self.logged_in? != true
       return redirect_to(login_url)
     end
 
-    p "@current_user ===>", @current_user
     @member = @current_user
   end
 
@@ -291,7 +277,11 @@ class MypageController < ApplicationController
       :message,
       :memo,
       :native_language,
-    )
+      :year,
+      :month,
+      :day,
+      :languages => [],
+    ).merge(:birthday => params[:member][:year] + "-" + params[:member][:month] + "-" + params[:member][:day])
   end
 
   # パスワード変更用のparams

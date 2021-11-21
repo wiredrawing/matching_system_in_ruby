@@ -11,11 +11,11 @@
       <% @informing_likes.each do |member| %>
         <div class="oaitelists">
           <% if (member.showable_images.length > 0) then %>
-            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+            <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
               <img src="<%= member.showable_images.first.image_url() %>">
             </a>
           <% else %>
-            <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+            <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
               <img src="/images/sample_user.jpg">
             </a>
           <% end %>

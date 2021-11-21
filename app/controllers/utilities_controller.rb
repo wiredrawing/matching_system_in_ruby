@@ -8,11 +8,11 @@ class UtilitiesController < ApplicationController
 
   # 性別リスト
   GENDER_LIST = [
-    { :id => 0, :value => "未設定" },
-    { :id => 1, :value => "男性" },
-    { :id => 2, :value => "女性" },
-    { :id => 3, :value => "上記以外" },
-    { :id => 4, :value => "未回答" },
+    { :id => 0, :value => "未設定(required)" },
+    { :id => 1, :value => "男性(guy)" },
+    { :id => 2, :value => "女性(woman)" },
+    { :id => 3, :value => "未回答(no comment)" },
+    { :id => 4, :value => "上記以外(other)" },
   ]
 
   # アップロード可能なファイル拡張子
@@ -64,7 +64,7 @@ class UtilitiesController < ApplicationController
 
   # 言語リスト
   LANG_LIST = [
-    { :id => 0, :value => "母国語を選択して下さい" },
+    { :id => 0, :value => "未設定" },
     { :id => 1, :value => "日本語" },
     { :id => 2, :value => "英語" },
     { :id => 3, :value => "韓国語" },
@@ -82,7 +82,71 @@ class UtilitiesController < ApplicationController
     { :id => 1000, :value => "その他" },
   ]
 
-  #
+  # 年齢リスト
+  AGE_LIST = (0..100).map do |age|
+    if age == 0
+      next { :id => age, :value => "未設定" }
+    end
+    next { :id => age, :value => age.to_s + "歳" }
+  end
+
+  # 西暦リスト
+  YEAR_LIST = (1900..(Time.new.strftime("%Y").to_i)).map do |year|
+    next { :id => year, :value => year.to_s + "年" }
+  end
+
+  # 月リスト
+  MONTH_LIST = (1..12).map do |month|
+    next { :id => month, :value => month.to_s + "月" }
+  end
+
+  # 日リスト
+  DAY_LIST = (1..30).map do |day|
+    next { :id => day, :value => day.to_s + "日" }
+  end
+
+  def self.fetch_age_list
+    list = self::AGE_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_gender_list
+    list = self::GENDER_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_language_list
+    list = self::LANG_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_year_list
+    list = self::YEAR_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_month_list
+    list = self::MONTH_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_day_list
+    list = self::DAY_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
   def self.gender_id_list
     gender_id_list = self::GENDER_LIST.map do |gender|
       next gender[:id]

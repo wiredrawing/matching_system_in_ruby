@@ -9,7 +9,7 @@
     </div>
     <div class="facebox">
       <!-- ID => {{$request->member->id}} -->
-      <p class="id_label"><%= @current_user.display_name %></p>
+      <p class="id_label"><%= @current_user.display_name %>(<%= @current_user.age %>歳)</p>
       <p class="id_label"><%= @current_user.family_name %> <%= @current_user.given_name %></p>
       <!-- 契約中プランの表示 -->
       <p class="id_label">
@@ -28,7 +28,7 @@
         <a href="<%= mypage_edit_url() %>" class="btn_mini_edit">プロフィール編集</a>
       </div>
       <div class="tex_c">
-        <a class="btn_mini_edit" href="<%= member_url :id => @current_user.id %>">自身のプロフィールを閲覧</a>
+        <a class="btn_mini_edit" href="<%= members_show_url :id => @current_user.id %>">自身のプロフィールを閲覧</a>
       </div>
     </div>
     <div class="numberbox">
@@ -63,7 +63,7 @@
   <div class="oaitelists_wrap">
     <% @hetero_members.each do |member| %>
       <div class="oaitelists">
-        <a href="<%= member_url(member.id) %>" class="oaitelists_img">
+        <a href="<%= members_show_url(member.id) %>" class="oaitelists_img">
           <% if member.showable_images.length > 0 then %>
             <img src="<%= member.showable_images.first.image_url %>">
           <% else %>

@@ -4,7 +4,7 @@
     <% if @members.length > 0 then %>
       <% @members.each do |member| %>
         <div class="oaitelists">
-          <a href="<%= member_url :id => member.id %>" class="oaitelists_img">
+          <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
             <% if member.showable_images.length > 0 then %>
               @if ($value->profile_image_id > 0)
               <img src="<%= member.showable_images.first.image_url() %>">
@@ -12,7 +12,7 @@
               <img src="/images/sample_user.jpg">
             <% end %>
           </a>
-          <p class="bold"><%= member.display_name %>(歳)</p>
+          <p class="bold"><%= member.display_name %>(<%= member.age %>歳)</p>
           <p>VIP</p>
           <p>職業: <%= member.display_name %></p>
           <p>エリア: <%= member.display_name %></p>

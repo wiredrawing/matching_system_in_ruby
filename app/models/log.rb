@@ -50,10 +50,10 @@ class Log < ApplicationRecord
   def url
     if self.action_id == UtilitiesController::ACTION_ID_LIST[:like]
       # いいねをもらった場合は､いいね送信元メンバーのURLへ
-      return member_url(:id => self.from_member.id)
+      return members_show_url(:id => self.from_member.id)
     elsif self.action_id == UtilitiesController::ACTION_ID_LIST[:match]
       # マッチングした場合は､マッチング先メンバーのURLへ
-      return member_url(:id => self.from_member.id)
+      return members_show_url(:id => self.from_member.id)
     elsif self.action_id == UtilitiesController::ACTION_ID_LIST[:message]
       # メッセージ受信時は､送信元メンバーとのチャットルームへ
       return message_talk_url(:id => self.from_member.id)
