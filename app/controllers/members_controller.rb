@@ -27,6 +27,8 @@ class MembersController < ApplicationController
 
     # 異性のmembers一覧を取得する
     @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list, search_params)
+    p ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
+    p @members
   end
 
   # 指定した任意のmember_idの情報を表示する

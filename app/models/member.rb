@@ -89,7 +89,7 @@ class Member < ApplicationRecord
     _second = today.strftime("%S")
 
     # 検索条件のベース条件
-    @members = self.where({
+    @members = self.left_joins(:interested_languages).where({
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     }).and(
       self.where.not({
@@ -138,9 +138,14 @@ class Member < ApplicationRecord
 
     # 母国語が設定されている場合
     if conditions[:native_language].nil? != true && conditions[:native_language].to_i > 0
-      @members = @members.where({
-        :native_language => conditions[:native_language],
-      })
+      @members = @members.merge(
+        self.left_joins(:interested_languages).where({
+          :native_language => conditions[:native_language],
+        }).or(self.left_joins(:interested_languages).where({
+          "languages.language" => conditions[:native_language],
+        }))
+      )
+      pp @members.to_a
     end
 
     # 任意の名前が設定されている場合
@@ -148,9 +153,12 @@ class Member < ApplicationRecord
       @members = @members.where("display_name like ?", conditions[:display_name])
     end
 
+    p ("=================")
+    p @members.to_a
     return(@members)
   rescue => error
-    puts(error.message)
+    p ("=================")
+    puts(error)
     # 例外発生時は[nil]を返却
     return(nil)
   end

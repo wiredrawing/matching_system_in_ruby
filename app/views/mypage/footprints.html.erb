@@ -13,7 +13,7 @@
                 <img src="/images/sample_user.jpg">
               <% end %>
             </a>
-            <p class="bold"><%= footprint.from_member.display_name %>(歳)</p>
+            <p class="bold"><%= footprint.from_member.display_name %>(<%= footprint.from_member.age %>歳)</p>
             <p>PR: <%= footprint.from_member.message %></p>
             <p class="footdate">
               <%= footprint.updated_at.strftime("%Y年%m月%d日 %H時%I分")%>
