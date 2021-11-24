@@ -16,7 +16,6 @@
     <div class="talk">
       <p v-on:click="fetchPastTimelines" class="past_message_btn">過去のメッセージを取得</p>
       <!-- メッセージのループ -->
-      {{timelines.length}}
       <div v-for="timeline in timelines">
         <div class="talkin_r" v-if="timeline.from_member_id == fromMemberId.value">
           <p class="kidokuornot">{{timeline.browsed}}</p>

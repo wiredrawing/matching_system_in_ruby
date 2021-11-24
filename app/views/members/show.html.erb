@@ -72,6 +72,14 @@
         <td><%= @member.native_language_string %></td>
       </tr>
       <tr>
+        <th>興味のある言語</th>
+        <td>
+          <% @member.interested_languages_string.each do |lang| %>
+            「<%= lang %>」
+          <% end %>
+        </td>
+      </tr>
+      <tr>
         <th>生年月日</th>
         <td><%= @member.birthday %></td>
       </tr>

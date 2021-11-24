@@ -9,9 +9,9 @@ class RegisterController < ApplicationController
     })
   end
 
-  ###########################################
+  # -----------------------------------------
   # 仮登録処理の実行
-  ###########################################
+  # -----------------------------------------
   def create
     # 本登録用トークンを生成
     _token = TokenForApi.make_random_token(128)
@@ -47,9 +47,9 @@ class RegisterController < ApplicationController
     logger.debug exception
   end
 
-  ###########################################
+  # -----------------------------------------
   # 本登録処理初期表示
-  ###########################################
+  # -----------------------------------------
   def main_index
     # 仮登録ユーザーの存在チェック
     _existed = Register.exists?({
@@ -67,9 +67,6 @@ class RegisterController < ApplicationController
         :token => params[:token],
         :is_registered => UtilitiesController::BINARY_TYPE[:off],
       })
-      # @register = Register.find_by(params.permit(:id, :token))
-      # print("@register=====> ", @register)
-      # print("@register=====> ", @register.errors)
       return render({ :template => "register/main_index", :aa => :aa })
     else
       _template = { :template => "register/error" }
@@ -77,46 +74,43 @@ class RegisterController < ApplicationController
     end
   end
 
-  ###########################################
+  # -----------------------------------------
   # 本登録処実行処理
-  ###########################################
+  # -----------------------------------------
   def main_create
-    # 例外ハンドリング
-    begin
-      # memberオブジェクトの作成
-      @member = Member.new(member_params)
-      _valid = @member.validate()
-      if _valid != true
-        raise StandardError.new("バリデーションエラーが発生しています")
-      end
-
-      # memberオブジェクトの再取得
-      @member = Member.find_by({
-        :id => member_params[:id],
-        :token => member_params[:token],
-      # :is_registered => UtilitiesController::BINARY_TYPE[:off],
-      })
-      if (@member == nil)
-        raise StandardError.new("仮登録中ユーザーが見つかりませんでした")
-      end
-
-      # postデータをHashオブジェクトに
-      member_params_hash = member_params.to_hash()
-      member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
-      member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
-      _updated = @member.update(member_params_hash)
-
-      # updateメソッドが成功した場合
-      if _updated != true
-        raise StandardError.new("本登録処理に失敗しました")
-      end
-
-      # ログインページにリダイレクト
-      return(redirect_to(login_url))
-    rescue => exception
-      logger.debug exception
-      return render({ :template => "register/main_index" })
+    # memberオブジェクトの作成
+    @member = Member.new(member_params)
+    _valid = @member.validate()
+    if _valid != true
+      raise StandardError.new("バリデーションエラーが発生しています")
     end
+
+    # memberオブジェクトの再取得
+    @member = Member.find_by({
+      :id => member_params[:id],
+      :token => member_params[:token],
+    # :is_registered => UtilitiesController::BINARY_TYPE[:off],
+    })
+    if (@member == nil)
+      raise StandardError.new("仮登録中ユーザーが見つかりませんでした")
+    end
+
+    # postデータをHashオブジェクトに
+    member_params_hash = member_params.to_hash()
+    member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
+    member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
+    _updated = @member.update(member_params_hash)
+
+    # updateメソッドが成功した場合
+    if _updated != true
+      raise StandardError.new("本登録処理に失敗しました")
+    end
+
+    # ログインページにリダイレクト
+    return(redirect_to(login_url))
+  rescue => exception
+    logger.debug exception
+    return render({ :template => "register/main_index" })
   end
 
   # ログインチェックをoverride
@@ -180,6 +174,7 @@ class RegisterController < ApplicationController
         :password_digest,
         :token,
         :native_language,
+        :agree,
       )
   end
 end

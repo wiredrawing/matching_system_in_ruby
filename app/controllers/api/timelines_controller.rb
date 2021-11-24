@@ -235,6 +235,7 @@ class Api::TimelinesController < ApplicationController
         :upload_file => create_image_params[:upload_file],
         :is_displayed => UtilitiesController::BINARY_TYPE[:on],
         :token_for_api => request.headers["token-for-api"],
+        :use_type => UtilitiesController::USE_TYPE_LIST[:timeline],
       }
 
       # ----------------------------------------------------------

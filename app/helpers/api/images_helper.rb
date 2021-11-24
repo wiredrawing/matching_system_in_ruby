@@ -1,8 +1,8 @@
 module Api::ImagesHelper
-  def upload_process(parameters = { :member_id => nil, :upload_file => nil, :token_for_api => nil })
+  def upload_process(parameters = { :member_id => nil, :upload_file => nil, :token_for_api => nil, :use_type => nil })
     # 表示スタータスが設定されていない場合は1を代入
     parameters[:is_displayed] ||= UtilitiesController::BINARY_TYPE[:on]
-
+    parameters[:use_type] ||= UtilitiesController::USE_TYPE_LIST[:profile]
     # トークンとIDの組み合わせのチェック
     @image = FormImage.new({
       :member_id => parameters[:member_id].to_i,
@@ -41,7 +41,8 @@ module Api::ImagesHelper
       :id => @uuid,
       :member_id => parameters[:member_id],
       :filename => @filename,
-      :use_type => 1,
+      # 自身のプロフィール用画像としてアップロードする
+      :use_type => parameters[:use_type],
       :blur_level => 0,
       :extension => parameters[:upload_file].content_type,
       :is_approved => UtilitiesController::BINARY_TYPE[:on],
@@ -60,15 +61,6 @@ module Api::ImagesHelper
     end
     # Return the new uuid on images table.
     return @image.id
-    # rescue ActiveModel::ValidationError => error
-    #   p error.backtrace
-    #   logger.debug error.model.errors.messages
-    #   # return render :json => error.model.errors.messages
-    #   return nil
-    # rescue => error
-    #   p error.backtrace
-    #   logger.debug error.message
-    #   return nil
   end
 
   # Return absolute path to save image file uploaded by logged in user.

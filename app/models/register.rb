@@ -20,6 +20,16 @@ class Register < ApplicationRecord
     next true
   end
 
+  # 利用規約の同意
+  validates_each :agree do |object, attr, value|
+    p ("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+    if (value.to_i != UtilitiesController::BINARY_TYPE[:on])
+      object.errors.add(attr, "利用規約に同意する必要があります")
+      next false
+    end
+    next true
+  end
+
   # emailバリデーション
   validates(:email, {
     :presence => {

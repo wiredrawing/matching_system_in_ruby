@@ -88,14 +88,20 @@
       </div>
       <!--selectors-->
       <div class="selectors mb32">
-        @if ($errors->has("agree"))
-        <p class="input_red">{{$errors->first("agree")}}</p>
-        @endif
         <p>利用規約の同意</p>
         <p>※本サービス利用については以下､利用規約に同意する必要があります｡</p>
         <p><a target="_blank" href="/terms">利用規約</a></p>
+        <% if member.errors.messages.length > 0 %>
+          <% member.errors.messages[:agree].each do |error|%>
+            <p class="input_red"><%= error %></p>
+          <% end %>
+        <% end %>
         <label>
-          {{Form::checkbox("agree", 1, old("agree"))}} 利用規約に同意する
+          <% if member.agree.to_i == 1 %>
+            <%= form.check_box :agree, {:checked => true, :include_hidden => false}, 1 %>利用規約に同意する
+          <% else %>
+            <%= form.check_box :agree, {:checked => false, :include_hidden => false}, 1 %>利用規約に同意する
+          <% end %>
         </label>
       </div>
       <!--selectors-->
@@ -108,17 +114,6 @@
 </section>
 <script>
   $(function () {
-      $(".body_style .M, .body_style .M").hide();
-      $("select[name='gender']").on("change", function (e) {
-          var gender = {
-              "F" : "M",
-              "M" : "F",
-          };
-          $("." + $(this).val()).show();
-          $("." + gender[$(this).val()]).hide();
-      });
-      // ページ読み込み直後にイベントを発火
-      $("select[name='gender']").trigger("change");
       // フォームの投稿ボタン
       $(".submit_button").on("click", function (e) {
           // 年月日を生年月日にフォーマットさせる。

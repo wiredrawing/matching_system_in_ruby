@@ -9,10 +9,6 @@ class MembersController < ApplicationController
 
   # 閲覧可能な全メンバー一覧を表示
   def index
-    p "検索条件を指定しつつメンバー一覧を表示させる--------------------"
-    pp params
-    pp search_params
-    p "検索条件を指定しつつメンバー一覧を表示させる--------------------"
     # ログインユーザーがブロックしたメンバー
     @members_you_block = Decline.members_you_block(@current_user.id).map do |member|
       next member.id
@@ -27,8 +23,6 @@ class MembersController < ApplicationController
 
     # 異性のmembers一覧を取得する
     @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list, search_params)
-    p ("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~")
-    p @members
   end
 
   # 指定した任意のmember_idの情報を表示する
@@ -38,6 +32,7 @@ class MembersController < ApplicationController
         raise StandardError.new "このメンバーを閲覧できません"
       end
       @is_yourself = false
+
       # 閲覧中ユーザーがログインユーザーかどうか?
       if params[:id].to_i == @current_user.id.to_i
         @is_yourself = true
@@ -187,9 +182,11 @@ class MembersController < ApplicationController
   end
 
   # 指定したユーザーに足跡をつける
+  # ただし自身のプロフィール閲覧時は､足跡を残さない
   def visited_member(member_id)
+
     # ログイン中ユーザーが自身のプロフィールを見た場合を除く
-    if member_id == @current_user.id
+    if member_id.to_i == @current_user.id
       logger.debug "#{@current_user.id}が自身のプロフィールページを閲覧しています｡"
       return nil
     end
@@ -217,7 +214,7 @@ class MembersController < ApplicationController
     else
       # 二回目以降のアクセス
       # updated_atとアクセス回数のみをアップデート
-      updated_at = Time.new.strftime("%Y-%m-%d %H:%S") # 再訪日時
+      updated_at = Time.new.strftime("%Y-%m-%d %H:%M:%S") # 再訪日時
       access_count = footprint.access_count.to_i + 1 # アクセス回数
       response = footprint.update({
         :updated_at => updated_at,

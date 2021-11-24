@@ -30,6 +30,7 @@ class Api::ImagesController < ApplicationController
     # 対象の画像一覧を取得する
     @images = Image.includes(:member, :member_blongs_to).where({
       :member_id => @member_id,
+      :use_type => UtilitiesController::USE_TYPE_LIST[:profile],
     }).order(:created_at => :desc)
 
     return render :json => @images.to_json(:include => [
@@ -203,61 +204,6 @@ class Api::ImagesController < ApplicationController
       raise StandardError.new "ファイルアップロードに失敗しました"
     end
     return render :json => @image.to_json(:includes => [:member])
-    # # トークンとIDの組み合わせのチェック
-    # @image = FormImage.new({
-    #   :member_id => upload_params[:member_id].to_i,
-    #   :extension => upload_params[:upload_file],
-    #   :token_for_api => upload_params[:token_for_api].to_s,
-    # })
-    # if @image.validate != true
-    #   raise ActiveModel::ValidationError.new(@image)
-    # end
-
-    # # Make variable named '@image' nil.
-    # remove_instance_variable :@image
-
-    # # 既存レコードにuuidが存在していないかどうかを検証
-    # @uuid = SecureRandom.uuid
-    # @uuid_hash = Digest::SHA256.hexdigest @uuid
-    # @image = Image.find_by({
-    #   :id => @uuid,
-    # })
-    # if @image != nil
-    #   raise StandardError.new "UUIDの重複がありました"
-    # end
-
-    # @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[upload_params[:upload_file].content_type]
-
-    # # アップロードファイルの確定フルパス
-    # uploaded_file_path = save_path.to_s + "/" + @filename
-    # response = FileUtils.cp(upload_params[:upload_file].tempfile.path, uploaded_file_path)
-
-    # # 仮パス -> 確定ディレクトリ へのコピー完了後
-    # uploaded_at = @today.strftime("%Y-%m-%d %H:%M:%S")
-    # random_token = TokenForApi.make_random_token 128
-
-    # @image = Image.new({
-    #   :id => @uuid,
-    #   :member_id => upload_params[:member_id],
-    #   :filename => @filename,
-    #   :use_type => 1,
-    #   :blur_level => 0,
-    #   :extension => upload_params[:upload_file].content_type,
-    #   :is_approved => true,
-    #   :token => random_token,
-    #   :uploaded_at => uploaded_at,
-    # })
-
-    # if @image.validate != true
-    #   raise StandardError.new "ああああああああああ"
-    #   raise ActiveModel::ValidationError.new(@image)
-    # end
-
-    # # If validation is successfully so execute inserting new image data to table.
-    # if (@image.save != true)
-    #   raise StandardError.new "画像のアップロードに失敗しました"
-    # end
-    # return render :json => @image.to_json(:include => [:member])
   rescue ActiveModel::ValidationError => error
     # logger.debug "111[例外]---#{error.message.to_s}"
     logger.error error
@@ -278,10 +224,12 @@ class Api::ImagesController < ApplicationController
       :member_id => nil,
       :upload_file => nil,
       :token_for_api => nil,
+      :use_type => UtilitiesController::USE_TYPE_LIST[:profile],
     }).permit(
       :member_id,
       :upload_file,
-      :token_for_api
+      :token_for_api,
+      :use_type => UtilitiesController::USE_TYPE_LIST[:profile],
     )
     return upload_params
   end

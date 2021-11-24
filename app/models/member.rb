@@ -4,6 +4,7 @@ class Member < ApplicationRecord
   attribute :getting_valid_likes
   attribute :timeline_created_at, :datetime
   attribute :native_language_string
+  attribute :interested_languages_string
   # attribute :year, :datetime
   # attribute :month, :datetime
   # attribute :day, :datetime
@@ -12,7 +13,7 @@ class Member < ApplicationRecord
   # ページング処理
   paginates_per 10
 
-  attr_accessor :year, :month, :day, :age, :languages
+  attr_accessor :year, :month, :day, :age, :languages, :agree
 
   # リレーションの関連付け
   # もらったいいいね
@@ -28,6 +29,7 @@ class Member < ApplicationRecord
     where({
       :is_displayed => UtilitiesController::BINARY_TYPE[:on],
       :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      :use_type => UtilitiesController::USE_TYPE_LIST[:profile],
     }).order(:created_at => :desc)
   end, **{
          :class_name => "Image",
@@ -153,12 +155,9 @@ class Member < ApplicationRecord
       @members = @members.where("display_name like ?", conditions[:display_name])
     end
 
-    p ("=================")
-    p @members.to_a
     return(@members)
   rescue => error
-    p ("=================")
-    puts(error)
+    logger.debug error
     # 例外発生時は[nil]を返却
     return(nil)
   end
@@ -186,6 +185,18 @@ class Member < ApplicationRecord
   rescue => error
     p error.message
     return nil
+  end
+
+  # 利用規約への同意
+  validates_each :agree do |object, attribute, data|
+    if object.is_registered != UtilitiesController::BINARY_TYPE[:on]
+      if data == nil || (data.to_i != UtilitiesController::BINARY_TYPE[:on])
+        object.errors.add(attribute, "使用規約に同意する必要があります")
+        next false
+      end
+      next true
+    end
+    next true
   end
 
   # 特定のキーに対して､任意のバリデー処理を実行させる
@@ -330,7 +341,7 @@ class Member < ApplicationRecord
     },
     :inclusion => {
       :in => lambda do
-        return UtilitiesController::LANG_LIST.map do |lang|
+        return UtilitiesController::LANGUAGE_LIST.map do |lang|
                  next lang[:id]
                end
       end[],
@@ -498,13 +509,26 @@ class Member < ApplicationRecord
 
   def native_language_string
     @native_language_string = ""
-    UtilitiesController::LANG_LIST.each do |lang|
+    UtilitiesController::LANGUAGE_LIST.each do |lang|
       if self.native_language == lang[:id]
         @native_language_string = lang[:value]
         next
       end
     end
     return @native_language_string
+  end
+
+  # 興味のある言語一覧を返却する
+  def interested_languages_string
+    languages = []
+    self.interested_languages.each do |lang|
+      UtilitiesController::LANGUAGE_LIST.each do |l|
+        if l[:id] == lang.language
+          languages.push(l[:value])
+        end
+      end
+    end
+    return languages
   end
 
   def year

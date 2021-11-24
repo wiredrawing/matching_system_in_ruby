@@ -15,7 +15,11 @@ class Timeline < ApplicationRecord
   has_one :message, :class_name => "Message", :foreign_key => :id, :primary_key => :message_id
 
   # 画像アクション
-  has_one :image, :class_name => "Image", :foreign_key => :id, :primary_key => :image_id
+  has_one :image, (-> do
+            where({
+              :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+            })
+          end), **{ :class_name => "Image", :foreign_key => :id, :primary_key => :image_id }
 
   # URLアクション
   has_one :url, :class_name => "Url", :foreign_key => :id, :primary_key => :url_id

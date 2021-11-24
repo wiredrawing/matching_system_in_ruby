@@ -71,7 +71,7 @@
           <% end %>
         </a>
         <p class="bold"><%= member.display_name %></p>
-        <p>本名: <%= member.family_name %> <%= member.given_name %></p>
+        <p>名前: <%= member.family_name %> <%= member.given_name %> (<%= member.age %>歳)</p>
         <p>もらったいいね: &starf; <%= member.getting_likes.length %></p>
         <p>贈ったいいね: &starf; <%= member.informing_likes.length %></p>
         <p>母国語: <%= member.native_language_string %></p>

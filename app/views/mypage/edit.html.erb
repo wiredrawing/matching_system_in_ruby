@@ -62,7 +62,7 @@
       <div class="selectors">
         <p>興味のある言語</p>
         <%= @member.interested_languages.to_a  %>
-        <% @languages.each do |lang|%>
+        <% @interested_languages.each do |lang|%>
           <p><label>
               <% if @member.interested_languages.to_a.map{ |lang| next lang.language}.include?(lang[1]) %>
                 <%= form.check_box :languages, {:multiple => true, :checked => true, :include_hidden => false}, lang[1]  %><%= lang[0] %>

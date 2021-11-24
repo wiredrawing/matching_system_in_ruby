@@ -32,15 +32,12 @@ class ApplicationController < ActionController::Base
   # 言語リスト一覧を取得する
   # ---------------------------------------------
   def languages
-    @languages = UtilitiesController::LANG_LIST.map do |lang|
+    @languages = UtilitiesController::LANGUAGE_LIST.map do |lang|
       next [
              lang[:value],
              lang[:id],
            ]
     end
-    # @languages = @languages.sort do |a, b|
-    #   a[0] <=> b[0]
-    # end
     return @languages
   end
 

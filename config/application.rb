@@ -12,6 +12,7 @@ Bundler.require(*Rails.groups)
 Bundler.require("rmagick")
 Bundler.require("kaminari")
 Bundler.require("uri")
+Bundler.require("fileutils")
 
 module MatchingSystem
   class Application < Rails::Application

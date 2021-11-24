@@ -37,6 +37,18 @@ class UtilitiesController < ApplicationController
     { :id => 30, :value => "大" },
   ]
 
+  # 画像アップロードの種別
+  USE_TYPE_LIST = {
+    :none => 0,
+    :profile => 1,
+    :timeline => 2,
+  }
+  USE_TYPE_NAME_LIST = {
+    0 => "未設定",
+    1 => "プロフィール",
+    2 => "タイムライン",
+  }
+
   # ユーザーのアクションリスト
   ACTION_ID_LIST = {
     :like => 10, # 特定のメンバーからいいねをもらった場合
@@ -62,8 +74,8 @@ class UtilitiesController < ApplicationController
   # 5MBに制御
   UPLOADABLE_SIZE = 3000000
 
-  # 言語リスト
-  LANG_LIST = [
+  # 母国語リスト
+  LANGUAGE_LIST = [
     { :id => 0, :value => "未設定" },
     { :id => 1, :value => "日本語" },
     { :id => 2, :value => "英語" },
@@ -81,6 +93,13 @@ class UtilitiesController < ApplicationController
     { :id => 14, :value => "インド語" },
     { :id => 1000, :value => "その他" },
   ]
+
+  INTERESTED_LANGUAGE_LIST = LANGUAGE_LIST.select do |lang|
+    if lang[:id] > 0
+      next true
+    end
+    next false
+  end
 
   # 年齢リスト
   AGE_LIST = (0..100).map do |age|
@@ -120,7 +139,15 @@ class UtilitiesController < ApplicationController
   end
 
   def self.fetch_language_list
-    list = self::LANG_LIST.map do |d|
+    list = self::LANGUAGE_LIST.map do |d|
+      next [d[:value], d[:id]]
+    end
+    return list
+  end
+
+  def self.fetch_interested_language_list
+    p self::INTERESTED_LANGUAGE_LIST
+    list = self::INTERESTED_LANGUAGE_LIST.map do |d|
       next [d[:value], d[:id]]
     end
     return list

@@ -15,6 +15,8 @@ class Image < ApplicationRecord
   attribute :image_url_to_delete
   attribute :image_url_to_upload
   attribute :display_status
+  attribute :updated_at_string
+  attribute :created_at_string
 
   showable_for_scope = -> {
     where({
@@ -79,7 +81,7 @@ class Image < ApplicationRecord
 
   # URL to show the public image .
   def image_url
-    image_url = api_public_image_url(:id => self.id, :token => self.token, :query => self.updated_at)
+    image_url = api_public_image_url(:id => self.id, :token => self.token, :query => self.updated_at_string)
     return image_url
   end
 
@@ -124,6 +126,20 @@ class Image < ApplicationRecord
       return "表示中"
     else
       return "非表示中"
+    end
+  end
+
+  # 画像アップロード日時
+  def created_at_string
+    if (self.created_at != nil)
+      return self.created_at.strftime("%Y-%m-%dT%H-%M-%S")
+    end
+  end
+
+  # 画像更新日時
+  def updated_at_string
+    if (self.updated_at != nil)
+      return self.updated_at.strftime("%Y-%m-%dT%H-%M-%S")
     end
   end
 end

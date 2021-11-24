@@ -7,26 +7,25 @@ class SessionsController < ApplicationController
   end
 
   def create
-    p "================"
     params.fetch(:login, {}).permit(
       :email,
       :password,
     )
-    p "================"
     @login = Login.new({
       :email => params[:login][:email],
       :password => params[:login][:password],
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
-    p "================"
     if @login.validate() != true
       raise StandardError.new "メンバー情報が見つかりませんでした"
     end
+
     # Forge new member object again, if vaildation to login is successfully.
     @member = Member.find_by({
       :email => params[:login][:email],
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
+
     # validation check.
     if @member == nil
       raise StandardError.new "メンバー情報が見つかりませんでした"
@@ -35,11 +34,16 @@ class SessionsController < ApplicationController
     # Reforge the token to request for api, and update record of login user's info.
     new_token = TokenForApi.make_random_token(128)
     p new_token
+
     response = @member.update({
       :token_for_api => new_token,
     })
     p response
+    pp @member
+    p new_token
     if response != true
+      p "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+      p response
       raise StandardError.new "ログインに失敗しました"
     end
 

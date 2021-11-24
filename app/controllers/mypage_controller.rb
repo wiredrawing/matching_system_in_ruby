@@ -14,10 +14,7 @@ class MypageController < ApplicationController
       next member.id
     end
     # 異性のmembers一覧を取得する
-    puts ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    pp @current_user.forbidden_members
     @hetero_members = Member.hetero_members(@current_user, @current_user.forbidden_members)
-    pp @hetero_members
     return render({ :template => "mypage/index" })
   end
 
@@ -26,6 +23,7 @@ class MypageController < ApplicationController
     @age_list = UtilitiesController::fetch_age_list
     @gender_list = UtilitiesController::fetch_gender_list
     @languages = UtilitiesController::fetch_language_list
+    @interested_languages = UtilitiesController::fetch_interested_language_list
     @year_list = UtilitiesController::fetch_year_list
     @month_list = UtilitiesController::fetch_month_list
     @day_list = UtilitiesController::fetch_day_list
