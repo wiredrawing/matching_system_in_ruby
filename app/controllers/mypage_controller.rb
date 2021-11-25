@@ -234,7 +234,6 @@ class MypageController < ApplicationController
     session[:member_id] = nil
     # セッション破棄後､TOPページへ
     return redirect_to(top_url)
-    # return redirect_to(mypage_url)
   end
 
   # ログインユーザーに向けられたアクションログを表示
@@ -280,7 +279,7 @@ class MypageController < ApplicationController
 
   # パスワード変更用のparams
   def member_params_to_change_password
-    params.fetch(:member, {}).permig(
+    params.fetch(:member, {}).permit(
       :password_digest
     )
   end
