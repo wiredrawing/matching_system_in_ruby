@@ -1,5 +1,4 @@
 class UtilitiesController < ApplicationController
-
   # バイナリータイプ
   BINARY_TYPE = {
     :on => 1,

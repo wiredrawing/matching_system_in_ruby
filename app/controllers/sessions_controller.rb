@@ -1,5 +1,9 @@
 class SessionsController < ApplicationController
   def new
+    # pp "########################################"
+    # p "ミドルウェアで設定した内容"
+    # pp request.env["registered_members"]
+    # p "ミドルウェアで設定した内容"
     @login = Login.new()
     render(
       :template => "sessions/new",
@@ -16,6 +20,7 @@ class SessionsController < ApplicationController
       :password => params[:login][:password],
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
+
     if @login.validate() != true
       raise StandardError.new "メンバー情報が見つかりませんでした"
     end

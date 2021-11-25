@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   include MembersHelper
   include Api::ImagesHelper
   include Api::TimelineHelper
-  before_action :set_gender_list
+  # before_action :set_gender_list
   before_action :login_check
   before_action :uncheck_notices
   before_action :uncheck_messages

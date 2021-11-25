@@ -14,37 +14,37 @@ class RegisterController < ApplicationController
   # -----------------------------------------
   def create
     # 本登録用トークンを生成
-    _token = TokenForApi.make_random_token(128)
-    print("生成された64文字のトークン ----->", _token)
+    token = TokenForApi.make_random_token(128)
+    logger.debug "新規で生成されたトークン #{token}"
+
     # 重複仮登録の場合を検証
-    @register = Register.find_by ({
+    @register = Register.find_by({
       :email => register_params[:email],
       :is_registered => UtilitiesController::BINARY_TYPE[:off],
     })
 
     update_params = register_params.to_hash
-    update_params["token"] = _token
-    # メールアドレスを小文字する
-    update_params["email"] = update_params["email"].downcase
+    update_params["token"] = token
 
-    _completed = false
+    completed = false
     if @register != nil
-      _response = @register.update(update_params)
-      _completed = true
+      response = @register.update(update_params)
+      completed = true
     else
       @register = Register.new(update_params)
-      if @register.validate && @register.save
-        _completed = true
+      if @register.validate && @register.save!
+        completed = true
       end
     end
 
-    if _completed == true
+    if completed == true
       return render :template => "register/completed"
-    else
-      return render ({ :template => "register/index" })
     end
+    # エラー時
+    return render ({ :template => "register/index" })
   rescue => exception
     logger.debug exception
+    return render :template => "errors/index"
   end
 
   # -----------------------------------------
@@ -52,26 +52,21 @@ class RegisterController < ApplicationController
   # -----------------------------------------
   def main_index
     # 仮登録ユーザーの存在チェック
-    _existed = Register.exists?({
+    @member = Member.find_by({
       :id => params[:id],
       :token => params[:token],
       :is_registered => UtilitiesController::BINARY_TYPE[:off],
     })
 
     # 仮登録中ユーザーが存在する場合
-    if _existed == true
-
-      # memberモデル経由で取得する
-      @member = Member.find_by({
-        :id => params[:id],
-        :token => params[:token],
-        :is_registered => UtilitiesController::BINARY_TYPE[:off],
-      })
-      return render({ :template => "register/main_index", :aa => :aa })
+    if @member != nil
+      return render ({ :template => "register/main_index" })
     else
-      _template = { :template => "register/error" }
-      return(render(_template))
+      return render :template => "register/error"
     end
+  rescue => error
+    logger.debug error
+    return render :template => "errors/index"
   end
 
   # -----------------------------------------
@@ -80,16 +75,15 @@ class RegisterController < ApplicationController
   def main_create
     # memberオブジェクトの作成
     @member = Member.new(member_params)
-    _valid = @member.validate()
-    if _valid != true
-      raise StandardError.new("バリデーションエラーが発生しています")
+    if @member.validate() != true
+      raise ActiveModel::ValidationError.new @member
     end
 
     # memberオブジェクトの再取得
     @member = Member.find_by({
       :id => member_params[:id],
       :token => member_params[:token],
-    # :is_registered => UtilitiesController::BINARY_TYPE[:off],
+      :is_registered => UtilitiesController::BINARY_TYPE[:off],
     })
     if (@member == nil)
       raise StandardError.new("仮登録中ユーザーが見つかりませんでした")
@@ -99,15 +93,18 @@ class RegisterController < ApplicationController
     member_params_hash = member_params.to_hash()
     member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
     member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
-    _updated = @member.update(member_params_hash)
 
     # updateメソッドが成功した場合
-    if _updated != true
+    if @member.update(member_params_hash) != true
       raise StandardError.new("本登録処理に失敗しました")
     end
 
     # ログインページにリダイレクト
     return(redirect_to(login_url))
+  rescue ActiveModel::ValidationError => error
+    # モデル内Errorの取得
+    logger.debug error.model.errors.messages
+    return render({ :template => "register/main_index" })
   rescue => exception
     logger.debug exception
     return render({ :template => "register/main_index" })

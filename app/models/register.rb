@@ -4,10 +4,12 @@ class Register < ApplicationRecord
 
   # 任意の処理で指定のカラムをバリデーションする
   validates_each :email do |object, attr, value|
-    # メールアドレスをすべて小文字に変換
-    value = value.downcase
-
-    member = self.find_by ({
+    # メールアドレスがすべて小文字かどかを判定
+    if value.downcase != value
+      object.errors.add(attr, "メールアドレスはすべて小文字で入力してください")
+      next false
+    end
+    member = self.find_by({
       :email => value,
       :is_registered => UtilitiesController::BINARY_TYPE[:on],
     })
@@ -15,16 +17,6 @@ class Register < ApplicationRecord
     # 既に本登録完了済みのメールアドレスの場合はエラーメッセージを追加する
     if member != nil
       object.errors.add(attr, "このメールアドレスは使用できません")
-      next false
-    end
-    next true
-  end
-
-  # 利用規約の同意
-  validates_each :agree do |object, attr, value|
-    p ("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-    if (value.to_i != UtilitiesController::BINARY_TYPE[:on])
-      object.errors.add(attr, "利用規約に同意する必要があります")
       next false
     end
     next true
@@ -38,7 +30,7 @@ class Register < ApplicationRecord
     :length => {
       :minimum => 5,
       :maximum => 512,
-      :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
+      :message => "メールアドレスは1文字以上512文字以内で入力して下さい",
     },
   })
 

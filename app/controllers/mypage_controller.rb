@@ -1,5 +1,3 @@
-require "fileutils"
-
 class MypageController < ApplicationController
   before_action :login_check
 
@@ -43,11 +41,9 @@ class MypageController < ApplicationController
     @day_list = UtilitiesController::fetch_day_list
 
     @member = Member.find(self.current_user.id)
-    @member.update(member_params_to_update)
+    @member.attributes = member_params_to_update
 
-    # バリデーション成功の場合はMyPageトップへリダイレクト
-    _valid = @member.validate()
-    if _valid == true
+    if @member.validate() == true
 
       # レコードの更新処理
       @member.save()
@@ -62,13 +58,13 @@ class MypageController < ApplicationController
           }).save()
         end
       end
-
       redirect_to mypage_url
     else
-      render({ :template => "mypage/edit" })
+      return render({ :template => "mypage/edit" })
     end
   rescue => error
     logger.debug error
+    return render :template => "errors/index"
   end
 
   # ログイン中ユーザーが受けとったいいね一覧

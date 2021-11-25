@@ -37,6 +37,6 @@ module MatchingSystem
     config.autoload_paths += %W(#{config.root}/app/forms)
 
     # 自作ミドルウェアの読み込み
-    # config.middleware.use(LoadEagerModel)
+    config.middleware.use(LoadEagerModel)
   end
 end

@@ -4,7 +4,15 @@ class LoadEagerModel
   end
 
   def call(env)
-    res = @app.call(env)
-    return res
+
+    # 登録済みメンバー情報を取得
+    @registered_members = Member.where({
+      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+    }).map do |member|
+      next member.id
+    end
+    env["registered_members"] = @registered_members
+
+    return @app.call(env)
   end
 end
