@@ -27,10 +27,6 @@ class Image < ApplicationRecord
 
   scope :showable, showable_for_scope
 
-  @member_id_list = Member.select(:id).all.map do |member|
-    next member.id.to_i
-  end
-
   # アップロードできるmimetypeを定義
   validates :extension, {
     :inclusion => {
@@ -46,7 +42,12 @@ class Image < ApplicationRecord
     },
     :inclusion => {
       # membersテーブルに存在するmember_idであることを保証する
-      :in => @member_id_list,
+      :in => (-> do
+        members = Member.select(:id).all().map do |member|
+          next member.id
+        end
+        next members
+      end).call(),
     },
   }
 
@@ -59,22 +60,25 @@ class Image < ApplicationRecord
     # selfからアップロードされた日時を取得する
     uploaded_at = self.uploaded_at.to_time
 
-    # 画像のアップロード先ディレクトリ
-    uploaded_path = Hash.new
-    uploaded_path[:year] = uploaded_at.strftime "%Y"
-    uploaded_path[:month] = uploaded_at.strftime "%m"
-    uploaded_path[:day] = uploaded_at.strftime "%d"
-    uploaded_path[:hour] = uploaded_at.strftime "%H"
-    uploaded_path[:minute] = uploaded_at.strftime "%M"
+    uploaded_path = self.uploaded_at.to_time.strftime "storage/uploads/%Y/%m/%d/%H/#{self.filename}"
 
-    # ファイルコピー先のディレクトリを確定
-    file_path = "storage/uploads/" +
-                uploaded_path[:year] + "/" +
-                uploaded_path[:month] + "/" +
-                uploaded_path[:day] + "/" +
-                uploaded_path[:hour] + "/" +
-                self.filename
-    file_path = Rails.root.join file_path
+    # # 画像のアップロード先ディレクトリ
+    # uploaded_path = Hash.new
+    # uploaded_path[:year] = uploaded_at.strftime "%Y"
+    # uploaded_path[:month] = uploaded_at.strftime "%m"
+    # uploaded_path[:day] = uploaded_at.strftime "%d"
+    # uploaded_path[:hour] = uploaded_at.strftime "%H"
+    # uploaded_path[:minute] = uploaded_at.strftime "%M"
+
+    # # ファイルコピー先のディレクトリを確定
+    # file_path = "storage/uploads/" +
+    #             uploaded_path[:year] + "/" +
+    #             uploaded_path[:month] + "/" +
+    #             uploaded_path[:day] + "/" +
+    #             uploaded_path[:hour] + "/" +
+    #             self.filename
+
+    file_path = Rails.root.join uploaded_path
     # ファイル保管場所パスを返却(※文字列型で返却)
     return file_path
   end
@@ -134,6 +138,7 @@ class Image < ApplicationRecord
     if (self.created_at != nil)
       return self.created_at.strftime("%Y-%m-%dT%H-%M-%S")
     end
+    return nil
   end
 
   # 画像更新日時
@@ -141,5 +146,6 @@ class Image < ApplicationRecord
     if (self.updated_at != nil)
       return self.updated_at.strftime("%Y-%m-%dT%H-%M-%S")
     end
+    return nil
   end
 end

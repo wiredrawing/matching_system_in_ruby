@@ -162,6 +162,7 @@ class Member < ApplicationRecord
     # 任意の名前が設定されている場合
     if conditions[:display_name].nil? != true && conditions[:display_name].length > 0
       @members = @members.where("display_name like ?", "%#{conditions[:display_name]}%")
+        .or(@members.where("message like ?", "%#{conditions[:display_name]}%"))
     end
 
     return(@members)
