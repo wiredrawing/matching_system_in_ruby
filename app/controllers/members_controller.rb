@@ -9,6 +9,8 @@ class MembersController < ApplicationController
 
   # 閲覧可能な全メンバー一覧を表示
   def index
+    pp "||||||||||||||||||||||||||||||||||||||||"
+    pp params
     # ログインユーザーがブロックしたメンバー
     @members_you_block = Decline.members_you_block(@current_user.id).map do |member|
       next member.id
@@ -195,6 +197,7 @@ class MembersController < ApplicationController
       :from_member_id => @current_user.id,
       :to_member_id => member_id,
     }).first()
+
     # logging
     logger.debug "footprint => " + footprint.to_s
 

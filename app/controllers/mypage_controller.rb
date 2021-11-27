@@ -69,18 +69,29 @@ class MypageController < ApplicationController
 
   # ログイン中ユーザーが受けとったいいね一覧
   def getting_likes
-    puts("likes =====================>")
-    puts(@current_user.getting_likes)
+    @getting_likes = @current_user.getting_likes.valid_likes(@current_user)
   end
 
   # ログイン中ユーザーが贈ったいいね一覧
   def informing_likes
-    puts("[マイページ内 informing_likes----------------------------]")
-    # 除外ユーザー一覧を取得する
-    excluded_members = Decline.fetch_blocking_members(@current_user.id).map do |member|
-      next member.id
-    end
-    @informing_likes = Member.hetero_members(@current_user, excluded_members)
+    p "ログイン中ユーザーが取得した有効ないいね一覧 ーーーーーーー"
+    # @informing_likes = Member.where({
+    #   :is_registered => UtilitiesController::BINARY_TYPE[:on],
+    #   :id => @current_user.informing_valid_likes,
+    # })
+    @informing_likes = @current_user.informing_likes.valid_likes(@current_user).includes(:to_member)
+    # @informing_likes.each do |like|
+    #   p "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■"
+    #   pp like.class
+    #   pp like.from_member
+    # end
+    # # 除外ユーザー一覧を取得する
+    # excluded_members = Decline.fetch_blocking_members(@current_user.id).map do |member|
+    #   next member.id
+    # end
+    # @informing_likes = Member.hetero_members(@current_user, excluded_members)
+    # puts(@current_user.getting_likes)
+    # @informing_likes = @current_user.informing_likes
   end
 
   # 画像アップロード処理
@@ -219,7 +230,7 @@ class MypageController < ApplicationController
 
   # 足跡一覧ページ
   def footprints
-    @footprints = Footprint.includes(:from_member).where({
+    @footprints = Footprint.page(params[:page]).includes(:from_member).where({
       :to_member_id => @current_user.id,
     }).order(:updated_at => :desc)
 

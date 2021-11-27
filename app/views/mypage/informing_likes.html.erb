@@ -8,19 +8,19 @@
   <!--opp_status-->
   <% if (@informing_likes.length > 0) then %>
     <div class="oaitelists_wrap mt0">
-      <% @informing_likes.each do |member| %>
+      <% @informing_likes.each do |like| %>
         <div class="oaitelists">
-          <% if (member.showable_images.length > 0) then %>
-            <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
-              <img src="<%= member.showable_images.first.image_url() %>">
+          <% if (like.to_member.showable_images.length > 0) then %>
+            <a href="<%= members_show_url :id => like.to_member.id %>" class="oaitelists_img">
+              <img src="<%= like.to_member.showable_images.first.image_url() %>">
             </a>
           <% else %>
-            <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
+            <a href="<%= members_show_url :id => like.to_member.id %>" class="oaitelists_img">
               <img src="/images/sample_user.jpg">
             </a>
           <% end %>
-          <p class="bold"><%= member.display_name %>(歳)</p>
-          <p>PR: <%= member.message %></p>
+          <p class="bold"><%= like.to_member.display_name %>(歳)</p>
+          <p>PR: <%= like.to_member.message %></p>
         </div>
       <% end %>
       <!--oaitelists-->

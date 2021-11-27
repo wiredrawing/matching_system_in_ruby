@@ -2,15 +2,15 @@ class Decline < ApplicationRecord
 
   # 任意のバリデート処理を指定のリクエストデータに対して行う
   validates_each :to_member_id do |object, attr, data|
-    # print("validates_each in Decline model --------------------->")
     already_blocks = false
-    _decline = self.exists?({
+    response = self.exists?({
       :from_member_id => object.from_member_id,
       :to_member_id => data,
     })
 
-    if _decline == true
+    if response == true
       object.errors.add(attr, "既にブロック済みです")
+      next false
     end
     next true
   end

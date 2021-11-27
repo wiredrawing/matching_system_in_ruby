@@ -54,7 +54,11 @@ class Register < ApplicationRecord
     },
     :inclusion => {
       # mapメソッドで1以上の値で構成された配列を返却する
-      :in => UtilitiesController.gender_id_list,
+      :in => UtilitiesController.gender_id_list.map do |gender|
+        if gender > 0
+          next gender
+        end
+      end,
       :message => "性別は未設定以外を選択して下さい",
     },
   }

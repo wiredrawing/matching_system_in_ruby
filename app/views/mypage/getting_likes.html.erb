@@ -6,9 +6,9 @@
     <a href="<%= mypage_getting_likes_url() %>" class="active">もらったGood</a>
   </div>
   <!--opp_status-->
-  <% if (@current_user.getting_likes.length > 0) then %>
+  <% if @getting_likes.length > 0 then %>
     <div class="oaitelists_wrap mt0">
-      <% @current_user.getting_likes.each do |like| %>
+      <% @getting_likes.each do |like| %>
         <div class="oaitelists">
           <% if (like.from_member.showable_images.length > 0) then %>
             <a href="<%= members_show_url :id => like.from_member.id %>" class="oaitelists_img">

@@ -24,13 +24,18 @@
     <% end %>
   </div>
   <!--oaitelists_wrap-->
-  <%= paginate @members %>
   <div class="paging">
-    <a href="{{ $members->previousPageUrl() }}" rel="prev">
-      <img src="/images/back.png" width="24">
-    </a>
-    <a href="{{ $members->nextPageUrl() }}" rel="next">
-      <img src="/images/forward.png" width="24">
-    </a>
+    <!-- 前ページへのリンク -->
+    <% if path_to_prev_page(@members) != nil then %>
+      <a href="<%= path_to_prev_page(@members) %>" rel="prev">
+        <img src="/images/back.png" width="24">
+      </a>
+    <% end %>
+    <!-- 次ページへのリンク -->
+    <% if path_to_next_page(@members) != nil then %>
+      <a href="<%= path_to_next_page(@members) %>" rel="next">
+        <img src="/images/forward.png" width="24">
+      </a>
+    <% end %>
   </div>
 </section>

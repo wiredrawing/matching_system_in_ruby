@@ -17,9 +17,18 @@ class Member < ApplicationRecord
 
   # リレーションの関連付け
   # もらったいいいね
-  has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id, :primary_key => :id)
+  has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id, :primary_key => :id) do
+    def valid_likes(current_user)
+      return where.not(:from_member_id => current_user.forbidden_members)
+    end
+  end
   # 贈ったいいね
-  has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id, :primary_key => :id)
+  has_many(:informing_likes, :class_name => "Like", :foreign_key => :from_member_id, :primary_key => :id) do
+    # 有効ないいねのみ取得する
+    def valid_likes(current_user)
+      where.not(:to_member_id => current_user.forbidden_members)
+    end
+  end
   # 自身をブロックしているユーザー
   has_many(:declined, :class_name => "Decline", :foreign_key => :to_member_id)
   # 自身がブロックしているユーザー
@@ -44,17 +53,13 @@ class Member < ApplicationRecord
   # 自身が送信したtimeline
   has_many(:send_timelines, :class_name => "Timeline", :foreign_key => :from_member_id, :primary_key => :id)
   # メンバーがアップロードした全画像
-  # 並び順sqlをlambda関数で渡す
-  _anonymous = lambda do
-    self.order({
-      :created_at => :desc,
-      :updated_at => :desc,
-    })
-  end
-  has_many(:all_images, _anonymous, **{
-                                      :class_name => "Image",
-                                      :foreign_key => :member_id,
-                                    })
+  has_many :all_images,
+           -> {
+             self.order({
+               :created_at => :desc,
+               :updated_at => :desc,
+             })
+           }, **{ :class_name => "Image", :foreign_key => :member_id }
 
   # 自身に送信されたメッセージ一覧を取得する
   has_many :getting_timeline,
@@ -152,12 +157,12 @@ class Member < ApplicationRecord
 
     # 任意の名前が設定されている場合
     if conditions[:display_name].nil? != true && conditions[:display_name].length > 0
-      @members = @members.where("display_name like ?", conditions[:display_name])
+      @members = @members.where("display_name like ?", "%#{conditions[:display_name]}%")
     end
 
     return(@members)
   rescue => error
-    logger.debug error
+    logger.error(error)
     # 例外発生時は[nil]を返却
     return(nil)
   end
@@ -183,7 +188,7 @@ class Member < ApplicationRecord
     end
     return(_member)
   rescue => error
-    p error.message
+    logger.error(error)
     return nil
   end
 
@@ -489,16 +494,22 @@ class Member < ApplicationRecord
       next like.from_member_id
     end
     valid_likes = likes - self.forbidden_members
+    pp "============================ アクセス禁止ユーザー"
+    pp self.forbidden_members
+    pp valid_likes
     return valid_likes
   end
 
   # アクセスできないメンバー一覧
   def forbidden_members
-    forbidden_members = Array.new
+    # アクセス禁止対象メンバー
+    forbidden_members = Array.new()
+
     # ブロックしているユーザー
     declining = self.declining.map do |d|
       next d.to_member_id
     end
+
     # ブロックされているユーザー
     declined = self.declined.map do |d|
       next d.from_member_id

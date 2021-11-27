@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   include MembersHelper
   include Api::ImagesHelper
   include Api::TimelineHelper
-  # before_action :set_gender_list
+
   before_action :login_check
   before_action :uncheck_notices
   before_action :uncheck_messages
@@ -41,7 +41,9 @@ class ApplicationController < ActionController::Base
     return @languages
   end
 
+  # ---------------------------------------------
   # ログインユーザーへの通知一覧を取得する
+  # ---------------------------------------------
   def uncheck_notices
     @uncheck_notices = nil
     if defined?(request.session[:member_id]) == nil
@@ -78,6 +80,9 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  # ---------------------------------------------
+  # 未確認の足跡を取得する
+  # ---------------------------------------------
   def uncheck_footprints
     @uncheck_footprints = nil
 
@@ -102,9 +107,10 @@ class ApplicationController < ActionController::Base
   # ---------------------------------------------
   def login_check
     # sessions_helperのメソッドを読み込む
-    if self.logged_in? == true
+    if self.logged_in? == true && self.current_user.token_for_api != nil
       return true
     end
+    session[:member_id] = nil
     # 未ログイン時は､ログインフォームへ
     return(redirect_to(login_url))
   end

@@ -25,12 +25,16 @@
     <% end %>
     <!-- ページング機能 -->
     <div class="paging">
-      <a href="{{ $footprints->previousPageUrl() }}" rel="prev">
-        <img src="/images/back.png" width="24">
-      </a>
-      <a href="{{ $footprints->nextPageUrl() }}" rel="next">
-        <img src="/images/forward.png" width="24">
-      </a>
+      <% if path_to_prev_page(@footprints) != nil then %>
+        <a href="<%= path_to_prev_page(@footprints) %>" rel="prev">
+          <img src="/images/back.png" width="24">
+        </a>
+      <% end %>
+      <% if path_to_next_page(@footprints) != nil then %>
+        <a href="<%= path_to_next_page(@footprints) %>" rel="next">
+          <img src="/images/forward.png" width="24">
+        </a>
+      <% end %>
     </div>
   </div>
   <!--oaitelists_wrap-->
