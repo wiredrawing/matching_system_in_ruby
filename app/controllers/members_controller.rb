@@ -7,10 +7,10 @@ class MembersController < ApplicationController
   # ログインしているユーザー以外かつログインユーザーの性別以外を表示
   # GET /members or /members.json
 
+  # --------------------------------------------
   # 閲覧可能な全メンバー一覧を表示
+  # --------------------------------------------
   def index
-    pp "||||||||||||||||||||||||||||||||||||||||"
-    pp params
     # ログインユーザーがブロックしたメンバー
     @members_you_block = Decline.members_you_block(@current_user.id).map do |member|
       next member.id
@@ -19,12 +19,10 @@ class MembersController < ApplicationController
     @members_blocking_you = Decline.members_blocking_you(@current_user.id).map do |member|
       next member.id
     end
-
     # ログインユーザーがアクセスできない全メンバー
     @disable_access_members = @members_you_block + @members_blocking_you
-
     # 異性のmembers一覧を取得する
-    @members = Member.page(params[:page]).hetero_members(@current_user, @declining_member_id_list, search_params)
+    @members = Member.hetero_members(@current_user, @declining_member_id_list, search_params).page(params[:page])
   end
 
   # 指定した任意のmember_idの情報を表示する
@@ -85,10 +83,10 @@ class MembersController < ApplicationController
     @year_list = UtilitiesController::fetch_year_list
     @month_list = UtilitiesController::fetch_month_list
     @day_list = UtilitiesController::fetch_day_list
+    @interested_languages = UtilitiesController::fetch_interested_language_list
 
     @input_params = params
-
-    return render :template => "members/search"
+    return render ({ :template => "members/search" })
   end
 
   # GET /members/new
@@ -160,6 +158,7 @@ class MembersController < ApplicationController
       :native_language,
       :gender,
       :display_name,
+      :languages => [],
     )
   end
 

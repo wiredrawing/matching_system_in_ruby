@@ -43,6 +43,18 @@
         </div>
       </div>
       <!--selectors-->
+      <div class="selectors">
+        <p>興味のある言語</p>
+        <%= @interested_languages %>
+        <% @interested_languages.each do |lang |%>
+          <p>
+            <label>
+              <%= check_box_tag :"languages[]", lang[1], false, :id => :"languages_#{lang[1]}" %>
+              <%= lang[0] %>
+            </label>
+          </p>
+        <% end %>
+      </div>
       <!--- 任意のキーワード -->
       <div class="selectors">
         <p>ユーザー名</p>

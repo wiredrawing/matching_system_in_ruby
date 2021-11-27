@@ -159,6 +159,11 @@ class Member < ApplicationRecord
       pp @members.to_a
     end
 
+    # 興味のある言語が指定されていた場合
+    if conditions[:languages].nil? != true && conditions[:languages].length > 0
+      @members = @members.where("languages.language" => conditions[:languages])
+    end
+
     # 任意の名前が設定されている場合
     if conditions[:display_name].nil? != true && conditions[:display_name].length > 0
       @members = @members.where("display_name like ?", "%#{conditions[:display_name]}%")
@@ -499,9 +504,6 @@ class Member < ApplicationRecord
       next like.from_member_id
     end
     valid_likes = likes - self.forbidden_members
-    pp "============================ アクセス禁止ユーザー"
-    pp self.forbidden_members
-    pp valid_likes
     return valid_likes
   end
 

@@ -1,5 +1,3 @@
-require "uri"
-
 class Api::TimelinesController < ApplicationController
 
   # csrfを除外するmethod
@@ -69,6 +67,7 @@ class Api::TimelinesController < ApplicationController
     }).update({
       :is_browsed => UtilitiesController::BINARY_TYPE[:on],
     })
+
     logger.debug @uncheck_timelines
 
     json_response = {
@@ -92,7 +91,7 @@ class Api::TimelinesController < ApplicationController
       :response => [],
       :errors => @errors,
     }
-    logger.debug "#{error.message}"
+    logger.debug error
     logger.debug json_response
     return render(:json => json_response)
   end
