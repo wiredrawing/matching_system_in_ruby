@@ -19,7 +19,7 @@
               <img src="/images/sample_user.jpg">
             </a>
           <% end %>
-          <p class="bold"><%= like.to_member.display_name %>(歳)</p>
+          <p class="bold"><%= like.to_member.display_name %>(<%= like.to_member.age %>歳)</p>
           <p>PR: <%= like.to_member.message %></p>
         </div>
       <% end %>
@@ -30,11 +30,15 @@
     <p>まだ､一度もGoodをもらっていません｡</p>
   <% end %>
   <div class="paging">
-    <a href="{{ $getting_likes->previousPageUrl() }}" rel="prev">
-      <img src="/images/back.png" width="24">
-    </a>
-    <a href="{{ $getting_likes->nextPageUrl() }}" rel="next">
-      <img src="/images/forward.png" width="24">
-    </a>
+    <% if path_to_prev_page(@informing_likes) != nil then %>
+      <a href="<%= path_to_prev_page(@informing_likes) %>" rel="prev">
+        <img src="/images/back.png" width="24">
+      </a>
+    <% end %>
+    <% if path_to_next_page(@informing_likes) != nil then %>
+      <a href="<%= path_to_next_page(@informing_likes) %>" rel="next">
+        <img src="/images/forward.png" width="24">
+      </a>
+    <% end %>
   </div>
 </section>

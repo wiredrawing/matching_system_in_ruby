@@ -15,7 +15,9 @@ class Member < ApplicationRecord
 
   attr_accessor :year, :month, :day, :age, :languages, :agree
 
-  # リレーションの関連付け
+  # -----------------------------------------------------------------
+  # ここからリレーションの関連付け
+  # -----------------------------------------------------------------
   # もらったいいいね
   has_many(:getting_likes, :class_name => "Like", :foreign_key => :to_member_id, :primary_key => :id) do
     def valid_likes(current_user)
@@ -47,7 +49,6 @@ class Member < ApplicationRecord
 
   # 自身に送信されたアクション一覧を取得
   has_many(:logs, :class_name => "Log", :foreign_key => :to_member_id, :primary_key => :id)
-
   # 自身が受け取ったtimelineのアクション
   has_many(:get_timelines, :class_name => "Timeline", :foreign_key => :to_member_id, :primary_key => :id)
   # 自身が送信したtimeline
@@ -81,6 +82,9 @@ class Member < ApplicationRecord
 
   # 興味のある言語一覧
   has_many :interested_languages, :class_name => "Language", :foreign_key => :member_id, :primary_key => :id
+  # -----------------------------------------------------------------
+  # ここまでリレーションの関連付け
+  # -----------------------------------------------------------------
 
   # -----------------------------------------------------------------
   # いいねを贈ることができる異性のメンバー一覧を取得する

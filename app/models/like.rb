@@ -1,4 +1,5 @@
 class Like < ApplicationRecord
+  paginates_per 1
   # 差し出し元member_id
   belongs_to(:from_member, :class_name => "Member", :foreign_key => :from_member_id)
   belongs_to(:to_member, :class_name => "Member", :foreign_key => :to_member_id)

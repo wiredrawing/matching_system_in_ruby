@@ -69,17 +69,25 @@ class MypageController < ApplicationController
 
   # ログイン中ユーザーが受けとったいいね一覧
   def getting_likes
-    @getting_likes = @current_user.getting_likes.valid_likes(@current_user)
+    @getting_likes = @current_user
+      .getting_likes
+      .valid_likes(@current_user)
+      .page(params[:page])
+      .includes(:to_member)
   end
 
   # ログイン中ユーザーが贈ったいいね一覧
   def informing_likes
-    p "ログイン中ユーザーが取得した有効ないいね一覧 ーーーーーーー"
+    @informing_likes = @current_user
+      .informing_likes
+      .valid_likes(@current_user)
+      .page(params[:page])
+      .includes(:to_member)
+    # p "ログイン中ユーザーが取得した有効ないいね一覧 ーーーーーーー"
     # @informing_likes = Member.where({
     #   :is_registered => UtilitiesController::BINARY_TYPE[:on],
     #   :id => @current_user.informing_valid_likes,
     # })
-    @informing_likes = @current_user.informing_likes.valid_likes(@current_user).includes(:to_member)
     # @informing_likes.each do |like|
     #   p "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■"
     #   pp like.class
@@ -220,7 +228,7 @@ class MypageController < ApplicationController
 
   # マッチング済み一覧ページ
   def matching
-    @matching_members = Like.fetch_matching_members(@current_user.id)
+    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members)
   end
 
   # ブロック中一覧ページ
