@@ -265,7 +265,7 @@ class Member < ApplicationRecord
   end
 
   # emailバリデーション
-  validates(:email, {
+  validates :email, {
     :presence => {
       :message => "メールアドレスは必須項目です",
     },
@@ -274,7 +274,7 @@ class Member < ApplicationRecord
       :maximum => 512,
       :message => "メールアドレスはは1文字以上512文字以内で入力して下さい",
     },
-  })
+  }
 
   # display_name(本名とは違うニックネーム表示用)
   validates :display_name, {

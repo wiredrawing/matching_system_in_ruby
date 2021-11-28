@@ -6,8 +6,22 @@
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
 
+def make_random_birthday
+  year_list = (1950..2020).map { |year|
+    next year
+  }
+  month_list = (1..12).map do |month|
+    next month
+  end
+  day_list = (1..31).map do |day|
+    next day
+  end
+  birthday = "#{year_list.shuffle[0]}-#{month_list.shuffle[0]}-#{day_list.shuffle[0]}"
+  return birthday
+end
+
 # 女性メンバーの登録処理
-(1..100).each do |index|
+(1..10000).each do |index|
   index = index.to_s
   # 女性メンバーのSeedデータ
   member = Member.new({
@@ -18,7 +32,7 @@
     :gender => 2,
     :height => 150,
     :weight => 50,
-    :birthday => "1988-12-25",
+    :birthday => make_random_birthday(),
     :salary => 250,
     :message => "女性#{index} のメッセージ",
     :memo => "女性#{index} のメモ",
@@ -36,7 +50,7 @@
 end
 
 # 男性メンバーの登録処理
-(1..100).each do |index|
+(1..10000).each do |index|
   index = index.to_s
   # 男性メンバーのseedデータ
   member = Member.new({
@@ -47,7 +61,7 @@ end
     :gender => 1,
     :height => 150,
     :weight => 50,
-    :birthday => "1988-12-25",
+    :birthday => make_random_birthday(),
     :salary => 250,
     :message => "This is message of sample guy1",
     :memo => "This is memo",

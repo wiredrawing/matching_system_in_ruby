@@ -42,9 +42,12 @@
     </div>
   </div>
   <!--box-->
-  <div class="balloon1-top">
-    <p><%= @member.message %></p>
-  </div>
+  <% if @member.message != nil && @member.message.length > 0 then %>
+    <div class="balloon1-top">
+      <p><%= @member.message %></p>
+    </div>
+  <% end %>
+  <br >
   <div class="box">
     <table>
       <tr>

@@ -5,6 +5,12 @@ class Log < ApplicationRecord
   attribute :action_name
   attribute :url
 
+  # 有効なログのみを取得する
+  scope :valid_logs, ->(current_user) {
+          forbbiden_members = current_user.forbidden_members()
+          where.not(:from_member_id, forbidden_members)
+        }
+
   # Memberテーブルとのリレーション
   has_one :from_member, :class_name => "Member", :foreign_key => :id, :primary_key => :from_member_id
   has_one :to_member, :class_name => "Member", :foreign_key => :id, :primary_key => :to_member_id
