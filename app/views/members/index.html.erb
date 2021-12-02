@@ -6,7 +6,6 @@
         <div class="oaitelists">
           <a href="<%= members_show_url :id => member.id %>" class="oaitelists_img">
             <% if member.showable_images.length > 0 then %>
-              @if ($value->profile_image_id > 0)
               <img src="<%= member.showable_images.first.image_url() %>">
             <% else %>
               <img src="/images/sample_user.jpg">

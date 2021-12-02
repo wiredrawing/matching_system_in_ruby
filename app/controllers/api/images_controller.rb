@@ -59,8 +59,8 @@ class Api::ImagesController < ApplicationController
     # 対象の画像一覧を取得する
     @images = Image.where({
       :member_id => params[:member_id].to_i,
-      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      :is_displayed => Constants::Binary::Type[:on],
+      :is_deleted => Constants::Binary::Type[:off],
     }).order(:created_at => :desc)
 
     return render :json => @images.to_json
@@ -75,8 +75,8 @@ class Api::ImagesController < ApplicationController
     @image = Image.find_by({
       :id => params[:id],
       :token => params[:token],
-      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      :is_displayed => Constants::Binary::Type[:on],
+      :is_deleted => Constants::Binary::Type[:off],
     })
     if @image == nil
       raise StandardError.new @errors.push("画像がみつかりません")

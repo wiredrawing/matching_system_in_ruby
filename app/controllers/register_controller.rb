@@ -91,7 +91,7 @@ class RegisterController < ApplicationController
 
     # postデータをHashオブジェクトに
     member_params_hash = member_params.to_hash()
-    member_params_hash["is_registered"] = UtilitiesController::BINARY_TYPE[:on]
+    member_params_hash["is_registered"] = Constants::Binary::Type[:on]
     member_params_hash["token_for_api"] = TokenForApi::make_random_token(128)
 
     # updateメソッドが成功した場合

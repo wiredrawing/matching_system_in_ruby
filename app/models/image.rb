@@ -30,7 +30,7 @@ class Image < ApplicationRecord
   # アップロードできるmimetypeを定義
   validates :extension, {
     :inclusion => {
-      :in => UtilitiesController::EXTENSION_LIST.keys,
+      :in => Constants::Extension::LIST.keys,
       :message => "画像ファイルのみアップロード可能です",
     },
   }

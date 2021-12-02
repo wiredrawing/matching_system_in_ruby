@@ -3,6 +3,7 @@ class FormImage
   include ActiveModel::Model
 
   attr_accessor :member_id, :extension, :token_for_api, :upload_file
+
   validates :member_id, {
     :presence => {
       :message => "画像送信者IDは必須項目です",
@@ -11,7 +12,7 @@ class FormImage
       # membersテーブルに存在するmember_idであることを保証する
       :in => lambda do
         members = Member.select(:id).where({
-          :is_registered => UtilitiesController::BINARY_TYPE[:on],
+          :is_registered => Constants::Binary::Type[:on],
         }).map do |member|
           next member.id
         end
@@ -41,7 +42,7 @@ class FormImage
 
     # ファイルの拡張子を検証
     content_type = data.content_type.to_s
-    if UtilitiesController::EXTENSION_LIST.keys.include?(content_type) != true
+    if Constants::Extension::LIST.keys.include?(content_type) != true
       object.errors.add(attribute, "無効なファイル拡張子です")
       next false
     end

@@ -18,7 +18,7 @@ class ApplicationRecord < ActiveRecord::Base
   # --------------------------------------
   def registered_members
     @registered_members = Member.where({
-      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :is_registered => Constants::Binary::Type[:on],
     }).map do |member|
       next member.id
     end

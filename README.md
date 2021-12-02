@@ -154,7 +154,8 @@ rails webpacker:compile
 
 ```
 # プロダクション環境での実行コマンド
-rails s --binding=0.0.0.0 --environment production
+rails s -d --environment production
+
 
 ```
 

@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     @login = Login.new({
       :email => params[:login][:email],
       :password => params[:login][:password],
-      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :is_registered => Constants::Binary::Type[:on],
     })
 
     if @login.validate() != true
@@ -28,7 +28,7 @@ class SessionsController < ApplicationController
     # Forge new member object again, if vaildation to login is successfully.
     @member = Member.find_by({
       :email => params[:login][:email],
-      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :is_registered => Constants::Binary::Type[:on],
     })
 
     # validation check.

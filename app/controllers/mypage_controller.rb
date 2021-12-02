@@ -48,9 +48,10 @@ class MypageController < ApplicationController
       # レコードの更新処理
       @member.save()
 
+      # 興味のある言語の編集
       @member.interested_languages.destroy_all()
 
-      if (member_params_to_update[:languages].length > 0)
+      if (member_params_to_update[:languages] != nil && member_params_to_update[:languages].length > 0)
         member_params_to_update[:languages].each do |lang|
           response = @member.interested_languages.new({
             :member_id => @member.id,
@@ -58,6 +59,7 @@ class MypageController < ApplicationController
           }).save()
         end
       end
+
       redirect_to mypage_url
     else
       return render({ :template => "mypage/edit" })
@@ -83,23 +85,6 @@ class MypageController < ApplicationController
       .valid_likes(@current_user)
       .page(params[:page])
       .includes(:to_member)
-    # p "ログイン中ユーザーが取得した有効ないいね一覧 ーーーーーーー"
-    # @informing_likes = Member.where({
-    #   :is_registered => UtilitiesController::BINARY_TYPE[:on],
-    #   :id => @current_user.informing_valid_likes,
-    # })
-    # @informing_likes.each do |like|
-    #   p "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■"
-    #   pp like.class
-    #   pp like.from_member
-    # end
-    # # 除外ユーザー一覧を取得する
-    # excluded_members = Decline.fetch_blocking_members(@current_user.id).map do |member|
-    #   next member.id
-    # end
-    # @informing_likes = Member.hetero_members(@current_user, excluded_members)
-    # puts(@current_user.getting_likes)
-    # @informing_likes = @current_user.informing_likes
   end
 
   # 画像アップロード処理
@@ -243,7 +228,7 @@ class MypageController < ApplicationController
     }).order(:updated_at => :desc)
 
     response = @footprints.update({
-      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+      :is_browsed => Constants::Binary::Type[:on],
     })
   end
 
@@ -259,7 +244,7 @@ class MypageController < ApplicationController
   def logs
     @logs = Log.where({
       :to_member_id => @current_user.id,
-      :is_browsed => UtilitiesController::BINARY_TYPE[:off],
+      :is_browsed => Constants::Binary::Type[:off],
     }).order(:created_at => :desc)
     @action_string_list = UtilitiesController::ACTION_STRING_LIST
   end

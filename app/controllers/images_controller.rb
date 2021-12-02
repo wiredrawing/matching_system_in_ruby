@@ -30,15 +30,15 @@ class ImagesController < ApplicationController
       @image = Image.find(params[:image][:id])
 
       # 現在の表示状態を判定後,onとoffを切り替える
-      if @image.is_displayed == UtilitiesController::BINARY_TYPE[:on]
+      if @image.is_displayed == Constants::Binary::Type[:on]
         # 表示ステータスをoffにする
         @image.update({
-          :is_displayed => UtilitiesController::BINARY_TYPE[:off],
+          :is_displayed => Constants::Binary::Type[:off],
         })
       else
         # 表示ステータスをonにする
         @image.update({
-          :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+          :is_displayed => Constants::Binary::Type[:on],
         })
       end
       # 表示状態変更後､元のページへリダイレクト

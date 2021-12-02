@@ -14,7 +14,7 @@ module SessionsHelper
         :declined,
         :declining,
         :interested_languages
-      ).find_by(id: session[:member_id])
+      ).find_by(:id => session[:member_id])
     else
       return @current_user
     end

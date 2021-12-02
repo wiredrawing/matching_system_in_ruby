@@ -156,7 +156,6 @@ class Member < ApplicationRecord
           "languages.language" => conditions[:native_language],
         }))
       )
-      pp @members.to_a
     end
 
     # 興味のある言語が指定されていた場合
@@ -169,7 +168,6 @@ class Member < ApplicationRecord
       @members = @members.where("display_name like ?", "%#{conditions[:display_name]}%")
         .or(@members.where("message like ?", "%#{conditions[:display_name]}%"))
     end
-
     return(@members)
   rescue => error
     logger.error(error)
@@ -356,7 +354,7 @@ class Member < ApplicationRecord
     },
     :inclusion => {
       :in => lambda do
-        return UtilitiesController::LANGUAGE_LIST.map do |lang|
+        return Constants::Language::LIST.map do |lang|
                  next lang[:id]
                end
       end[],
@@ -527,7 +525,7 @@ class Member < ApplicationRecord
 
   def native_language_string
     @native_language_string = ""
-    UtilitiesController::LANGUAGE_LIST.each do |lang|
+    Constants::Language::LIST.each do |lang|
       if self.native_language == lang[:id]
         @native_language_string = lang[:value]
         next
@@ -540,7 +538,7 @@ class Member < ApplicationRecord
   def interested_languages_string
     languages = []
     self.interested_languages.each do |lang|
-      UtilitiesController::LANGUAGE_LIST.each do |l|
+      Constants::Language::LIST.each do |l|
         if l[:id] == lang.language
           languages.push(l[:value])
         end

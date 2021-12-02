@@ -1,7 +1,7 @@
 module Api::ImagesHelper
   def upload_process(parameters = { :member_id => nil, :upload_file => nil, :token_for_api => nil, :use_type => nil })
     # 表示スタータスが設定されていない場合は1を代入
-    parameters[:is_displayed] ||= UtilitiesController::BINARY_TYPE[:on]
+    parameters[:is_displayed] ||= Constants::Binary::Type[:on]
     parameters[:use_type] ||= UtilitiesController::USE_TYPE_LIST[:profile]
     # トークンとIDの組み合わせのチェック
     @image = FormImage.new({
@@ -27,7 +27,8 @@ module Api::ImagesHelper
     end
 
     # Make file name wtih hash text from uuid maded by random function.
-    @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[parameters[:upload_file].content_type]
+    @filename = @uuid_hash + "." + Constants::Extension::LIST[parameters[:upload_file].content_type]
+    # @filename = @uuid_hash + "." + UtilitiesController::EXTENSION_LIST[parameters[:upload_file].content_type]
 
     # アップロードファイルの確定フルパス
     uploaded_file_path = save_path.to_s + "/" + @filename
@@ -45,7 +46,7 @@ module Api::ImagesHelper
       :use_type => parameters[:use_type],
       :blur_level => 0,
       :extension => parameters[:upload_file].content_type,
-      :is_approved => UtilitiesController::BINARY_TYPE[:on],
+      :is_approved => Constants::Binary::Type[:on],
       :is_displayed => parameters[:is_displayed],
       :token => random_token,
       :uploaded_at => uploaded_at,

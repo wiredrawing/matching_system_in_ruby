@@ -30,7 +30,7 @@ class MessageToTimeline
     :inclusion => {
       :in => lambda do
         members = Member.select(:id).where({
-          :is_registered => UtilitiesController::BINARY_TYPE[:on],
+          :is_registered => Constants::Binary::Type[:on],
         }).to_a.map do |member|
           next member.id
         end
@@ -46,7 +46,7 @@ class MessageToTimeline
     :inclusion => {
       :in => lambda do
         members = Member.select(:id).where({
-          :is_registered => UtilitiesController::BINARY_TYPE[:on],
+          :is_registered => Constants::Binary::Type[:on],
         }).to_a.map do |member|
           next member.id
         end

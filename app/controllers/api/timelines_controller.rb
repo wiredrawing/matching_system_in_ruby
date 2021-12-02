@@ -65,7 +65,7 @@ class Api::TimelinesController < ApplicationController
       :to_member_id => request.headers["member-id"].to_i,
       :from_member_id => params[:to_member_id].to_i,
     }).update({
-      :is_browsed => UtilitiesController::BINARY_TYPE[:on],
+      :is_browsed => Constants::Binary::Type[:on],
     })
 
     logger.debug @uncheck_timelines
@@ -232,7 +232,7 @@ class Api::TimelinesController < ApplicationController
       upload_params = {
         :member_id => create_image_params[:from_member_id].to_i,
         :upload_file => create_image_params[:upload_file],
-        :is_displayed => UtilitiesController::BINARY_TYPE[:on],
+        :is_displayed => Constants::Binary::Type[:on],
         :token_for_api => request.headers["token-for-api"],
         :use_type => UtilitiesController::USE_TYPE_LIST[:timeline],
       }

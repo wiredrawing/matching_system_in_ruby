@@ -12,7 +12,7 @@ class TokenCheck
       # membersテーブルに存在するmember_idであることを保証する
       :in => (lambda do
         members = Member.select(:id).where({
-          :is_registered => UtilitiesController::BINARY_TYPE[:on],
+          :is_registered => Constants::Binary::Type[:on],
         }).to_a.map do |member|
           next member.id
         end
