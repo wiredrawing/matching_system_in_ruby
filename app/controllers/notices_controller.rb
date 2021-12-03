@@ -30,7 +30,7 @@ class NoticesController < ApplicationController
 
     return render :template => "notices/index"
   rescue => error
-    logger.debug error.backtrace
+    logger.info error.backtrace
     return render :template => "errors/index"
   end
 end

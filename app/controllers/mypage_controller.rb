@@ -65,7 +65,7 @@ class MypageController < ApplicationController
       return render({ :template => "mypage/edit" })
     end
   rescue => error
-    logger.debug error
+    logger.info error
     return render :template => "errors/index"
   end
 
@@ -190,7 +190,7 @@ class MypageController < ApplicationController
       })
       return redirect_to(mypage_upload_url)
     rescue => exception
-      logger.debug exception
+      logger.info exception
       return render :tempate => "errors/index"
     end
   end

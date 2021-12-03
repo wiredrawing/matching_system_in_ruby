@@ -15,7 +15,7 @@ class RegisterController < ApplicationController
   def create
     # 本登録用トークンを生成
     token = TokenForApi.make_random_token(128)
-    logger.debug "新規で生成されたトークン #{token}"
+    logger.info "新規で生成されたトークン #{token}"
 
     # 重複仮登録の場合を検証
     @register = Register.find_by({
@@ -43,7 +43,7 @@ class RegisterController < ApplicationController
     # エラー時
     return render ({ :template => "register/index" })
   rescue => exception
-    logger.debug exception
+    logger.info exception
     return render :template => "errors/index"
   end
 
@@ -65,7 +65,7 @@ class RegisterController < ApplicationController
       return render :template => "register/error"
     end
   rescue => error
-    logger.debug error
+    logger.info error
     return render :template => "errors/index"
   end
 
@@ -103,10 +103,10 @@ class RegisterController < ApplicationController
     return(redirect_to(login_url))
   rescue ActiveModel::ValidationError => error
     # モデル内Errorの取得
-    logger.debug error.model.errors.messages
+    logger.info error.model.errors.messages
     return render({ :template => "register/main_index" })
   rescue => exception
-    logger.debug exception
+    logger.info exception
     return render({ :template => "register/main_index" })
   end
 

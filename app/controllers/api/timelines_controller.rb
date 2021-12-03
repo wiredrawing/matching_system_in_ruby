@@ -68,7 +68,7 @@ class Api::TimelinesController < ApplicationController
       :is_browsed => Constants::Binary::Type[:on],
     })
 
-    logger.debug @uncheck_timelines
+    logger.info @uncheck_timelines
 
     json_response = {
       :status => true,
@@ -82,7 +82,7 @@ class Api::TimelinesController < ApplicationController
       :response => [],
       :errors => error.model.errors.messages,
     }
-    logger.debug json_response
+    logger.info json_response
     return render(:json => json_response)
   rescue => error
     # APIのレスポンスデータ
@@ -91,8 +91,8 @@ class Api::TimelinesController < ApplicationController
       :response => [],
       :errors => @errors,
     }
-    logger.debug error
-    logger.debug json_response
+    logger.info error
+    logger.info json_response
     return render(:json => json_response)
   end
 
@@ -213,7 +213,7 @@ class Api::TimelinesController < ApplicationController
     }
     return render :json => json_response
   rescue ActiveModel::ValidationError => error
-    logger.debug error.model.errors.messages
+    logger.info error.model.errors.messages
     json_response = {
       :status => false,
       :response => error.model.errors.messages,
@@ -290,7 +290,7 @@ class Api::TimelinesController < ApplicationController
     }
     return render :json => json_response
   rescue ActiveModel::ValidationError => error
-    logger.debug error
+    logger.info error
     # p error.backtrace
     json_response = {
       :status => false,
@@ -299,7 +299,7 @@ class Api::TimelinesController < ApplicationController
     }
     return render :json => json_response
   rescue => error
-    logger.debug error
+    logger.info error
     # p error.backtrace
     @errors.push(error.message)
     json_response = {

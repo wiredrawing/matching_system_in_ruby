@@ -101,7 +101,7 @@ class MessagesController < ApplicationController
 
     return redirect_to(message_talk_url :id => params[:message][:to_member_id])
   rescue => exception
-    logger.debug exception
+    logger.info exception
   end
 
   # GET /messages/new

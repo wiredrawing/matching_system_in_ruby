@@ -64,7 +64,7 @@ class MembersController < ApplicationController
         @images = @member.showable_images
       end
     rescue => error
-      logger.debug(error)
+      logger.info(error)
       return render({
                :template => "members/error",
              })
@@ -188,7 +188,7 @@ class MembersController < ApplicationController
 
     # ログイン中ユーザーが自身のプロフィールを見た場合を除く
     if member_id.to_i == @current_user.id
-      logger.debug "#{@current_user.id}が自身のプロフィールページを閲覧しています｡"
+      logger.info "#{@current_user.id}が自身のプロフィールページを閲覧しています｡"
       return nil
     end
 
@@ -198,7 +198,7 @@ class MembersController < ApplicationController
     }).first()
 
     # logging
-    logger.debug "footprint => " + footprint.to_s
+    logger.info "footprint => " + footprint.to_s
 
     if (footprint == nil)
       # 初めてアクセスしたとき

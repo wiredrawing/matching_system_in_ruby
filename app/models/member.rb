@@ -413,7 +413,7 @@ class Member < ApplicationRecord
     }).first()
 
     if (like != nil)
-      logger.debug "#{self.id}は#{member_id}にいいねをしています"
+      logger.info "#{self.id}は#{member_id}にいいねをしています"
       return true
     end
     return false
@@ -429,7 +429,7 @@ class Member < ApplicationRecord
     }).first()
 
     if (like != nil)
-      logger.debug "#{self.id}は#{member_id}にいいねされています"
+      logger.info "#{self.id}は#{member_id}にいいねされています"
       return true
     end
     return false

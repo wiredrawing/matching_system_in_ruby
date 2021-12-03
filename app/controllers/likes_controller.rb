@@ -69,7 +69,7 @@ class LikesController < ApplicationController
   rescue => error
     p "[例外発生--------------------------------------------------]"
     pp error
-    logger.debug "[例外発生] #{error.message}"
+    logger.info "[例外発生] #{error.message}"
     ActiveRecord::Rollback
     return redirect_to members_show_url(:id => params[:id])
   end
