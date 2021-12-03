@@ -5,7 +5,6 @@ class Api::UtilitiesController < ApplicationController
 
   # 各種ユーティリティーを返却する
   def get
-    pp "各種ユーティリティーを返却する---------------------------"
     genders = UtilitiesController::GENDER_LIST
     extension_list = Constants::Extension::LIST
     # extension_list = UtilitiesController::EXTENSION_LIST
@@ -19,7 +18,6 @@ class Api::UtilitiesController < ApplicationController
       :display_status_list => display_status_list,
     }
 
-    pp "各種ユーティリティーを返却する---------------------------"
     return render({
              :json => response, :status => 200,
            })

@@ -93,7 +93,7 @@ class UtilitiesController < ApplicationController
     { :id => 1000, :value => "その他" },
   ]
 
-  INTERESTED_LANGUAGE_LIST = Constants::Language::LIST.select do |lang|
+  INTERESTED_LANGUAGE_LIST = Constants::Language::List.select do |lang|
     if lang[:id] > 0
       next true
     end
@@ -138,7 +138,7 @@ class UtilitiesController < ApplicationController
   end
 
   def self.fetch_language_list
-    list = Constants::Language::LIST.map do |d|
+    list = Constants::Language::List.map do |d|
       next [d[:value], d[:id]]
     end
     return list

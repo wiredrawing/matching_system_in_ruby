@@ -354,7 +354,7 @@ class Member < ApplicationRecord
     },
     :inclusion => {
       :in => lambda do
-        return Constants::Language::LIST.map do |lang|
+        return Constants::Language::List.map do |lang|
                  next lang[:id]
                end
       end[],
@@ -525,7 +525,7 @@ class Member < ApplicationRecord
 
   def native_language_string
     @native_language_string = ""
-    Constants::Language::LIST.each do |lang|
+    Constants::Language::List.each do |lang|
       if self.native_language == lang[:id]
         @native_language_string = lang[:value]
         next
@@ -538,7 +538,7 @@ class Member < ApplicationRecord
   def interested_languages_string
     languages = []
     self.interested_languages.each do |lang|
-      Constants::Language::LIST.each do |l|
+      Constants::Language::List.each do |l|
         if l[:id] == lang.language
           languages.push(l[:value])
         end

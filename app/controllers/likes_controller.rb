@@ -67,61 +67,9 @@ class LikesController < ApplicationController
       return redirect_to members_show_url(:id => params[:id])
     end
   rescue => error
-    p "[例外発生--------------------------------------------------]"
-    pp error
     logger.info "[例外発生] #{error.message}"
     ActiveRecord::Rollback
     return redirect_to members_show_url(:id => params[:id])
-  end
-
-  # GET /likes/1 or /likes/1.json
-  def show
-  end
-
-  # GET /likes/new
-  def new
-    @like = Like.new
-  end
-
-  # GET /likes/1/edit
-  def edit
-  end
-
-  # POST /likes or /likes.json
-  def create
-    @like = Like.new(like_params)
-
-    respond_to do |format|
-      if @like.save
-        format.html { redirect_to @like, notice: "Like was successfully created." }
-        format.json { render :show, status: :created, location: @like }
-      else
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @like.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # PATCH/PUT /likes/1 or /likes/1.json
-  def update
-    respond_to do |format|
-      if @like.update(like_params)
-        format.html { redirect_to @like, notice: "Like was successfully updated." }
-        format.json { render :show, status: :ok, location: @like }
-      else
-        format.html { render :edit, status: :unprocessable_entity }
-        format.json { render json: @like.errors, status: :unprocessable_entity }
-      end
-    end
-  end
-
-  # DELETE /likes/1 or /likes/1.json
-  def destroy
-    @like.destroy
-    respond_to do |format|
-      format.html { redirect_to likes_url, notice: "Like was successfully destroyed." }
-      format.json { head :no_content }
-    end
   end
 
   private

@@ -92,9 +92,9 @@ class MypageController < ApplicationController
     @image = Image.new()
     @images = @current_user.all_images
     @blur_level = UtilitiesController::BLUR_LEVEL
-    render({
-      :template => "mypage/upload",
-    })
+    return render({
+             :template => "mypage/upload",
+           })
   end
 
   def completed_uploading
@@ -159,9 +159,9 @@ class MypageController < ApplicationController
                         :template => "mypage/upload",
                       })
       else
-        render ({
-          :template => "mypage/upload",
-        })
+        return render ({
+                        :template => "mypage/upload",
+                      })
       end
     rescue => error
       logger.error error
@@ -251,9 +251,9 @@ class MypageController < ApplicationController
 
   private
 
-  ##########################################
+  # ----------------------------------------
   # マイページへはログイン済みユーザーのみ許可
-  ##########################################
+  # ----------------------------------------
   def login_check
     if self.logged_in? != true
       return redirect_to(login_url)

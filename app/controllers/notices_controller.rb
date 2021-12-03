@@ -26,8 +26,6 @@ class NoticesController < ApplicationController
       :is_browsed => UtilitiesController::BINARY_TYPE[:on],
     })
 
-    pp @logs
-
     return render :template => "notices/index"
   rescue => error
     logger.info error.backtrace

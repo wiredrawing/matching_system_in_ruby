@@ -19,7 +19,7 @@ class ApplicationController < ActionController::Base
   # 性別リスト一覧を取得する
   # ---------------------------------------------
   def genders
-    @genders = Constants::Gender::LIST.map do |gender|
+    @genders = Constants::Gender::List.map do |gender|
       next [
              gender[:value],
              gender[:id],
@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
   # 言語リスト一覧を取得する
   # ---------------------------------------------
   def languages
-    @languages = Constants::Language::LIST.map do |lang|
+    @languages = Constants::Language::List.map do |lang|
       next [
              lang[:value],
              lang[:id],

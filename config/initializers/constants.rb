@@ -3,7 +3,7 @@ module Constants
   # 性別リスト
   # ---------------------------------------------
   module Gender
-    LIST = [
+    List = [
       {
         :id => 0,
         :value => "未設定(required)",
@@ -33,7 +33,7 @@ module Constants
 
     # 定数として設定する
     TYPE = {}
-    self::LIST.map do |gender|
+    self::List.map do |gender|
       TYPE[gender[:type]] = gender[:id]
     end
   end
@@ -42,7 +42,7 @@ module Constants
   # 対応言語一覧
   # ---------------------------------------------
   module Language
-    LIST = [
+    List = [
       { :id => 0, :value => "未設定" },
       { :id => 1, :value => "日本語" },
       { :id => 2, :value => "英語" },

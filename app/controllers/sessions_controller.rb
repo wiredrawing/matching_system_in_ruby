@@ -1,9 +1,5 @@
 class SessionsController < ApplicationController
   def new
-    # pp "########################################"
-    # p "ミドルウェアで設定した内容"
-    # pp request.env["registered_members"]
-    # p "ミドルウェアで設定した内容"
     @login = Login.new()
     render(
       :template => "sessions/new",
@@ -38,17 +34,12 @@ class SessionsController < ApplicationController
 
     # Reforge the token to request for api, and update record of login user's info.
     new_token = TokenForApi.make_random_token(128)
-    p new_token
 
     response = @member.update({
       :token_for_api => new_token,
     })
-    p response
-    pp @member
-    p new_token
+
     if response != true
-      p "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-      p response
       raise StandardError.new "ログインに失敗しました"
     end
 
@@ -56,9 +47,8 @@ class SessionsController < ApplicationController
     self.login(@member)
     return redirect_to(mypage_url)
   rescue => error
-    p error
     # When failed logging in.
-    render :template => "sessions/new"
+    return render :template => "sessions/new"
   end
 
   # ログインページはログイン状態が不要なためoverride
