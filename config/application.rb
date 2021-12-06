@@ -13,6 +13,8 @@ Bundler.require("rmagick")
 Bundler.require("kaminari")
 Bundler.require("uri")
 Bundler.require("fileutils")
+Bundler.require("hirb")
+Bundler.require("hirb-unicode")
 
 module MatchingSystem
   class Application < Rails::Application

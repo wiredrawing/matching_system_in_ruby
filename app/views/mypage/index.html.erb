@@ -45,7 +45,7 @@
         <p class="number">
           <a href="<%= mypage_informing_likes_url() %>">
             <!-- 有効ないいね件数のみを取得する -->
-            <%= @current_user.informing_valid_likes().length %>
+            <%= @current_user.informing_likes.valid_likes(@current_user).length %>
           </a>
         </p>
       </div>
@@ -53,7 +53,7 @@
         <p>もらったGood</p>
         <p class="number">
           <a href="<%= mypage_getting_likes_url() %>">
-            <%= @current_user.getting_valid_likes.length %>
+            <%= @current_user.getting_likes.valid_likes(@current_user).length %>
           </a>
         </p>
       </div>

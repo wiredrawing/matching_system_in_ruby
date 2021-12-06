@@ -2,10 +2,8 @@ class MypageController < ApplicationController
   before_action :login_check
 
   def index
-    pp @current_user
-
     # 有効なマッチング済みメンバー
-    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members)
+    @matching_members = @current_user.matching_members(@current_user.id, @current_user.forbidden_members)
 
     # ブロック中のユーザー
     @declining_member_id_list = Decline.fetch_blocking_members(@current_user.id).map do |member|
@@ -89,9 +87,9 @@ class MypageController < ApplicationController
 
   # 画像アップロード処理
   def upload
-    @image = Image.new()
-    @images = @current_user.all_images
-    @blur_level = UtilitiesController::BLUR_LEVEL
+    # @image = Image.new()
+    # @images = @current_user.all_images
+    # @blur_level = UtilitiesController::BLUR_LEVEL
     return render({
              :template => "mypage/upload",
            })
@@ -213,7 +211,7 @@ class MypageController < ApplicationController
 
   # マッチング済み一覧ページ
   def matching
-    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members)
+    @matching_members = @current_user.matching_members(@current_user.id, @current_user.forbidden_members)
   end
 
   # ブロック中一覧ページ

@@ -32,9 +32,9 @@ module Constants
     ]
 
     # 定数として設定する
-    TYPE = {}
+    Type = {}
     self::List.map do |gender|
-      TYPE[gender[:type]] = gender[:id]
+      Type[gender[:type]] = gender[:id]
     end
   end
 

@@ -5,6 +5,17 @@ class Timeline < ApplicationRecord
   #   TimelineBroadcastJob.perform_later(self)
   # end
 
+  # 指定したマッチングでのやり取りを取得する
+  scope :each_other, ->from_member_id, to_member_id {
+          where({
+            :from_member_id => from_member_id,
+            :to_member_id => to_member_id,
+          }).or(self.where({
+            :from_member_id => to_member_id,
+            :to_member_id => from_member_id,
+          }))
+        }
+
   # 送信者
   has_one :from_member, :class_name => "Member", :foreign_key => :id, :primary_key => :from_member_id
 
@@ -18,8 +29,8 @@ class Timeline < ApplicationRecord
   has_one :image, -> do
             # ラムダ記法で記述
             where({
-              :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-              :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+              :is_displayed => Constants::Binary::Type[:on],
+              :is_deleted => Constants::Binary::Type[:off],
             })
           end, **{ :class_name => "Image", :foreign_key => :id, :primary_key => :image_id }
 
@@ -74,10 +85,9 @@ class Timeline < ApplicationRecord
   end
 
   def browsed
-    if self.is_browsed == UtilitiesController::BINARY_TYPE[:on]
+    if self.is_browsed == Constants::Binary::Type[:on]
       return "既読"
-    else
-      return "未読"
     end
+    return "未読"
   end
 end

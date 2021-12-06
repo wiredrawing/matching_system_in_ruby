@@ -68,6 +68,7 @@ class Log < ApplicationRecord
       return nil
     end
   rescue => error
-    p error.message
+    logger.into(error)
+    return nil
   end
 end

@@ -23,52 +23,58 @@ class MembersController < ApplicationController
     @disable_access_members = @members_you_block + @members_blocking_you
     # 異性のmembers一覧を取得する
     @members = Member.hetero_members(@current_user, @declining_member_id_list, search_params).page(params[:page])
+
+    if (@members.length === 0)
+      raise StandardError.new "マッチする検索結果が見つかりませんでした"
+    end
+  rescue => error
+    # error.full_message => 何故か<Encoding:ASCII-8BIT>のため､viewに表示できない
+    @error_message = error.message
+    return render :template => "errors/index"
   end
 
   # 指定した任意のmember_idの情報を表示する
   def show
-    begin
-      if @current_user.browsable?(params[:id]) != true
-        raise StandardError.new "このメンバーを閲覧できません"
-      end
-      @is_yourself = false
-
-      # 閲覧中ユーザーがログインユーザーかどうか?
-      if params[:id].to_i == @current_user.id.to_i
-        @is_yourself = true
-        @member = Member.find params[:id]
-      else
-        # 自身以外のプロフィールを閲覧している場合
-        # ブロックしていないかどうかをチェック
-        declining = Decline.where({
-          :from_member_id => @current_user.id,
-          :to_member_id => params[:id],
-        }).first()
-
-        if declining != nil
-          raise StandardError.new("このメンバーをブロックしています")
-        end
-
-        # ブロックされていないかどうかをチェック
-        declined = Decline.where({
-          :from_member_id => params[:id],
-          :to_member_id => current_user.id,
-        }).first()
-
-        if declined != nil
-          raise StandardError.new("このメンバーからブロックされています")
-        end
-
-        @member = Member.showable_member(@current_user, params[:id])
-        # 表示可能な画像一覧のみ
-        @images = @member.showable_images
-      end
-    rescue => error
-      logger.info(error)
-      return render({
-               :template => "members/error",
-             })
+    if @current_user.browsable?(params[:id]) != true
+      raise StandardError.new "このメンバーを閲覧できません"
     end
+    @is_yourself = false
+
+    # 閲覧中ユーザーがログインユーザーかどうか?
+    if params[:id].to_i == @current_user.id.to_i
+      @is_yourself = true
+      @member = Member.find params[:id]
+    else
+      # 自身以外のプロフィールを閲覧している場合
+      # ブロックしていないかどうかをチェック
+      declining = Decline.where({
+        :from_member_id => @current_user.id,
+        :to_member_id => params[:id],
+      }).first()
+
+      if declining != nil
+        raise StandardError.new("このメンバーをブロックしています")
+      end
+
+      # ブロックされていないかどうかをチェック
+      declined = Decline.where({
+        :from_member_id => params[:id],
+        :to_member_id => current_user.id,
+      }).first()
+
+      if declined != nil
+        raise StandardError.new("このメンバーからブロックされています")
+      end
+
+      @member = Member.showable_member(@current_user, params[:id])
+      # 表示可能な画像一覧のみ
+      @images = @member.showable_images
+    end
+  rescue => error
+    logger.info(error)
+    return render({
+             :template => "members/error",
+           })
   end
 
   # --------------------------------------------

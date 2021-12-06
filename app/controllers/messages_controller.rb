@@ -3,7 +3,7 @@ class MessagesController < ApplicationController
 
   # 現時点で､メッセージ可能なメンバーリストを表示
   def index
-    @matching_members = Like.fetch_matching_members(@current_user.id, @current_user.forbidden_members).to_a.map do |member|
+    @matching_members = @current_user.matching_members(@current_user.id, @current_user.forbidden_members).to_a.map do |member|
       next member.id
     end
 
@@ -23,7 +23,7 @@ class MessagesController < ApplicationController
   end
 
   def talk
-    @matching_members = Like.fetch_matching_members(@current_user.id).map do |member|
+    @matching_members = @current_user.matching_members(@current_user.id, @current_user.forbidden_members).map do |member|
       next member.id
     end
     if @matching_members.include?(params[:id].to_i) != true

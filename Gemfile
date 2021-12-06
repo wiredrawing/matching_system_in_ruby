@@ -30,6 +30,10 @@ gem 'mini_magick'
 
 gem 'kaminari'
 
+gem 'hirb'
+
+gem 'hirb-unicode'
+
 gem 'activerecord-session_store'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'

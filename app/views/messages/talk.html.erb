@@ -119,9 +119,6 @@
             if (response.data.status === true) {
               this.timelines = response.data.response
             }
-  
-  
-            // this.timelines = response.data
           });
         },
         // 過去のメッセージリストを取得
@@ -143,13 +140,13 @@
             } else {
               return false
             }
-  
+
             // console.log("=====================================>>")
             // console.log(response);
             // console.log(this.timelines);
             // this.timelines = this.timelines.splice(0, 0, response.data.response)
             // console.log(this.timelines);
-  
+
             // this.timelines.concat(response.data.response);
             // this.timelines = response.data.concat(this.timelines)
           });
@@ -171,13 +168,12 @@
             }
           }
           axios.post(this.requestUrl.value, postData, options).then((response) => {
-  
             if (response.data.status === true) {
-              let timeline = response.data.response.timeline;
-              this.timelines.push(timeline);
-              console.log(response);
+              let timelines = response.data.response.timelines;
+              timelines.forEach((timeline) => {
+                this.timelines.push(timeline);
+              });
               this.message.value = "";
-              // this.fetchTimelines();
             } else {
               console.log(response.data.response);
               throw new Error(response.data.response)
@@ -200,7 +196,7 @@
             this.file_resorce = URL.createObjectURL(files[0]);
           }
           reader.readAsBinaryString(files[0])
-  
+
           console.log(files);
         },
         uploadSelectedFile: function() {

@@ -19,15 +19,18 @@ class Api::TimelinesController < ApplicationController
       raise ActiveModel::ValidationError.new @token_check
     end
 
-    @timeline_id_list = Timeline.where({
-      :from_member_id => params[:from_member_id].to_i,
-      :to_member_id => params[:to_member_id].to_i,
-    }).or(Timeline.where({
-      :from_member_id => params[:to_member_id].to_i,
-      :to_member_id => params[:from_member_id].to_i,
-    })).map do |timeline|
+    @timeline_id_list = Timeline.each_other(params[:from_member_id].to_i, params[:to_member_id].to_i).map do |timeline|
       next timeline.id
     end
+    # @timeline_id_list = Timeline.where({
+    #   :from_member_id => params[:from_member_id].to_i,
+    #   :to_member_id => params[:to_member_id].to_i,
+    # }).or(Timeline.where({
+    #   :from_member_id => params[:to_member_id].to_i,
+    #   :to_member_id => params[:from_member_id].to_i,
+    # })).map do |timeline|
+    #   next timeline.id
+    # end
 
     @timelines = Timeline.includes(
       :image,
@@ -98,11 +101,14 @@ class Api::TimelinesController < ApplicationController
 
   # メッセージの投稿
   def create_message
+    # 作成したtimeline_idの配列
+    @timeline_id_list = []
+    # エラー配列
+    @errors = []
     # Start transaction.
     ActiveRecord::Base.transaction do
       # メッセージからURLを抜き出す
       @urls = URI.extract(create_message_params[:message])
-
       @message_to_timeline = MessageToTimeline.new ({
         :from_member_id => create_message_params[:from_member_id].to_i,
         :to_member_id => create_message_params[:to_member_id].to_i,
@@ -118,6 +124,7 @@ class Api::TimelinesController < ApplicationController
         :member_id => create_message_params[:from_member_id],
         :message => create_message_params[:message],
       }
+
       @message = Message.new(new_message)
       if @message.validate() != true
         # errors = @message.errors.messages
@@ -135,6 +142,7 @@ class Api::TimelinesController < ApplicationController
         :to_member_id => create_message_params[:to_member_id],
         :message_id => @message.id,
       )
+
       if @timeline.validate() != true
         raise StandardError.new "タイムラインのバリデーションに失敗しました"
       end
@@ -142,6 +150,8 @@ class Api::TimelinesController < ApplicationController
       if response != true
         raise StandardError.new "タイムラインの作成に失敗しました"
       end
+
+      @timeline_id_list.push(@timeline.id)
 
       # ---------------------------------------------------------
       # メッセージ中にURLが含まれる場合
@@ -185,6 +195,8 @@ class Api::TimelinesController < ApplicationController
             if response != true
               raise StandardError.new "タイムラインの作成に失敗しました"
             end
+
+            @timeline_id_list.push(@timeline.id)
           end
         end
       end
@@ -195,6 +207,7 @@ class Api::TimelinesController < ApplicationController
         :to_member_id => create_message_params[:to_member_id].to_i,
         :action_id => UtilitiesController::ACTION_ID_LIST[:message],
       })
+
       if @log.validate() != true
         raise ActiveModel::ValidationError.new @log
       end
@@ -204,14 +217,43 @@ class Api::TimelinesController < ApplicationController
       end
     end
 
+    @timelines = Timeline.includes(
+      :image,
+      :message,
+      :url,
+      :from_member,
+      :to_member,
+    ).where({
+      :id => @timeline_id_list,
+    }).order(
+      :created_at => :desc,
+    )
+
+    if @timelines.first == nil
+      @errors.push("メッセージのやりとりは有りません")
+      raise StandardError.new @errors
+    end
+
+    # メッセージをIDのasc順に再度並び替え
+    @timelines = @timelines.sort do |a, b|
+      if a.id > b.id
+        next 1
+      elsif a.id < b.id
+        next -1
+      else
+        next 0
+      end
+    end
+
     # pp @timeline.methods
     json_response = {
       :status => true,
       :response => {
-        :timeline => @timeline,
+        :timelines => @timelines,
       },
     }
-    return render :json => json_response
+
+    return render({ :json => json_response })
   rescue ActiveModel::ValidationError => error
     logger.info error.model.errors.messages
     json_response = {
@@ -220,7 +262,15 @@ class Api::TimelinesController < ApplicationController
     }
     return render({ :json => json_response })
   rescue => exception
+    p "\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\"
+    p exception
+    p exception.class
     logger.error exception
+    json_response = {
+      :status => false,
+      :response => exception.message,
+    }
+    return render({ :json => json_response })
   end
 
   # 画像の投稿

@@ -20,8 +20,8 @@ class Image < ApplicationRecord
 
   showable_for_scope = -> {
     where({
-      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      :is_displayed => Constants::Binary::Type[:on],
+      :is_deleted => Constants::Binary::Type[:off],
     })
   }
 

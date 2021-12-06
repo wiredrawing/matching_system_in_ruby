@@ -1,10 +1,11 @@
 class Member < ApplicationRecord
   attribute :forbidden_members
-  attribute :informing_valid_likes
-  attribute :getting_valid_likes
+  # attribute :informing_valid_likes
+  # attribute :getting_valid_likes
   attribute :timeline_created_at, :datetime
   attribute :native_language_string
   attribute :interested_languages_string
+  # attribute :matching_members
   # attribute :year, :datetime
   # attribute :month, :datetime
   # attribute :day, :datetime
@@ -31,6 +32,7 @@ class Member < ApplicationRecord
       where.not(:to_member_id => current_user.forbidden_members)
     end
   end
+
   # 自身をブロックしているユーザー
   has_many(:declined, :class_name => "Decline", :foreign_key => :to_member_id)
   # 自身がブロックしているユーザー
@@ -38,8 +40,8 @@ class Member < ApplicationRecord
   # メンバーが公開中にしているアップロード画像
   has_many(:showable_images, lambda do
     where({
-      :is_displayed => UtilitiesController::BINARY_TYPE[:on],
-      :is_deleted => UtilitiesController::BINARY_TYPE[:off],
+      :is_displayed => Constants::Binary::Type[:on],
+      :is_deleted => Constants::Binary::Type[:off],
       :use_type => UtilitiesController::USE_TYPE_LIST[:profile],
     }).order(:created_at => :desc)
   end, **{
@@ -54,13 +56,13 @@ class Member < ApplicationRecord
   # 自身が送信したtimeline
   has_many(:send_timelines, :class_name => "Timeline", :foreign_key => :from_member_id, :primary_key => :id)
   # メンバーがアップロードした全画像
-  has_many :all_images,
-           -> {
-             self.order({
-               :created_at => :desc,
-               :updated_at => :desc,
-             })
-           }, **{ :class_name => "Image", :foreign_key => :member_id }
+  # has_many :all_images,
+  #          -> {
+  #            self.order({
+  #              :created_at => :desc,
+  #              :updated_at => :desc,
+  #            })
+  #          }, **{ :class_name => "Image", :foreign_key => :member_id }
 
   # 自身に送信されたメッセージ一覧を取得する
   has_many :getting_timeline,
@@ -101,7 +103,7 @@ class Member < ApplicationRecord
 
     # 検索条件のベース条件
     @members = self.left_joins(:interested_languages).where({
-      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :is_registered => Constants::Binary::Type[:on],
     }).and(
       self.where.not({
         :id => exculded_members,
@@ -179,7 +181,7 @@ class Member < ApplicationRecord
   # member情報を返却する
   def self.showable_member(current_user = nil, member_id = 0)
     _member = self.where({
-      :is_registered => UtilitiesController::BINARY_TYPE[:on],
+      :is_registered => Constants::Binary::Type[:on],
       :id => member_id,
     }).and(
       self.where.not({
@@ -202,8 +204,8 @@ class Member < ApplicationRecord
 
   # 利用規約への同意
   validates_each :agree do |object, attribute, data|
-    if object.is_registered != UtilitiesController::BINARY_TYPE[:on]
-      if data == nil || (data.to_i != UtilitiesController::BINARY_TYPE[:on])
+    if object.is_registered != Constants::Binary::Type[:on]
+      if data == nil || (data.to_i != Constants::Binary::Type[:on])
         object.errors.add(attribute, "使用規約に同意する必要があります")
         next false
       end
@@ -255,7 +257,8 @@ class Member < ApplicationRecord
 
   # 母国語の選択
   validates_each :native_language do |object, attribute, value|
-    if value.to_i > UtilitiesController::BINARY_TYPE[:off]
+    if value.to_i > Constants::Binary::Type[:off]
+      # if value.to_i > UtilitiesController::BINARY_TYPE[:off]
       next true
     end
     object.errors.add(attribute, "母国語を選択して下さい")
@@ -435,12 +438,12 @@ class Member < ApplicationRecord
     return false
   end
 
-  ##########################################
+  # -----------------------------------------------------
   # 指定したユーザーとマッチしているかどうか?
-  ##########################################
+  # -----------------------------------------------------
   def match_you?(member_id)
     # Have you gotten likes from member_id?
-    getting_like = self.getting_likes.where({
+    getting_likes = self.getting_likes.where({
       :from_member_id => member_id,
       :to_member_id => self.id,
     }).first()
@@ -451,18 +454,18 @@ class Member < ApplicationRecord
       :to_member_id => member_id,
     }).first()
 
-    if getting_like != nil && informing_likes != nil
+    if getting_likes != nil && informing_likes != nil
       return true
     else
       return false
     end
   end
 
-  ##########################################
+  # -----------------------------------------------------------
   # 指定したユーザーにブロックされてないかしていないか?
   # You can browse member info which you selected, if return true on this method.
   # if return value is false, you cannot browse this member info.
-  ##########################################
+  # -----------------------------------------------------------
   def browsable?(member_id)
 
     # Does login user decline selected member?
@@ -485,25 +488,25 @@ class Member < ApplicationRecord
     return true
   end
 
-  # 自身が贈った現時点で有効なlike
-  def informing_valid_likes
-    valid_likes = Array.new()
-    likes = self.informing_likes.map do |like|
-      next like.to_member_id
-    end
-    valid_likes = likes - self.forbidden_members
-    return valid_likes
-  end
+  # # 自身が贈った現時点で有効なlike
+  # def informing_valid_likes
+  #   valid_likes = Array.new()
+  #   likes = self.informing_likes.map do |like|
+  #     next like.to_member_id
+  #   end
+  #   valid_likes = likes - self.forbidden_members
+  #   return valid_likes
+  # end
 
-  # 自身がもらった現時点で有効なlike
-  def getting_valid_likes
-    valid_likes = Array.new()
-    likes = self.getting_likes.map do |like|
-      next like.from_member_id
-    end
-    valid_likes = likes - self.forbidden_members
-    return valid_likes
-  end
+  # # 自身がもらった現時点で有効なlike
+  # def getting_valid_likes
+  #   valid_likes = Array.new()
+  #   likes = self.getting_likes.map do |like|
+  #     next like.from_member_id
+  #   end
+  #   valid_likes = likes - self.forbidden_members
+  #   return valid_likes
+  # end
 
   # アクセスできないメンバー一覧
   def forbidden_members
@@ -525,6 +528,10 @@ class Member < ApplicationRecord
 
   def native_language_string
     @native_language_string = ""
+    # attributeを取得しない場合
+    if self.respond_to?(:native_language) != true
+      return nil
+    end
     Constants::Language::List.each do |lang|
       if self.native_language == lang[:id]
         @native_language_string = lang[:value]
@@ -571,5 +578,32 @@ class Member < ApplicationRecord
       return (Time.new.strftime("%Y%m%d").to_i - self.birthday.strftime("%Y%m%d").to_i) / 10000
     end
     return "?"
+  end
+
+  def matching_members(member_id, forbidden_members = [])
+    # Fetch likes which logged in user send.
+    informing_likes = Like.select(:to_member_id).where({
+      :from_member_id => member_id,
+    }).to_a.map do |like|
+      next like.to_member_id.to_i
+    end
+
+    # ログインユーザーがいいねしたメンバーが自身をいいねしているかどうか
+    getting_likes = Like.select(:from_member_id).where({
+      :to_member_id => member_id,
+    }).to_a.map do |like|
+      next like.from_member_id.to_i
+    end
+
+    # 双方いいねしている場合かつ､ブロックしてない且つされていないメンバーを取得
+    matching_members = getting_likes & informing_likes
+    matching_members = Member.where({
+      :id => matching_members,
+    }).and(
+      Member.where.not({
+        :id => forbidden_members,
+      })
+    )
+    return (matching_members)
   end
 end

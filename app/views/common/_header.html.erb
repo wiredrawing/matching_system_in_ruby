@@ -53,8 +53,9 @@
           </div>
           <!--side_profile1-->
           <div class="side_profile2">
-            <a href="<%= mypage_getting_likes_url() %>" class="side_profile2b"><%= @current_user.getting_likes.length %> もらったGood</a>
-            <a href="<%= mypage_matching_url() %>" class="side_profile2a"><%= @current_user.informing_likes.length %> 相互マッチ</a>
+            <a href="<%= mypage_getting_likes_url() %>" class="side_profile2b"><%= @current_user.getting_likes.valid_likes(@current_user).length %> もらったLIKE</a>
+            <a href="<%= mypage_informing_likes_url() %>" class="side_profile2a"><%= @current_user.informing_likes.valid_likes(@current_user).length %> 贈ったLIKE</a>
+            <a href="<%= mypage_matching_url() %>" class="side_profile2a"><%= @current_user.informing_likes.length %> 相互LIKE</a>
           </div>
           <!--side_profile2-->
         </div>

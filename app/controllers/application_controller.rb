@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  Hirb.enable()
   # helperの読み込み
   include SessionsHelper
   include RegisterHelper
