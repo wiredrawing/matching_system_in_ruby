@@ -88,7 +88,7 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
 ## postgresql依存ライブラリをインストール
 
 ```
-sudo apt install libpg-dev
+sudo apt install libpq-dev
 
 ```
 
@@ -96,13 +96,17 @@ sudo apt install libpg-dev
 
 ```
 # RMagickインストール時に必要?
-sudo apt install pgk-config
+sudo apt install pkg-config
 
 sudo apt install imagemagick
 
 # ImageMagickのdevelパッケージ?
 # このパッケージをインストールすると MagickCore.pc というファイルがインストールされそう｡
 sudo apt install libmagickwand-dev
+
+
+# sqliteに必要
+apt install libsqlite3-dev
 
 ```
 
