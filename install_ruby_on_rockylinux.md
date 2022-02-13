@@ -95,6 +95,46 @@ dnf install ImageMagick-devel
 
 ```
 
+## PowerTools リポジトリを設定してインストール
+
+**参考例**
+**https://tech-blog.s-yoshiki.com/entry/206**
+
+```
+cd /etc/yum.repos.d/
+
+cat Rocky-PowerTools.repo
+
+# # Rocky-PowerTools.repo
+# #
+# # The mirrorlist system uses the connecting IP address of the client and the
+# # update status of each mirror to pick current mirrors that are geographically
+# # close to the client.  You should use this for Rocky updates unless you are
+# # manually picking other mirrors.
+# #
+# # If the mirrorlist does not work for you, you can try the commented out
+# # baseurl line instead.
+#
+# [powertools]
+# name=Rocky Linux $releasever - PowerTools
+# mirrorlist=https://mirrors.rockylinux.org/mirrorlist?arch=$basearch&repo=PowerTools-$releasever
+# #baseurl=http://dl.rockylinux.org/$contentdir/$releasever/PowerTools/$basearch/os/
+# gpgcheck=1
+# enabled=0
+# gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
+
+# 上記のような内容が記載されているため､
+# enabled=0 => enabled=1
+# と修正する
+
+dnf install epel-release
+
+dnf update
+
+# 上の通りコマンドを実行する
+# 以上で,ImageMagick-develがインストールできるようになる
+
+```
 
 
 # rbenv関係
@@ -140,7 +180,9 @@ eval "$(rbenv init - bash)"
 ```
 rbenv init  >> ~/.bash_profile  2>&1
 
+source ~/.bash_profile
 # 上記コマンドで rbenv init の実行結果が追記される
+
 ```
 
 ## rbenvでインストール可能なRubyのバージョンを確認
