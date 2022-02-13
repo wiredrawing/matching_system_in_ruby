@@ -57,6 +57,46 @@ dnf install openssl-devel
 
 ```
 
+## Rmagick用依存ライブラリのインストール
+
+```
+dnf install ImageMagick ImageMagick-devel
+
+# どうもRMagickをインストールするためにはPowerToolsが必要らしい...
+# https://ja.linuxcapable.com/enable-powertools-repository-on-rocky-linux-8/
+
+```
+
+## PowerToolsのインストール
+
+> 必要な依存関係をインストールする
+> PowerToolsリポジトリを正常に有効にするには、次の依存関係が必要です。
+> これはデフォルトですでにインストールされているはずですが、
+> コマンドを実行して確認してください。
+
+```
+dnf install dnf-plugins-core
+# 上記をインストールすることで
+# dnf config-manager というコマンドを実行できるようになる
+
+
+＃ 上記コマンド実行後､以下コマンドを実行する
+sudo dnf config-manager --set-enabled powertools
+
+＃ 続いて､powertoolsが有効なことを確認する
+dnf repolist | grep powertools
+
+# [root@387a48353afb ~]# dnf repolist | grep powertools
+# powertools         Rocky Linux 8 - PowerTools
+# リポジトリが有効になっていることを確認
+
+＃ 以上を実行した上で､再度 ImageMagickの開発用パッケージをインストールする
+dnf install ImageMagick-devel
+
+```
+
+
+
 # rbenv関係
 
 ## rbenvのリポジトリをクローン
@@ -98,7 +138,7 @@ eval "$(rbenv init - bash)"
 メッセージの通り .bash_profileに追記する｡
 
 ```
-rbenv init  >> .bash_profile  2>&1
+rbenv init  >> ~/.bash_profile  2>&1
 
 # 上記コマンドで rbenv init の実行結果が追記される
 ```
