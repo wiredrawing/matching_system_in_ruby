@@ -4,56 +4,32 @@
 
 ## パッケージのアップデート
 
-```
-dnf update
-# epel-releaseのインストール
-dnf install epel-release
+**epel-releaseのインストール**
 
 ```
-
-## gitコマンドのインストール
-
-### rockylinuxのdockerコンテナはビルド直後はgitがインストールされていないためインストールをおこなう
-
-```
-dnf install git
-
-# ついでにwhichコマンドもインストールする
-
-dnf install which
+dnf install -y epel-release && dnf update -y
 
 ```
 
-## bzip2のインストール
+## Rubyのビルドに必要なパッケージをインストール
+
 
 ```
-# rubyのビルドに必要なため
-dnf install bzip2
-```
-
-## Cコンパイラをインストール
-
-```
-# こちらもrubyのコンパイルに必要なため
-dnf install gcc
-```
-
-## makeコマンドのインストール
+dnf install -y git \
+which \
+bzip2 \
+gcc-c++ \
+make \
+openssl-devel \
+sqlite sqlite-devel
 
 ```
-# 同じくmake処理に必要なため
-dnf install make
+## Gem pgをインストールするためpostgresqlの開発用パッケージをインストール
+
+**Postgresqlへの接続に必要なため**
 
 ```
-
-## opensslのインストール
-
-```
-# ビルドが失敗し､ビルドログに
-# `require': cannot load such file -- openssl (LoadError)
-# 上記の様なエラーがでていた場合は､以下コマンドを実行
-
-dnf install openssl-devel
+dnf install -y postgresql-devel
 
 ```
 
@@ -67,6 +43,7 @@ dnf install ImageMagick ImageMagick-devel
 
 ```
 
+
 ## PowerToolsのインストール
 
 > 必要な依存関係をインストールする
@@ -75,13 +52,13 @@ dnf install ImageMagick ImageMagick-devel
 > コマンドを実行して確認してください。
 
 ```
-dnf install dnf-plugins-core
+dnf install -y dnf-plugins-core
 # 上記をインストールすることで
 # dnf config-manager というコマンドを実行できるようになる
 
 
 ＃ 上記コマンド実行後､以下コマンドを実行する
-sudo dnf config-manager --set-enabled powertools
+dnf config-manager --set-enabled powertools
 
 ＃ 続いて､powertoolsが有効なことを確認する
 dnf repolist | grep powertools
@@ -91,7 +68,7 @@ dnf repolist | grep powertools
 # リポジトリが有効になっていることを確認
 
 ＃ 以上を実行した上で､再度 ImageMagickの開発用パッケージをインストールする
-dnf install ImageMagick-devel
+dnf install -y ImageMagick ImageMagick-devel
 
 ```
 
