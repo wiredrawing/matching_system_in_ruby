@@ -86,6 +86,7 @@ ActiveRecord::Schema.define(version: 2021_11_21_045501) do
     t.text "message"
     t.text "memo"
     t.string "token"
+    t.string "completed_token"
     t.string "token_for_api"
     t.string "password_digest"
     t.integer "native_language"

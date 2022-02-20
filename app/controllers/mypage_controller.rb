@@ -39,6 +39,7 @@ class MypageController < ApplicationController
     @day_list = UtilitiesController::fetch_day_list
 
     @member = Member.find(self.current_user.id)
+
     @member.attributes = member_params_to_update
 
     if @member.validate() == true
@@ -58,7 +59,10 @@ class MypageController < ApplicationController
         end
       end
 
-      redirect_to mypage_url
+      # プロフィール編集完了後は完了ページへ画面遷移
+      return render({
+               :template => "mypage/completed_updating",
+             })
     else
       return render({ :template => "mypage/edit" })
     end
@@ -262,6 +266,8 @@ class MypageController < ApplicationController
 
   # プロフィール情報の更新時の許可リスト
   def member_params_to_update
+    # プロフィール完了フラグ用のuuidを生成
+    completed_token = SecureRandom.uuid()
     params.fetch(:member, {}).permit(
       :display_name,
       :family_name,
@@ -276,7 +282,10 @@ class MypageController < ApplicationController
       :month,
       :day,
       :languages => [],
-    ).merge(:birthday => params[:member][:year] + "-" + params[:member][:month] + "-" + params[:member][:day])
+    ).merge({
+      :birthday => params[:member][:year] + "-" + params[:member][:month] + "-" + params[:member][:day],
+      :completed_token => completed_token,
+    })
   end
 
   # パスワード変更用のparams

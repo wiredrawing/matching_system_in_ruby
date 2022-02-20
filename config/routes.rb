@@ -148,7 +148,10 @@ Rails.application.routes.draw do
   # ----------------------------------------------
   # マイページ関連
   # ----------------------------------------------
-  get "/mypage", { :to => "mypage#index" }
+  get "/mypage", {
+    :to => "mypage#index",
+    :as => "mypage",
+  }
   get "/mypage/edit", { :to => "mypage#edit" }
   patch "/mypage/edit", { :to => "mypage#update" }
   # 画像のぼかし具合を設定

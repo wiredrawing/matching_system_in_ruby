@@ -15,6 +15,7 @@ class CreateMembers < ActiveRecord::Migration[6.1]
       t.text :message
       t.text :memo
       t.string :token
+      t.string(:completed_token)
       t.string :token_for_api
       t.string :password_digest
       t.integer :native_language
